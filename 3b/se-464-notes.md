@@ -19,3 +19,17 @@
     - about algorithms
     - about data structures
 
+
+
+## Readings
+
+###[What should a Software Engineering Course look like?](http://tomasp.net/blog/2019/software-engineering/)
+
+- SE has become a course trying to cover whatever methods and tools the industry needs; not practical (keep changing)
+- what about SE will still be relevant in 100 years?
+- what are the mortifications that led to ideas like waterfall and agile? (agile = need for more rapid response)
+- what was the context in which UML appeared? Metaphor or an architect who designs a master rplan for a system
+- believes that universities should teach historically situated software engineering as it provides a framework for critical thinking about software engineering, and past examples to guide this thinking
+
+
+

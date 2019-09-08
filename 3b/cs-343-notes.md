@@ -1,5 +1,7 @@
 # CS 343: Concurrent and Parallel Programming
 
+## Intro
+
 - Peter Buhr
 - website: https://www.student.cs.uwaterloo.ca/~cs343/people.shtml
 - office: DC 2504
@@ -11,6 +13,31 @@
 - see sample code-files; don't need to cite [link](https://www.student.cs.uwaterloo.ca/~cs343/codeExamples.shtml)
 - c++17, gcc 9 for microC++
 
+## Review
+
+- routine documentation; comments to give overview AND to explain tricky portions of the code
+- variables should be accompanied by a comment describing their purpose if that is not obvious
+- Group of statements performing a non-trivial task should be preceded by a comment summarizing that task
+- always use modularity - break down code into its functional components
+- routine should perform exactly one operation
+- for command line operations: must handle errors, print messages, and terminate
+- ==premature optimization is the root of all evil==
+- align comments at a particular column
+- Global macros and types are allowed while global variables are strongly discouraged
+- one situation where global variables can be used: simulation a module or package
+- ==dynamic allocation must only be used when a variable's storage must outlive the block in which it is allocated OR for dynamic allocation of objects where you must use the constructor and pass in a param==
+- use `const float PI = 3.14` instead of `#define PI3.14`
+- closing brackets must start on a separate line, ==good habbit to leabel them== like `} // end if`
+- ++, -- can only be used as statements, they cannot be used as part of expressions
+- prefer += 1 to ++ etc
+- only use `this` if you have to
+
+```
+// instead of this (which is illegal)
+[x, y] = f(a, b)
+do f(&x, &y, a, b) and set x's, y's values there
+```
+
 ***
 
 ## Chapter 0: Intro
@@ -20,6 +47,8 @@
     - Moore's laws: every 18 months you can double the number of transistors
     - can't make them run faster (speed of light, heat); use more cores
     - can't keep writing sequential programs
+
+****
 
 ## Chapter 1: Control Flow (Review)
 
