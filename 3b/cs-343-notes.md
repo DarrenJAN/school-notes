@@ -159,7 +159,10 @@ void small_routine() {
 }
 ```
 
-### Dynamic Multi-Level Exit
+
+
+## Chapter 2: Dynamic Multi-Level Exit
+
 - routine activation (call, invocation) has complex control flow
 - among routines (h calls g calls f returns to g returns to h)
 - cannot return from f to h directly ??????
@@ -182,5 +185,94 @@ B1: for ...
     w = rtn()
 ```
 
+- example of ==non-local transfer==
+  - h calls g calls f
+  - h wants to set a place that f will transfer back to (recall: labels are local scope) (we can skip g)
+  - but what you can do is have a global variable label
+  - these labels are constants; at compile time it knows where to go; this is why using a variable label helps you change where to go at compile time
+  - sometimes we can have recursive functions. if L1 is declared in the recursive function h, then there are multiple L1 variables that have been declared! in which frame do you go? but what if you set the variable only on the 6th recursive call? this means you want to transfer to the L1 in the 6th call, and skip the first 5
+  - also, when g (which is recursive) gets skipped as f skips over it to h, then f will skip over ALL recursive calls of g
+  - so, we also need to store the FRAME on the STACK for the variable (location within the frame) then you know where to jump to
+  - if you're in C++ and you want to go from f to h and skip over all g frames, then it might be more of a walk than a go-to because, as you go, you need to call all of the destructors for memory allocated on the heap
+  - C has this capability (jmp_buf, setjmp, longjmp)
 
+```
+label L
+void c(int i) {
+	if (i == 1) goto L;
+}
+void b(int i) {
+	c(i)
+}
+void a() {
+	L = L1
+	b(1)
+L2:
+	print("bye")
+L1: // ---> f jumps to here from c; doesn't return from b
+	print("hi")
+}
+```
+
+
+
+### 2.1 Implementation
+
+- compares throw/catch to variable label and goto
+- TIP: see slide 11 for help on assignment 1
+
+### 2.2 Traditional Approaches
+
+- return code: returns a value indicating normal or exceptioonal execution
+- status flag: like `errno` variable in UNIX; this is the place where errors put additional information
+- Fix-up routine: global or local routine called for an exceptional event to fix-up and return a corrective result so a computation can continue
+
+- can we force the programmer to look at these return codes?
+- `optional` type is one option; `variant` is better
+- varaint: you can have many things inside of it; helps to force checking, but still possible to ignore; still can only return 1 level at a time
+
+### 2.3 Exception Handling
+
+- is a dynamic multi-level exit (don't really know where the thrown exception will be caught)
+- exception usually occurs with low frequency
+- EHM execution handling mechanism
+
+### 2.4 Execution Environment
+
+- when you exit a {} (which is, basically, a local lambda function) and if code inside of it creates a variable, then when you exit that stack from (which it basically is) you need to call dfestructors for all of those variables
+- when you have multiple stacks, the execution environment gets even more complex
+- 1 stack: exception thrown, goes down stack trying to be caught. if not caught, program has error
+- many stacks: get to bottom of 1 stack, should you cause error for all other stacks? you have a new dimension for you can do with exceptions
+
+### 2.5 Terminology
+
+- execution: language unit in which an exception can be raised, usually with its own runtime stack (any routine)
+
+### 2.6 Static/Dynamic Call/Return
+
+- Static: things that you can tell about your program when it is not running
+- dynamic: program must be running to know
+- dynamic return AND static call: routine call
+  - you call foo() -> you know where you are going
+  - you return from foo(): if it is called from multiple places, it must know where it must return to
+- dymanic return AND dynamic call: routine pointer, virtual routines
+  - dynamic call: you don't know which routine is going to be called until you evaluate the pointer
+
+### 2.7 Static Propagation (Sequel)
+
+- sequel: has a static call AND a static return; you always know statically where it is going to go after
+- rule: after is finishes, it goes to the just outside the END of the block in which it was DECLARED
+- sequel is a nested routine
+
+```
+for ... {
+	sequel S1(...) { ... } // nested routine
+	void M1(...) { // assume you can declare a nested function here
+		...
+		S1()...
+	}
+	... other stuff ...
+	... other stuff ...
+} // S1 statically returns here!!!!
+```
 
