@@ -36,16 +36,16 @@
 
 ## Chapter 1: Search
 
-### Search Problem and States / Expansion
+### Search Problem
 
 - Search Problem:
   - consists of
-    - a state space
-      - world state: includes every last detail of the environment
-      - search state: keeps only the details needed for planning (is an abstraction)
-    - a successor functon(actions, cost)
-    - a start state and a goal test
-  - a solution is a sequence of actions (plan) from the start state to a goal state
+    - a **state space**
+      - **world state**: includes every last detail of the environment
+      - **search state**: keeps only the details needed for planning (is an abstraction)
+    - a **successor** functon(actions, cost)
+    - a **start state** and a **goal test**
+  - a **solution** is a sequence of actions (plan) from the start state to a goal state
 - E.g. Sliding Tile Toy Problem
   - states: all configs of tiles
   - actions: slide a tile to a legal adjacent space; must move blank tile NSEW (this way, you only ever need to look at blank spot, you don't need to scan all other spots and find out which of their NSEW moves are legal)
@@ -71,12 +71,13 @@
     - state space: 2000
   - goal: place n queens on a n x n grid such that no queen can attack another
 
-- Representing Search
-  - state space graph
-    - vertex corresponds to states
-    - one vertex for each state
-    - edge correspond to successors
-  - we search for a solution by building a search tree and traversing it to find a goal state
+### Representing Search
+
+- state space graph
+  - vertex corresponds to states
+  - one vertex for each state
+  - edge correspond to successors
+- we search for a solution by building a **search tree** and traversing it to find a goal state
 - Search Tree
   - state start is the root
   - children are successors
@@ -102,33 +103,28 @@
 - Implementation Details
 
   ```
-  insert start node
+  insert start node to queue
   repeat:
   	if q empty then return FAIL
-  	dequeue
+  	f = dequeue
+  	if f goal state then return SUCCESS
+  	add all of f's children to queue
   ```
+
+
 
 #### DFS
 
 - recall: we transform our problem graph into our search graph
 
-```
-DFS(G, s)
-	stack = [s]
-	while stack not empty
-		front = stack.pop()
-		print("visited", front)
-		visited.add(front)
-		for n in G.neighbours(front) // recall: only visit a node once, don't need visited
-			stack.push(n)
-```
 - Key Properties
-  - completeness: is the algorithm guaranteed to find a solution if one exists?
-  - optimality: does the algorithm find the optimal solution?
-  - time complexity: suppose we have $b$, our branching factor (max number of nodes you can branch to) and $m$, our maximum depth. Then the time complexity of our algorithm is $O(b^m)$
+  - completeness: is the algorithm guaranteed to find a solution if one exists? YES
+  - optimality: does the algorithm find the optimal solution? NO
+  - time complexity: suppose we have $b$, our branching factor (max number of nodes you can branch to) and $m$, our maximum depth. Then the time complexity of our algorithm is $O(b^m)$ as there are just about $2*b^m$ nodes
+    - time complexity is equivalent to the number of nodes traversed
   - space complexity
-    - store **path** from start -> current node
-    - store **fringe**, these are the unexplored siblings of nodes on path
+    - store **path** from start -> current node (at most m)
+    - store **fringe**, these are the unexplored siblings of each node on the path (b for each node on the path)
     - $\in O(bm)$
 
 <img src="./images/cs486-2.png" alt="alt text" style="zoom:30%;" />
@@ -137,17 +133,18 @@ DFS(G, s)
 
 #### BFS
 
-- time complexity: $O(b^{d + 1})$ where $d$ is the depth of the goal node
+- time complexity: $O(b^{d + 1})$ where $d$ is the depth of the goal node; total number of nodes traversed until the shallowest solution is found
 - space complexity: $O(b^{d + 1})$
+- optimal if all edges equal
 
 #### Iterative Deepening Search
 
 - combines DFS and BFS
-- outer loop which inreases depth of how far you are willing to search (do DFS but only expand down to $d_1$)
+- outer loop which inreases depth of how far you are willing to search (do DFS but only expand down to some depth, then increase depth and repeat)
 - Complete: yes
 - optimal: will find the shallowest goal node fastest
-- time complexity: $O(b^{d + 1})$
-- space complexity: 
+- time complexity: $O(b^d)$
+- space complexity: uses less space than BFS; $\in O(d)$ where $d$ is the depth of the goal. it is only ever engaged in a depth-first search, so only needs to store nodes which represent the current path it is exploring. since it is optimal, and finds the shallowest goal at depth $d$, then the length of this path is only ever $d$
 - comparisons:
   - $b = 10, d = 5$
   - N(BFS) = 1,111,000
@@ -158,4 +155,5 @@ DFS(G, s)
 - expand cheapest node first
 - complete: yes, optimal: yes (as long as they aren't all 0; no negative costs)
 - biased on little paths that have low-cost actions and puts-off larger costs branches
+- Uses minimum-cumulative cost as the priority in the priority queue, as opposed to depth as the priority in the queue for DFS
 
