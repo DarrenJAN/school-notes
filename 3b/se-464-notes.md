@@ -3,10 +3,10 @@
 - Begin all email subjects with [SE 464]
 - office hours by appointment
 - tutorials: informal
+- Sept 16, 18 lectures: review CS 247 material
+- Sept 13, 20 tutorials: review design patterns
 
-
-
-## Week 1: Decomposition, Non-Functional Props, Architecture
+## Lec 02: Architecture Introduction
 
 ###What is Software Architecture?
 
@@ -60,7 +60,6 @@
 - prescriptive vs descriptive architecture
   - Prescriptive: captures the design decisions made prior to the system's construction; **as-intended**
   - Descriptive: describes how the sytem has been built; **as-implemented**
-
 - architectural evolution
   - as a system evolves, ideally its prescriptive architecture is modified first
   - in practice, the descriptive architecture is modified directly
@@ -74,7 +73,6 @@
   - processing
   - data (information; state)
   - interaction
-
 - components
   - elements that encapsulate processing and data
   - defn: a software components is an architectural entity that
@@ -84,7 +82,7 @@
     - usually are application-specific
 - connectors
   - interaction might become more important and challenging than functionality of individual components
-  - defn: a building block tasked with effecting and regulating interactions among ocmponents
+  - defn: a building block tasked with effecting and regulating interactions among components
   - important because you have performance considerations and tradeoffs
   - examples
     - procedure call
@@ -92,15 +90,14 @@
     - message passing
 - configurations
   - defn: also called a topology, is a set of associations between components and connectors
-- deployment:
+- deployment
+  - a software system cannot fulfill its purpose until it is deployed
   - executable modules are physicalled placed on hardware devices on which they are to be run
-  - ==TODO==
-
+- possible assessment dimensions: available memory, power consumption, required network bandwidth
 - essential difficulties (hard to overcome)
   - complexity
   - conformity: system is dependent on its environment
   - Intangibility: hard to manage or understand; not constrainted by physical laws
-
 - attacks on complexity
   - high-level language
   - development tools and environments

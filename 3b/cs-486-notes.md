@@ -5,8 +5,13 @@
 - Tutorials: ~every second Friday
     - 8:30 - 9:20 RCH 207 MUST ATTEND THIS ONE
 - Office Hours: Mondays 1:30 - 3:30 DC2518
+- can submit assignments up to 48 hours late (and tutorial assignments)
+- assignments
+    - A1 out Sept 18, due Oct 2
+    - A2 out Oct 2, due Nov 6
+    - A3 out Nov 6, 
 
-***
+
 
 ## Intro
 
@@ -153,7 +158,151 @@
 #### Cost-Sensitive Search: Uniform Cost Search
 
 - expand cheapest node first
-- complete: yes, optimal: yes (as long as they aren't all 0; no negative costs)
+- complete: yes
+- optimal: yes (as long as they aren't all 0; no negative costs)
 - biased on little paths that have low-cost actions and puts-off larger costs branches
 - Uses minimum-cumulative cost as the priority in the priority queue, as opposed to depth as the priority in the queue for DFS
+
+## Chapter 2: Informed Search
+
+### Using Knowledge
+
+- uninformed search uses no knowledge about the problem (looks at cost or distnace, never looks ahead to the goal); very general and expensive
+- informed search
+  - we often have additional knowledge about the problem
+  - want to encode that knowledge into the nodes
+  - different notions of merit
+    - cost of solution
+    - minimize computation
+- Uninformed vs Informed search
+  - uninformed expands based on distance from start node - ==why not expand on distance to goal?==
+- ==Heuristic: is a function that estimates the cost of reaching a goal from a given state==
+  - estimate; doesn't need to be correct
+  - E.g. euclidian distance (hypotenuse)
+  - manhatten distance (distance you would have to travel if you could only travel NSEW)
+- Heuristics: Structure
+  - If $h(n1) < h(n2)$ we guess it is cheaper to reach the goal from $n1$ than from $n2$
+  - We require $h(n, goal) = 0$
+
+### Best-First Search (bad algorithm)
+
+- Search Strategy: expand the most promising node according to the heuristic
+- S(4) --> 2 --> A(3) --> 1 --> B(2) --> 1 --> C(1) --> 2 --> G(0)
+  - Also, A(3) --> 4 --> C(1)
+- S --> A --> (can go to B or C. C has lower heuristic) so --> C --> G
+- Always compare the heuristic values of the nodes on the fringe to one another
+- Properties:
+  - Complete: no
+  - Optimal: no
+  - Time complexity: worst case explores entire graph, $O(b^m)$
+  - Space complexity: $O(b^m)$
+
+### A* Search
+
+- Observations:
+
+  - Best first search ordered nodes by forward cost to goal, h(n)
+  - Uniform cost search ordered nodes by backward cost of path so far, g(n) (cost at node n was the cost of getting to that node from the start node)
+
+- A* Search expand nodes in order of f(n) = g(n) + h(n)
+
+- Example:
+
+  - TODO insert image
+
+    ```
+    S(4) --> 2 --> A(3) --> 1 --> B(2) --> 1 --> C(1) --> 2 --> G(0)
+    A(3) --> 4 --> C(1)
+    start at S (f(S) = 4)
+    calculate f(A) = 3 + 2 = 5
+    go to A 
+    consider B and C
+    calculate f(B) = (2 + 1) + 2 = 5
+    calculate f(C) = (2 + 4) + 1 = 7
+    choose B
+    go to B
+    calculate f(C2) = (2 + 1 + 1) + 1 = 5
+    compare C to C2 (same C, but different paths). C2 is lower
+    go to C2 (using path SABC)
+    f(G) = 6 + 0 = 6
+    go to G
+    ```
+
+- ==When do you do your goal test?==
+
+  - For A* search, always do goal test when you are expanding a node (remove it from front of queue)
+  - If you check goal test when you GET to a node, then you could get wrong answer. Just add it on the queue like any other node.
+  - Then you choose which node to expand based off of minimum value (f) on the queue, and THEN you check if it is the goal state
+
+- NOTE: with a good heuristic, when A* finds the goal state (removes it from front of queue) then that is the optimal path
+
+- Admissible Heuristics
+
+  - An optimistic heuristic, always under-estimating
+  - A heuristic function $h(n)$ is ==admissible== if $0 \leq h(n) \leq h^*(n)$ where $h^*(n)$ is the TRUE, god-given value
+  - Note that $h(i) = 0$ for all $i$ is admissible (this is just cost-sensitive search)
+
+- Optimality of A*
+
+  - If the heuristic is admissible then A* with tree search is optimal
+  - If we have a graph (**multiple paths to the goal**), then we require a stronger property for the heuristic function
+  - A heuristic is ==consistent== if $h(n) \leq cost(n,n') + h'(n)$
+  - Cost of getting to goal state from n is less than cost of going from n to n' + cost of getting to goal state from n'
+
+- Example
+
+  Let G be optimal goal. Let G2 be suboptimal goal. cost(G) < cost(G2). Let n be on queue and is on path to G. Assume G2 is on queue and assume G2 is selected.
+
+  Recall g(x) is distance from start to x, h(x) is heuristic from x to goal
+
+  ```
+  G2 is selected over n, so this means f(G2) < f(n).
+  f(G2) = g(G2) + h(G2)
+  			= g(G2) // as h(G2) = 0
+  			> g(G) // G2 is suboptimal
+  			= cost(S,n) + cost(n, G) // because n is on optimal path to G
+  			>= g(n) + h(n) = f(n)
+  			contradiction as we have shown that f(G2) >= f(n)
+  ```
+
+- A* is Optimally Efficient
+  - A* expands the fewest nodes compared to all algorithms that start at the same node and use the same heuristic function
+- A* Search Properties
+  - Optimal: yes
+  - Time complexity: TODO FIXME WRONG $O(b^\Delta)$ where $\Delta$ is the relative error of heuristic; $\Delta = \frac{h^* - h}{h^*}$
+  - Space complexity: has to remember every node that has been expanded in memory (need to keep all possible paths)
+  - In our graph example (country, Austria) the perfect heuristic function $h^*$ is the actual distance required to travel from node n to the goal (not the straight line distance, but the distance from travelling through all of the roads in the optimal way)
+  - But, getting that perfect heuristic, in this example, requires solving the problem before-hand. Pointless.
+
+### Heuristic Functions
+
+- Extremely important to have a good heuristic function
+
+- 8 Puzzle Toy Problem Example:
+
+  - Relax the game; change the rules?
+  - Option 1: you can move A to B (swap) if A is next to B
+  - Option 2: you can move A to B (swap) if B is blank
+  - Option 3: you can move A to B (swap)
+  - Count the number of moves it would require to win the game using those options; clearly an under-estimate of the real value played using the games' real rules
+  - ==use these relaxed forms using relaxed rules to get under-estimates of moves required to reach goal==
+
+- Dominating Heuristic: Given heuristics $h_1, h_2$ we say $h_2$ dominates $h_1$ if $\forall \, n \, h_2(n) \geq h_1(n)$ and $\exists \, n \, | h_2(n) > h_1(n)$
+
+- Dominating Heuristic Theorem: If h2(n) dominates h1(n) then A* using h2(n) will never expand more nodes than A* using h1(n)
+
+- Notes
+
+  ```
+  C* = cost of optimal solution
+  A* expands all n where f(n) < C* 
+  = h(n) + g(n) < C*
+  ==> h(n) < C* - g(n)
+  but h2(n) > h1(n)
+  ```
+
+- Designing Heuristics
+  - Relax the problem
+  - Pre-compute solution costs of sub-problems and store them in a pattern-database
+  - Tradeoff between accuracy of heuristic (and therefore amount of search) and amount of computation needed to compute it
 
