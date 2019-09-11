@@ -105,6 +105,126 @@
 
 
 
+## Let 03: Views and Non-Functional Properties
+
+- Topological goals
+  - Minimize coupling; less components know about one another the better
+  - Maximize cohesion; components should be responsible for a single logical service
+- Abstraction
+  - Abstract away unnecessary detail; focus on key issues
+  - Use structured programming and data abstraction (ADT)
+  - Interfaces
+- Decomposition
+  - ==top-down abstraction is also called decomposition==
+  - Break down the problem into independent components
+  - ==make typical cases simple, and exception cases possible==
+
+> The structure of a software system reflects the structure of the organization that built it (Conway's Law)
+
+- Architectural Representations
+  - Fundamentally about facilitating technical communication between project stakeholders (let them talk about their viewpoints, their strengths)
+  - properties
+    - (Min) Ambiguity: open to more than one interpretation?
+    - (Max) Accuracy: correct within tolerances (how close are you to the true value, the goal)
+    - (Max) Precision: consistent but not necessarily correct (how spread out your measurements are)
+
+- 4 + 1 View Model
+  - Logical View: static decomposition
+  - Development View: how do you decompose into individual files; package naming; which developers work on what; aspects about the development process
+  - Process View: sequence diagrams; how typical interactions between components works; sequence of events that system must support
+  - Physical View: deployment view, servers, network topology, power consumption
+  - +1: all the possible scenarios; ==want to be grounded in your understanding of what the end-user actually wants==
+- Architectural Models, Views, and Visualizations
+  - Model: high-level documentation of the design
+  - Visualization: 
+  - View: subset of related design decisions (deployment viewpoint)
+- Component Diagram
+  - Capture components and relationships
+  - Expose an input interface and output interface
+- Sequence Diagram
+  - Inter-component collaboration
+  - Specific runtime scenarios
+  - Arrows running left and right between components, with time increasing as you move down
+- Deployment Diagram: How to map components to physical devices
+- Statechart Diagram: state machine; might design first to figure out how your system will actually function
+
+### F and NF Properties
+
+- FP: system shall do X
+
+- NFP: system shall be Y
+
+- NFP:
+
+  - Constrain on the manner in which the system implements and delivers its functionality
+  - High-level types: Product requirements, process requirements, external requirements
+  - Examples: Efficiency; complexity; scalability
+  - Lots of conflicts between stakeholder NFP desires
+
+- Design Guidelines for different NFPs
+
+  - Efficiency 
+
+    - Components 
+      - small (**high cohesion**)
+      - simple and concise interfaces
+      - separate data from processing components
+      - separate data from meta-data (keep movie names list separate from GB's of movies video data)
+      - **know which components are bottlenecks**
+    - Connectors 
+      - select connectors carefully (live in same memory? Communicate over server?)
+      - encourage async interactions
+      - careful of broadcast connectors (all other components will need to listen and be able to handle that info)
+      - Location transparency (scalability: don't want to care where that other component (DB) is; efficiency: DO want to know where it is)
+    - Topology
+      - keep frequent collaborators close; ex: don't pass GBs of data through multiple layers
+
+  - Complexity
+
+    - Proportional to size of system; internal structure
+    - Components
+      - Separate concerns
+      - Isolate functionality from interaction
+      - Ensure high cohesiveness
+    - connectors
+      - Isolate interaction from functionality
+      - Network connector: bitstream in, bitstream out
+      - Keep a simple network topology
+      - Restrict interaction; **good API design**
+    - topology
+      - Eliminate unnecessary dependencies
+      - If you have many components, the **compose** groups of related components into larger components; **zoom out**
+
+  - Scalability / Heterogeneity:
+
+    - Scalability: capability of a system to be adapted to meet new size or scope requirements
+    - Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
+    - Portability: ability of a system to properly execute on multiple platforms
+    - Components
+      - Keep components focused (==so you can find bottlenecks==)
+      - Distribute data sources (different data centres around the world)
+      - Replicate data: don'y only have 1 DB that stores the information; have different data centres around the world, each replicate the data; migrate changes over time (issue with concurrent modifications)
+
+    - Connectors
+      - Be explicit: don't use shared memory as a communication platform (doesn't scale)
+      - Direct vs indirect: easier to scale if indirect (didn't hard-code the connection)
+
+    - Topology
+      - Place data close to customer
+      - Think about who owns the data, about what moves around and where it stays
+
+  - Evolvability
+
+    - Ability to change to satisfy new requirements and environments
+    - Components
+      - 
+    - Connectors
+      - 
+    - Topology
+      - 
+
+
+
 ## Readings
 
 ###[What should a Software Engineering Course look like?](http://tomasp.net/blog/2019/software-engineering/)
