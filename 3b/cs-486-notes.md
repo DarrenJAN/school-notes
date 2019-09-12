@@ -208,25 +208,31 @@
 
 - Example:
 
-  - TODO insert image
+  ```mermaid
+  graph LR
+  S4 -- 2 -->A3 
+  A3 -- 1 --> B2
+  B2 -- 1 --> C1
+  C1 -- 2 --> G
+  A3 -- 4 --> C1
+  
+  ```
 
-    ```
-    S(4) --> 2 --> A(3) --> 1 --> B(2) --> 1 --> C(1) --> 2 --> G(0)
-    A(3) --> 4 --> C(1)
-    start at S (f(S) = 4)
-    calculate f(A) = 3 + 2 = 5
-    go to A 
-    consider B and C
-    calculate f(B) = (2 + 1) + 2 = 5
-    calculate f(C) = (2 + 4) + 1 = 7
-    choose B
-    go to B
-    calculate f(C2) = (2 + 1 + 1) + 1 = 5
-    compare C to C2 (same C, but different paths). C2 is lower
-    go to C2 (using path SABC)
-    f(G) = 6 + 0 = 6
-    go to G
-    ```
+  ```
+  start at S (f(S) = 4)
+  calculate f(A) = 3 + 2 = 5
+  go to A 
+  consider B and C
+  calculate f(B) = (2 + 1) + 2 = 5
+  calculate f(C) = (2 + 4) + 1 = 7
+  choose B
+  go to B
+  calculate f(C2) = (2 + 1 + 1) + 1 = 5
+  compare C to C2 (same C, but different paths). C2 is lower
+  go to C2 (using path SABC)
+  f(G) = 6 + 0 = 6
+  go to G
+  ```
 
 - ==When do you do your goal test?==
 
@@ -266,7 +272,9 @@
   ```
 
 - A* is Optimally Efficient
+  
   - A* expands the fewest nodes compared to all algorithms that start at the same node and use the same heuristic function
+  
 - A* Search Properties
   - Optimal: yes
   - Time complexity: TODO FIXME WRONG $O(b^\Delta)$ where $\Delta$ is the relative error of heuristic; $\Delta = \frac{h^* - h}{h^*}$
@@ -294,15 +302,63 @@
 - Notes
 
   ```
-  C* = cost of optimal solution
+  C* = cost of optimal solution, constant
+  recall: f(n) = g(n) + h(n)
   A* expands all n where f(n) < C* 
-  = h(n) + g(n) < C*
-  ==> h(n) < C* - g(n)
-  but h2(n) > h1(n)
+  = g(n) + h(n) < C*
+  ==> h(n) < C* - g(n) // g(n) using either heuristic is the same!
+  ==> h1(n) < h2(n) < C* - g(n) // because h2(n) > h1(n)
+  
+  if a node was expanded in the h2 heuristic then it must ALSO have been expanded in the h1 heuristic
   ```
 
 - Designing Heuristics
   - Relax the problem
   - Pre-compute solution costs of sub-problems and store them in a pattern-database
   - Tradeoff between accuracy of heuristic (and therefore amount of search) and amount of computation needed to compute it
+
+
+
+
+
+
+
+
+
+***
+
+
+
+## Tutorial Readings
+
+### Tutorial 1 Readings
+
+#### Philosophers are building ethical algorithms to help control self-driving cars
+
+- Philosophers are working on real-life Trolly problem scenarios as self-driving cars will, inevitably, be put in similar situations in the future
+- Do you save the driver or the pedestrian? Which lives are worth more?
+- You could just jump in front of a moving self-driving car to have it crash and protect the pedestrian -> bad!
+- Usually people get to make an informed decision as to whether or not they want to be in an experiment. When self-driving cars come out, society won't be able to choose, they will be forced
+- Who is responsible when a self-driving car kills someone?
+- Can't fully imagine how it will change our lives
+
+#### The Montreal Declaration for a responsible development of AI REQUIRED
+
+- Main objectives:
+  - Develop ethical framework for development of AI
+  - Guide the digital transition so everyone benefits
+  - Open national and international forum to discuss it
+
+- Can "restrict the choices of individuals and groups", "lower living standard", "influence politics", "affect the climate and environment"
+- Principles
+  - Well-Being. Must permit the growth of well-being of all sentient beings
+  - Response for Autonomy. Should aim to increase people's control over their lives and their surroundings.
+  - Protection of Privacy and Intimacy. Prevent data intrusion
+  - Solidarity
+  - Democratic Participation. Must be subjected to democratic scrutiny, debate, and control.
+  - Equity. Must contribute to just and equitable society. (Silly)
+  - Diversity Inclusion. Must be compatible with maintaining social and cultural diversity
+  - Prudence. Everyone involved in its development must exercise caution
+  - Responsibility. Must not lessen the responsibility of human beings when decisions must be made (silly)
+  - Sustainable development. Help to sustain the planet
 
