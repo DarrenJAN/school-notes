@@ -250,19 +250,23 @@ L1: // ---> f jumps to here from c; doesn't return from b
 
 ### 2.6 Static/Dynamic Call/Return
 
+<img src="./images/cs343-1.png" alt="alt text" style="zoom:30%;" />
+
 - Static: things that you can tell about your program when it is not running
 - dynamic: program must be running to know
-- dynamic return AND static call: routine call
+- dynamic return AND static call: **routine call**
   - you call foo() -> you know where you are going
   - you return from foo(): if it is called from multiple places, it must know where it must return to
-- dymanic return AND dynamic call: routine pointer, virtual routines
-  - dynamic call: you don't know which routine is going to be called until you evaluate the pointer
+- Dynamic return AND dynamic call: **routine pointer, virtual routines**
+  - dynamic call: you don't know which routine is going to be called until you evaluate the pointer (think of inheritance)
 
-### 2.7 Static Propagation (Sequel)
+### 2.7 Static Propagation (Sequel)(Static Return)
 
 - sequel: has a static call AND a static return; you always know statically where it is going to go after
 - rule: after is finishes, it goes to the just outside the END of the block in which it was DECLARED
 - sequel is a nested routine
+- ==If break X is going to break out of innermost for-loop, then the corresponding sequel for it must be written in that innermost for-loop==
+- Disadvantage: only works for monolithic programs
 
 ```
 for ... {
@@ -273,6 +277,123 @@ for ... {
 	}
 	... other stuff ...
 	... other stuff ...
-} // S1 statically returns here!!!!
+}
+// S1 statically returns here!!!!
 ```
 
+### 2.8 Dynamic Propogation
+
+- Cases 3 (termination exception), 4
+
+- Static return, dynamic call (dynamic multi level exit)
+
+- Termination:
+
+  ```
+  void f {
+  	throw E() // dynamical call, needs to find which catch clause
+  }
+  int main {
+  	try {
+  		f()
+  	} catch (E) {
+  		...
+  	}
+  	
+  	try {
+  		f()
+  	} catch (E) {
+  		...
+  	}
+  	
+  	try {
+  		// copy the code from f
+  		// f
+  		...
+  		...
+  		//throw --> instead of throw you call sequel()
+  		sequel()
+  	}
+  }
+  ```
+
+  - Don't know statically where it will return to
+  - **Throw: This is a dynamic call (a strange call)**. Throw E is supposed to find the appropriate handler (catch clause), then it executes the code in the catch clause (which is a routine). O(n) call.
+  - Now we finish a catch, where do we return to? The next line. This is a static return.
+  - Sequels: you pick them up, and put them in the block you want to terminate. So if you want to terminate the try block, then you make the catch a sequel, and put it inside the try block
+
+- ==Note: microC++, don't try and check the return code of opening a file. You need to check for exceptions.==
+
+  - Except for end of file
+
+- **Retry**: each func has a contract it must fulfill; instead of catch, call retry, and then do try again, unless you break to finish to exit; can be simulated using a while loop
+
+- **Resumption**: provides a limited mechanism to generate new blocks on call stack
+
+  - Instead of throw, do resume(E). While looking for the catch in O(n), it does NOT unwind the stack
+  - ==In catch, you are to FIX the problem, and after the catch it goes back to next line after the resume call==
+  - Better, just use a fixup function pointer (pass it all the way up to fix the code if there is an error)
+
+- Throws do recovery; fixups do correction
+
+- Exceptional Example
+
+  - unGuarded block = no catch clauses
+  - When you `throw` you start on the NEXT block on the stack, don't continue in current block you are in (look at throw in C5, it does not go and check C6) 
+    - Option 1: Want to do a resumption? Initial throw should have be a `resume` (and so would not have unwound the stack)
+    - Option 2: retry, you go back to B2 and retry
+    - Option 3: terminate, exit out of B2 and continue to next line of code in B1
+  - Note: can never put anything in middle of stack, must go to top of stack
+  - You can pass a pointer from the block of the exception down the stack to the catch clause
+
+
+
+## Chapter 3: Coroutine
+
+- Coroutine: a routine that can also be suspended at some point and resumed from that point when control returns
+
+  - Execution location:
+
+  - Execution state:
+
+  - Execution status:
+
+  - H -> G -> F -----> H' -> G' -> F (original F)
+
+  - Does not start from the beginning of each activation; it is activated at the point of last suspension
+
+  - In contrast, a routine always starts at the top for new activation
+
+    ```
+    call G (starts at 0)
+    at G line 10, G co-calls F
+    F runs from line 0 to 15, then suspends back to G
+    G starts at 0 again
+    at G line 10, G co-calls F (starts at line 16)
+    F run from line 16 to 25, then suspends back to G
+    G starts at 0 again
+    at G line 10, G co-calls F
+    F run from line 26 to termination
+    ```
+
+  - Coroutines execute synchronously (no concurrency)
+
+- Recall: a variable that tells you where to transfer to is a flag variable (typically a global var)
+
+- Semi-Coroutine:
+
+  - It's how you use it that makes it a semi
+
+- Full-Coroutine:
+
+  - It's how you use it that makes it a full
+
+- `_Coroutine`
+
+  - Must have member routine called **main** (is the actual co-routine)
+  - Main routine must be private
+  - `suspend()`, `resume()` (hide these from the interface)
+  - Inherits from type `uBaseCoroutine` magically
+    - Can give it a name, adjust the stack size (uses that name for error messages)
+    - You can ask who resumed you, which coroutine resumed me?
+  - Only ever remembers the last resumer; no stack growth; just context switches

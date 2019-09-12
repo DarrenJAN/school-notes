@@ -6,6 +6,8 @@
     - How do we use a Database Management System?
     - How do we design a database?
 
+
+
 ## Intro to Database Management (Sept 5)
 
 - persistent data: information is stored long-term, persists after power is turned off
@@ -72,7 +74,7 @@
 
 
 
-## The Relational Model (Sept 10)
+## The Relational Model (Sept 10, 12)
 
 - How to ask the right questions?
   - Ex: Find all pairs of natural numbers that add to 5 --> {(x,y) | x >= 0 and y >= 0 and x + y = 5}
@@ -93,19 +95,21 @@
 
 - Relational Databases
 
-  - Universe: a set of values D with equality
+  - Universe: a set of values **D** with equality (=)
   - Relation: 
     - a predicate name R, and arity k of R (the number of columns) (==schema, table declaration==)
     - Instance: a relation R contained in $D^k$
   - Database 
-    - TODO
+    - Signature: finite set $p$ of predicate names (symbols, table names)
+    - Instance: **R_i** for each R_i // yes, boldness matters
   - Notation:
     - Signature $p = (R1, R2, \dots, Rn)$
-    - TODO
+    - Instance **DB = (D, =, R_1, ..., R_n)**
+    - ==Clarification: R1 is the TABLE R1, **R1** is the entire instance inside of R1==
 
-- Example of relational Databases: Bibliograph
+- Example of relational Databases: Bibliography
 
-- >  What is the diffferene between a relation name and a relation instance?
+- >  What is the difference between a relation name and a relation instance?
   - relation name is what do you call it (part of meta-data, part of schema)
   - Relation instance is the actual data
 
@@ -129,9 +133,9 @@
 
 - Conditions in the Relational Calculus
 
-- First-Order Variables and Valuations
+- ==First-Order Variables and Valuations==
 
-  - Defn: Valuation is a function $\theta$ that maps variable names to values in the universe
+  -  ==Valuation function is a function $\theta$== that maps variable names to values in the universe $\theta: \{ x1, x2 \rightarrow \textbf{D}\}$
   - $a \models  b$ means that a entails b (a being true makes b be true)
   - $\theta \models R(x1,...,xk)$ means that the tuple (x1, ..., xk) exists in some table with name R??
     - is (a, b, c) record in table R -> maybe it means a partial record, too?
@@ -140,22 +144,97 @@
 
   - find pair of employees working for the same boss
 
-- Relational Calculus
+- Equivalences TODO
 
-- Free Variables
+- Relational Calculus TODO
 
-- Sample Queries
+- Free Variables TODO
 
-  - list all composite numbers (you have an addition and multiplication table)
-    - Composite: all non-prime numbers
-    - need to find two factors (none of them 1) that multiply together to create the number x
-    - $composite = \{ x | \exists y,z | TIMES(y,z,x) \and \neg(x = y) \and \neg(x = z)\}$
-    - can't use the constant 1 (don't have that symbol available)
+### Sample Queries
 
-  - list of all prime numbers
-    - $\{ x | \neg(composite(x))\}$
-  - list all publications (all their IDs): $\{ x | \exists y | PUBLICATION(x,y) \}$
-  - titles of all books: $\{ x | \exists y,z,w | PUBLICATION(y,x) and BOOK(y,z,w)\}$ // x is title from PUBLICATION, and book and publication both share same id y
+<img src="./images/cs348-1.png" alt="alt text" style="zoom:30%;" />
+
+- list all composite numbers (you have an addition and multiplication table)
+  - Composite: all non-prime numbers
+  - need to find two factors (none of them 1) that multiply together to create the number x
+  - $composite = \{ x | \exists y,z | TIMES(y,z,x) \and \neg(x = y) \and \neg(x = z)\}$
+  - can't use the constant 1 (don't have that symbol available)
+- list of all prime numbers
+  - $\{ x | \neg(composite(x))\}$
+- list all publications (all their IDs): $\{ x | \exists y | PUBLICATION(x,y) \}$
+- titles of all books: 
+  - $\{ x | \exists y,z,w | PUBLICATION(y,x) and BOOK(y,z,w)\}$
+  -  x is title from PUBLICATION, and book and publication both share same id y
+- all publications without an author:
+  - $\{ x : (\exists y : PUBLICATION(x,y)) \and \neg(\exists z,w : WROTE(z,x) \and AUTHOR(z,w))\}$
+  - Where: y is the publication title, z is author that wrote the publication, w is the name of author
+  - Don't actually need the AUTHOR part; if there's no WROTE record relating an author to a publication, then clearly no author write that publication
+- All pairs of coauthor names
+  - $\{ (x,y) : (\exists w,z : AUTH(w,x) \and AUTH(z,y) \and \neg(w = z)) \and (\exists v,t : PUBL(v,t) \and WROTE(w,v) \and WROTE(z,v)\}$
+  - W is the authID of name x
+  - Y is the authID of name y
+- Titles of publications written by a single author
+  - $\{ x : (\exists y : PUBL(y,x)) \and (\exists z : WROTE(z,y)) \and (\forall z' : WROTE(z',y) \implies z'=z)\}$
+  - Recall: can't use $\forall$, need to convert it to an $\exists$ 
+  - $\neg(\exists z' : \neg(WROTE(z',y) \implies z'=z))$
+  - $\neg(\exists z' : (WROTE(z',y) \and \neg(z'=z))$ // should convert implication to logical equivalent instead
+  - ==Recall: $\forall x : \beta$ is the same as $\neg (\exists x : \neg \Beta)$==
+  - x is publication name
+  - Y is publication ID
+  - Skip the author table because if z' exists in WROTE then
+
+- Asking Questions and Understanding Answers
+  - Find the neutral element of addition: just do PLUS(x,x,x) don't need to do exists y such that PLUS(y,x,x) and PLUS(x,y,x) because addition is COMMUTATIVE and those two are the same
+
+- Laws (aka Integrity Constraints)
+  - Addition is commutative
+  - Addition is a total function
+
+### Integrity Constraints
+
+- In addition to having the names of our tables, and structure of our tuples, we also have some restrictions on what combinations of value can appear in some instances (because they have to obey our laws)
+- For example, in PLUS if you find 0,1,1 then this guarantees that you will find 1,0,1
+- Yes/no conditions that must be true in every valid database instance
+- Examples
+  - Every boss is an employee
+    - $\{ \forall x,y,z : EMP(x,y,z) \implies \exists u,w : EMP(z,u,w)\}$
+    - For all bosses z this implies there exists other roles (u,w) such that boss z is also an employee
+  - Every boss manages a unique department
+- Relational signature captures only the structure of relations
+  - Valid database instances satisfy additional integrity constraints
+    - For all x,y then PUBLICATION(y,x) implies STRING(x)
+  - Values of attributes are unique among tuples in a relation (**keys**)
+  - Values appearing in one relation must also appear in another relation (ex: bosses must be employees) (**referential integrity**)
+  - Values cannot appear simultaneously in certain relations (**disjointness**) (ex: author IDs do not look like publication IDs, so if you see an authorID x then you know that x is not an ID in the publication table)
+  - Values in a certain relation must appear in at least one of another set of relations (**coverage**)
+- More examples to do (exercise)
+  - TODO...
+- Views and Integrity Constraints
+  - Idea: answers to queries can be used to define derived relations (views); an extension of a DB schema
+  - **[UNDERSTAND THIS BETTER]**
+- Database Instances and Integrity Constraints
+  - Relational database schema:
+  - Relational database instance **DB**:
+
+### Safety and Finiteness
+
+- Important: database instances must be **finite**
+- Unsafe Queries
+  - All y that are not the names of authors (so all strings in your database that aren't names of authors)
+  - All x,y,z such that BOOK(x,y,z) or PROCEEDINGS(x,y)
+    - Image you have no books and 1 proceedings, then z can be ANY value (infinite results)
+  - All x,y such that x = y (returns everything)
+  - Domain-Independent Query:
+    - The above unsafe queries will end up using all or most of the domain
+    - ==If you fix the instance (contents) of the DB, but you fiddle with the domain (currently just English strings, next you put all Chinese strings into it too) then the query better return the SAME answer==
+    - TODO write equations
+    - Recall: Domain $\textbf{D_1}$ all of the information (single values) (SUE, BOB, ..., ...) but
+    - All the contents of **R1** must also be in D1 and D2...
+    - Unary relations (just 1 value) are a subset of a domain
+    - Can only query the intersection of those two domains
+  - Domain-Independent Theorem: TODO
+- ==Domain-Independent and finite database implies safe==
+- Pdf
 
 
 
