@@ -105,7 +105,7 @@
 
 
 
-## Let 03: Views and Non-Functional Properties
+## Lec 03: Views and Non-Functional Properties
 
 - Topological goals
   - Minimize coupling; less components know about one another the better
@@ -221,7 +221,107 @@
     - Connectors
       - 
     - Topology
-      - 
+
+
+
+## Lec 04: Design Patterns
+
+- composition vs aggregation
+  - composition: 
+    - both are dependent on one another
+    - **(part of)** object A can't exist without object B (a carbonator can't exist without a car)
+  - aggregation: 
+    - unidirectional (one-way): a department has a student, but a student does not have a department
+    - **(has a)** class A and class B can exist without one another
+- Liskov Substitution Principle: subtypes should behave (and be able to replace) their parents
+- Design Pattern General Stuff
+  - 4 main parts
+    - name
+    - problem
+    - solution
+    - consequences
+  - still need to manually apply the design patterns using names that make sense
+
+### Creational Patterns
+
+- what is bad about `Foo foo = new Foo()` ?
+- use `Foo foo = indirection.makeFoo()` instead
+- defer decisions about class instantiation until runtime. **Why is this better?**
+
+#### Singleton Pattern
+
+- is basically a global variable; affects other parts of the system that maybe you don't want to
+- concurrency issues
+
+```
+class Singleton {
+	private static Singleton instance;
+	private Singleton(){}
+	static Singleton create() { // method on the class instead of the object
+															// don't need an instance to use it
+		if (instance == null) instance = new Singleton()
+		return instance
+	}
+}
+```
+
+- why not just make all fields and functions static? because in the create method you could still have some logic to decide what kind of singleton to create (if there are sub-classes). You could want to use a RedSingleton or a BlueSingleton etc
+
+#### Factory Method Pattern
+
+- call factory method to give me a new object instead of directly calling the constructor
+- need to pass in params to factory method if you want to get a new concrete class
+- Creator (abstract), ConcreteCreator implements the abstract method. If you want to change from 1 concrete product to another, you will need to pass params.
+
+#### Abstract Factory Method Pattern
+
+- solution to above point? this
+- makes creation even more indirect; you have a separate object for the factory
+- AbstractFactory: createProductA, createProductB
+- AbstractProductA can create A1 and A2 concrete types
+- AbstractProductB can create B1 and B2 concrete types
+- so you need 4 concrete implementations
+
+#### Builder Pattern
+
+- more complex creator patterns
+- create an object, then you set fieldA, then you set fieldB, ..., then you build and give me the object I wanted
+- Builder::BuildPart()
+- Foo = new FooDirector(new FooConcreteBuilder()).construct().addA().addB().addC().getResult()
+- good for: constructing objects with many different variations, or many params in constructor
+
+#### Prototype Builder
+
+- instead of having a class and saying give me this class, you add fields and add methods to a data structure, and at some point you say "this is my object, it has everything I want" and from then on you just close that prototype
+
+
+
+### Structural Patterns
+
+- ==make the relationships/structure of the code more flexible==
+
+#### Class Adapter Pattern
+
+- have an existing impl that provides some functionality
+- adapter provides impl that new interface can use but still have access to origin impl
+- client see's Adapter::methodA(), which is a function that uses Adaptee1::method1(), ..., AdapteeN::methodN()... (it calls all of them)
+- Adapter inherits from Adaptee1, ...,  AdapteeN
+- what's bad of using class-based: because it inherits, then client can see ALL of the methods of the adaptee's
+- **use case: old interface to new interface; want to abstract away old implementation details and use a new interface**
+
+#### Object Adapter Pattern
+
+- Adaptor doesn't inherit from Adaptee, ==instead it just HAS the Adaptee it wants to use==
+- interface to client is not cluttered with Adaptee functions, only sees the Adaptor method
+- **use case: old interface to new interface; want to abstract away old implementation details and use a new interface**
+
+
+
+
+
+
+
+
 
 
 
