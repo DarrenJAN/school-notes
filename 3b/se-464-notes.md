@@ -255,7 +255,7 @@
 - is basically a global variable; affects other parts of the system that maybe you don't want to
 - concurrency issues
 
-```
+```java
 class Singleton {
 	private static Singleton instance;
 	private Singleton(){}
@@ -267,7 +267,7 @@ class Singleton {
 }
 ```
 
-- why not just make all fields and functions static? because in the create method you could still have some logic to decide what kind of singleton to create (if there are sub-classes). You could want to use a RedSingleton or a BlueSingleton etc
+- why not just make all fields and functions static? because in the create method you could still have some logic to decide what kind of singleton to create (if there are sub-classes). You could want to use a RedSingleton or a BlueSingleton etc`
 
 #### Factory Method Pattern
 
@@ -306,7 +306,7 @@ public class ShapeFactory {
 - isolates client code from concrete implementation factory classes
 - 
 
-```
+```java
 interface Shape {
 	void draw();
 }
@@ -341,7 +341,7 @@ class RoundedShapeFactory extends AbstractFactory {
 			return new RoundedRectangle()
 	}
 }
-class FactoryProducer {
+class FactoryProducer { // this is what you use to get your factory
 	static AbstractFactory getFactory(boolean isRounded) {
 		if is rounded return RountedShapeFactory()
 		else return NormalShapeFactory()
@@ -353,11 +353,60 @@ class FactoryProducer {
 
 #### Builder Pattern
 
-- more complex creator patterns
-- create an object, then you set fieldA, then you set fieldB, ..., then you build and give me the object I wanted
-- Builder::BuildPart()
-- Foo = new FooDirector(new FooConcreteBuilder()).construct().addA().addB().addC().getResult()
-- good for: constructing objects with many different variations, or many params in constructor
+```java
+class Car {
+	int numSeats
+	String engineType
+	String colour
+	// setters and getters
+}
+
+// Generic Car Builder
+interface Builder {
+	void reset()
+	void setSeats(int x)
+	void setEngineType(String e)
+	void setColour(c)
+}
+class CarBuilder implements Builder {
+	private Car car
+	public CarBuilder() {
+		reset()
+	}
+	void reset() { this.car = new Car() }
+	void setSeats(int x) {
+		car.setSeats(x)
+	}
+	void setEngineType(String e) {
+		car.setEngineType(e)
+	}
+	void setColour(String c) {
+		car.setColour(c);
+	}
+	Car getProduct() {
+		return this.car
+	}
+}
+
+class Director {
+	void constructSportsCar(Builder b) {
+		builder.reset()
+		builder.setSeats(2)
+		builder.setEngine("FAST")
+		builder.setColour("red")
+	}
+	
+	void constructSUV(Builder b) {
+		...
+	}
+}
+
+main {
+	CarBuilder builder = new CarBuilder()
+	director.constructSportscar(builder)
+	Car c = builder.getProduct()
+}
+```
 
 #### Prototype Builder
 
@@ -373,10 +422,39 @@ class FactoryProducer {
 
 - have an existing impl that provides some functionality
 - adapter provides impl that new interface can use but still have access to origin impl
-- client see's Adapter::methodA(), which is a function that uses Adaptee1::method1(), ..., AdapteeN::methodN()... (it calls all of them)
-- Adapter inherits from Adaptee1, ...,  AdapteeN
 - what's bad of using class-based: because it inherits, then client can see ALL of the methods of the adaptee's
 - **use case: old interface to new interface; want to abstract away old implementation details and use a new interface**
+
+```java
+interface Bird {
+	void makeSound()
+}
+class Sparrow implements Bird {
+  @Override makeSound() { print("Chirp Chirp") }
+}
+interface ToyDuck {
+  void squeak();
+}
+class PlasticToyDick implements ToyDuck {
+  @Override squeak() { print("Squeak")}
+}
+class SparrowAdapter extends Sparrow implements ToyDuck {
+  @Override squeak() { this.makeSound() } // ADAPTED
+  // this.makeSound() is STILL PUBLIC for this static class
+}
+main {
+  ToyDuck toyDuck = new PlasticToyDuck()
+  ToyDuck toySparrow = new BirdAdapter(new Sparrow())
+	toyDuck.squeak() // --> "squeak"
+  toySparrow.squeak() // --> "chirp chirp"
+  
+  SparrowAdapter gg = new SparrowAdapter();
+  gg.squeak();
+  gg.makeSound(); // --> we don't want this to be public
+}
+```
+
+
 
 #### Object Adapter Pattern
 
@@ -384,11 +462,157 @@ class FactoryProducer {
 - interface to client is not cluttered with Adaptee functions, only sees the Adaptor method
 - **use case: old interface to new interface; want to abstract away old implementation details and use a new interface**
 
+```java
+interface Bird {
+	void makeSound()
+}
+class Sparrow implements Bird {
+  @Override makeSound() { print("Chirp Chirp") }
+}
+interface ToyDuck {
+  void squeak();
+}
+class PlasticToyDick implements ToyDuck {
+  @Override squeak() { print("Squeak")}
+}
+class BirdAdapter implements ToyDuck {
+  // **** OBJECT ADAPTER, adapter holds instance of adaptee ****
+  Bird bird;
+  public BirdAdapter(Bird b) { this.bird = b}
+  @Override squeak() { bird.makeSound() } // ADAPTED
+}
+main {
+  ToyDuck toyDuck = new PlasticToyDuck()
+  ToyDuck toySparrow = new BirdAdapter(new Sparrow())
+	toyDuck.squeak() // --> "squeak"
+  toySparrow.squeak() // --> "chirp chirp"
+}
+```
 
 
 
+#### Bridge Pattern
+
+- separate the abstraction from the implementation
+- client codes to the abstraction (interface) without being concerned about the implementation
+- abstraction has a reference to the implementor
+- Note: adapter helps things work AFTER they've been created; Bridge designs classes such that they work up front and let abs/impl vary independently
+
+```java
+// Implementation:
+// Abstract Implementation
+abstract class MoveLogic {
+  abstract void move()
+}
+// Concrete Implementations
+class Walk extends MoveLogic {
+  void move() { print("move my legs") }
+}
+class Fly extends MoveLogic {
+  void move() { print("flap my wings") }
+}
+
+// Abstraction:
+// Abstract Abstraction
+abstract class Animal {
+  abstract void howDoIMove()
+}
+// Concrete Implementations
+class Person extends Animal {
+	private MoveLogic moveLogic;
+  public Person(MoveLogic m) { this.moveLogic = m }
+  public void howDoIMove() {
+    this.moveLogic.move()
+  }
+}
+class Bird extends Animal {
+	private MoveLogic moveLogic;
+  public Bird(MoveLogic m) { this.moveLogic = m }
+  public void howDoIMove() {
+    this.moveLogic.move()
+  }
+}
+
+main {
+  MoveLogic walk = new Walk()
+  MoveLogic fly = new Fly()
+  Animal person = new Person(walk)
+  Animal bird = new Bird(fly)
+  person.howDoIMove() // --> move my legs
+  bird.howDoIMove() // --> flap my wings
+}
+
+```
 
 
+
+#### Decorator Design Pattern
+
+- lets users add new functionality to an **existing** object without altering its structure
+- create a decorator class which wraps the original class and provides additional functionality 
+
+```java
+abstract class Vehicle {
+  abstract String description();
+}
+class Car extends Vehicle {
+  @Override String description() { return "I am a car" }
+}
+class Decorator extends Vehicle {
+  protected Vehicle component;
+  public Decorator(Vehicle v) { this.component = v}
+  // does NOT override description()
+}
+class CoolWheels extends Decorator {
+  public CoolWheels(Vehicle v) {
+    super(v)
+  }
+  @Override String description() {
+    return component.description() + " with cool wheels"
+  }
+}
+class CoolPaint extends Decorator {
+  public CoolPaint(Vehicle v) {
+    super(v)
+  }
+  @Override String description() {
+    return component.description() + " with cool paint"
+  }
+}
+main {
+  Vehicle car = new Car()
+  car = new CoolWheels(car)
+  car = new CoolPaint(car)
+  print(car.description())
+  // i am a car with cool wheels with cool paint
+}
+```
+
+
+
+#### Facade Pattern
+
+```java
+class Oven {
+  void startOven
+}
+class PizzaMaker {
+  void preparePizza
+}
+class PizzaBoxer {
+  void boxPizza
+}
+class PizzaFacade {
+  private Oven oven
+  private PizzaMaker pizzaMaker
+  private PizzaBoxer pizzaBoxer
+  void getAndServicePizza() {
+    oven.startOven
+    pizzaMaker.preparePizza
+    pizzaBoxer.boxPizza
+  }
+}
+```
 
 
 
