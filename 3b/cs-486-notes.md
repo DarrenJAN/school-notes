@@ -39,7 +39,7 @@
     - Static vs Dynamic: static means only we are changing the environment
     - Single Agent vs MultiAgent
 
-## Chapter 1: Search
+## Chapter 2: Search
 
 ### Search Problem
 
@@ -163,7 +163,7 @@
 - biased on little paths that have low-cost actions and puts-off larger costs branches
 - Uses minimum-cumulative cost as the priority in the priority queue, as opposed to depth as the priority in the queue for DFS
 
-## Chapter 2: Informed Search
+## Chapter 3: Informed Search
 
 ### Using Knowledge
 
@@ -275,9 +275,10 @@
   
   - A* expands the fewest nodes compared to all algorithms that start at the same node and use the same heuristic function
   
-- A* Search Properties
+- **A* Search Properties**
+  
   - Optimal: yes
-  - Time complexity: TODO FIXME WRONG $O(b^\Delta)$ where $\Delta$ is the relative error of heuristic; $\Delta = \frac{h^* - h}{h^*}$
+  - Time complexity: $O(b^{\Delta*d})$ where $d$ is the depth of the shallowest goal node and $\Delta$ is the relative error of heuristic; $\Delta = \frac{h^* - h}{h^*}$
   - Space complexity: has to remember every node that has been expanded in memory (need to keep all possible paths)
   - In our graph example (country, Austria) the perfect heuristic function $h^*$ is the actual distance required to travel from node n to the goal (not the straight line distance, but the distance from travelling through all of the roads in the optimal way)
   - But, getting that perfect heuristic, in this example, requires solving the problem before-hand. Pointless.
@@ -316,6 +317,201 @@
   - Relax the problem
   - Pre-compute solution costs of sub-problems and store them in a pattern-database
   - Tradeoff between accuracy of heuristic (and therefore amount of search) and amount of computation needed to compute it
+
+
+
+## Chapter 4: Constraint Satisfaction Problems (CSPs)
+
+### CSPs and Constraint Graphs
+
+- Intro
+  - Standard search: 
+    - state, black box, state is just a node in our graph, don't really care what the underlying state structure is
+    - goal test: any function over states
+    - successor function: anything that let you move from one state to another
+  - CSP
+    - subset of search problems
+    - states have a specific definition; defined by variables $X_i$ with values from domains $D_i$
+    - goal test: set of specific constraints
+- CSP Examples
+  - Map Colouring
+    - variables (provinces)
+    - domains (colours R, G, B, Y that are assigned to variables)
+    - constraints: adjacent provinces must have different colours
+    - solution: an assignment of domain elements to variables that satisfies all constraints
+  - N Queens
+    - variables (cell $C_{i,j}$)
+    - domains (QUEEN, EMPTY)
+    - constraints ...
+  - N Queens p2 (far fewer states, far faster to solve)
+    - variables (columns $C_i$)
+    - domains (1, ..., N) where $C_i = x$ means that the x'th row in the i'th column is a queen
+    - constraints ...
+  - 3SAT
+    - variable ($v_1, ..., v_n$)
+    - domains (true, false)
+    - constraints: satisfy the input equation which is disjunctions of conjunctions of clauses of 3 variables
+- Types of CSPs
+  - discrete variables
+    - finite domains: with $n$ variables and $d$ domain elements then there are $O(d^n)$ complete assignments
+    - infinite domains
+  - continuous variables
+- Types of Constraints
+  - unary: single variable; this variable $x_1$ cannot be $d_1$
+  - binary: variable $x_1$ cannot equal variable $x_2$
+  - higher-order: involve multiple variables
+  - soft constraints (preferences):
+    - "red" is better than "green"
+    - constrained optimization problems
+- Constraint Graphs
+  - binary constraints: nodes are variables, edges are constraints
+  - higher order constraints: hypergraphs
+- CSPs and Search: Map Colouring Example
+  - state: partial assignment of domain values to the different variables
+  - initial state: {}
+  - successor function: assign a domain value to some unassigned variable
+  - goal test: complete assignment and constraints satisfied
+  - BFS doesn't work well:
+    - too many starting states here ($|Variables| \times |Domain|$)
+  - Commutativity
+    - ==important: CSPs are commutative; order of actions does not effect outcome; can assign variables in any order==
+
+### Solving CSPs
+
+#### Backtracking Search (basic)
+
+```
+select unassigned variable x(j)
+	for each domain value d1,..., dn that can be assigned to x
+		if value satisfies constraints, assign x = di
+		break
+	if assignment found
+		continue to next variable x(j + 1)
+	if assignment not found
+		go back to previous variable x(j - 1)
+```
+
+
+
+```mermaid
+graph TD;
+	S-->WA_B;
+	S-->WA_R
+	S-->WA_G
+	WA_B-->NT_R
+	NT_R-->SA_G
+	SA_G-->NSW_B
+	NSW_B-->ERROR1
+	
+	SA_G-->NSW_R
+	
+```
+
+NOTE: don't actually draw an ERROR state (just visual helper here)
+
+```
+colours = [B,R,G]
+start at WA. it can be blue
+go to NT. can't be blue. can be red.
+go to SA. can't be blue or red. can be green
+go to NSW. can't be green. can be blue
+go to Q. can't be blue or red or green. ERROR
+
+go back to NSW. try a different domain value. can be red
+```
+
+- Notes
+  - DFS with some small improvements
+  - correctness: will find a correct answer
+  - ordering: which variables should be tried first?
+  - filtering: can we detect failure early?
+  - structure: can we exploit the problem structure?
+
+### Improving Our Solution
+
+- ordering: **most constrainED variable**
+
+  - choose the **variable** which has the fewest legal moves (MRV minimum remaining values)
+
+  - assign first variable. then look at other variables. surely, one of the first variable's neighbours will have fewer possible legal values than a variable on the other side of the graph.
+
+    <img src="./images/cs486-4.png" alt="alt text" style="zoom:30%;" /> 
+
+- ordering: **most constrainING variable**
+
+  - choose variable with most constraints on remaining variables
+  - ex: most neighbours (if there are constraints between all neighbours, like in Map Colouring)
+
+  - we want to detect failure as quickly as possible.
+
+  <img src="./images/cs486-5.png" alt="alt text" style="zoom:30%;" />
+
+- ordering: **least-constraining value**
+
+  - choose the value that rules out the fewest values in the remaining variables
+
+  <img src="./images/cs486-6.png" alt="alt text" style="zoom:30%;" />
+
+- filtering: **forward checking**
+
+  - keep track of remaining legal values for unassigned variables
+  - done at runtime
+  - terminate (go back) when any variable has no legal values
+
+  <img src="./images/cs486-7.png" alt="alt text" style="zoom:30%;" />
+
+
+
+- filtering: arc consistency
+
+  - forward checking propagates information from assigned to unassigned variables, but it cannot detect all future failures early
+  - run a pre-processing step to get consistency across variables
+  - arc: directed edge
+  - give domains D1, D2 an arc is consistent if for all x in D1 there is a y in D2 such that x and y are consistent with the given constraints
+
+  ```mermaid
+  graph LR;
+  	A --> B
+  	B --> A
+  ```
+
+  ```
+  D(A) = { blue }
+  D(B) = { blue, red }
+  A -> B is consistent
+  B -> A is not consistent. remove { blue } from D(B)
+  ```
+
+  - if you can't make an arc consistent, then there is no solution
+  - works for 2 variables at a time
+
+- k-consistency
+
+  - forall sets of k - 1 variables, and consistent assignment of values; a consistent value can always be found for any kth variable
+
+### Structure
+
+- look for independent subproblems
+
+  - ex: tasmania is not connected to other components in australia map
+
+  - idea: break down the graph into its connected components; solve each component separately
+
+  - big savings: if each component has $c$ variables then there are $n/c$ components and ==worst case cost is now $O(d^c \times n/c)$==
+
+    
+
+​		
+
+
+
+
+
+
+
+
+
+
 
 
 

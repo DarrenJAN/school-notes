@@ -6,6 +6,8 @@
 - Sept 16, 18 lectures: review CS 247 material
 - Sept 13, 20 tutorials: review design patterns
 
+
+
 ## Lec 02: Architecture Introduction
 
 ###What is Software Architecture?
@@ -271,16 +273,83 @@ class Singleton {
 
 - call factory method to give me a new object instead of directly calling the constructor
 - need to pass in params to factory method if you want to get a new concrete class
-- Creator (abstract), ConcreteCreator implements the abstract method. If you want to change from 1 concrete product to another, you will need to pass params.
+
+```java
+public abstract class Shape {
+  public abstract void draw();
+}
+public class Square extends Shape {
+  @Override
+  public void draw(print("square"))
+}
+public class Circle extends Shape {
+  @Override
+  public void draw(print("circle"))
+}
+public class ShapeFactory {
+  public Shape getShape(String shape) {
+    if shape is null
+      return null
+    if shape is "square"
+      return new Square()
+    if shape is "circle"
+      return new Circle()
+  }
+}
+```
+
+
 
 #### Abstract Factory Method Pattern
 
-- solution to above point? this
-- makes creation even more indirect; you have a separate object for the factory
-- AbstractFactory: createProductA, createProductB
-- AbstractProductA can create A1 and A2 concrete types
-- AbstractProductB can create B1 and B2 concrete types
-- so you need 4 concrete implementations
+- an interface (super factory) is responsible for creating a factory of related objects without explicitly specifying their classes
+- isolates client code from concrete implementation factory classes
+- 
+
+```
+interface Shape {
+	void draw();
+}
+class RoundedSquare implements Shape {
+	void draw() { print("ROUNDED SQUARE") }
+}
+class RoundedRectangle implements Shape {
+	void draw() { print("ROUNDED RECTANGLE") }
+}
+class Rectangle implements Shape {
+	void draw() { print("RECTANGLE") }
+}
+class Square implements Shape {
+	void draw() { print("SQUARE") }
+}
+abstract class AbstractFactory {
+	abstract Shape getShape(String type)
+}
+class NormalShapeFactory extends AbstractFactory {
+	Shape getShape(String type) {
+		if type is SQAURE
+			return new Square()
+		if type is RECTANGLE
+			return new Rectangle()
+	}
+}
+class RoundedShapeFactory extends AbstractFactory {
+	Shape getShape(String type) {
+		if type is SQAURE
+			return new RoundedSquare()
+		if type is RECTANGLE
+			return new RoundedRectangle()
+	}
+}
+class FactoryProducer {
+	static AbstractFactory getFactory(boolean isRounded) {
+		if is rounded return RountedShapeFactory()
+		else return NormalShapeFactory()
+	}
+}
+```
+
+
 
 #### Builder Pattern
 
