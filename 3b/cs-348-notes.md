@@ -8,7 +8,7 @@
 
 
 
-## Intro to Database Management (Sept 5)
+## Lec 01: Intro to Database Management (Sept 5)
 
 - persistent data: information is stored long-term, persists after power is turned off
 - early data management: lots of redundancy, duplication
@@ -74,7 +74,7 @@
 
 
 
-## The Relational Model (Sept 10, 12)
+## Lec 02: The Relational Model (Sept 10, 12)
 
 - How to ask the right questions?
   - Ex: Find all pairs of natural numbers that add to 5 --> {(x,y) | x >= 0 and y >= 0 and x + y = 5}
@@ -104,7 +104,7 @@
     - Instance: **R_i** for each R_i // yes, boldness matters
   - Notation:
     - Signature $p = (R1, R2, \dots, Rn)$
-    - Instance **DB = (D, =, R_1, ..., R_n)**
+    - ==Instance **DB = (D, =, R_1, ..., R_n)**==
     - ==Clarification: R1 is the TABLE R1, **R1** is the entire instance inside of R1==
 
 - Example of relational Databases: Bibliography
@@ -149,6 +149,8 @@
 - Relational Calculus TODO
 
 - Free Variables TODO
+
+  - basically just the variables used in a eqn / formula / query
 
 ### Sample Queries
 
@@ -228,19 +230,89 @@
     - The above unsafe queries will end up using all or most of the domain
     - ==If you fix the instance (contents) of the DB, but you fiddle with the domain (currently just English strings, next you put all Chinese strings into it too) then the query better return the SAME answer==
     - TODO write equations
-    - Recall: Domain $\textbf{D_1}$ all of the information (single values) (SUE, BOB, ..., ...) but
-    - All the contents of **R1** must also be in D1 and D2...
+    - Recall: Domain **D1** all of the information (**single values**) (SUE, BOB, ..., ...)
+    - All the contents of **R1** must also be in **D1** and **D2**...
     - Unary relations (just 1 value) are a subset of a domain
     - Can only query the intersection of those two domains
-  - Domain-Independent Theorem: TODO
-- ==Domain-Independent and finite database implies safe==
-- Pdf
+  - Domain-Independent Theorem: answers to domain-independent queries contain only values that exist in **R1, R2,...,Rk** (the active domain)
+  - active domain: the domain you construct just from the DATA (finite file) I've told you about
+  - ==Domain-Independent and finite database implies safe==
+- Safety and Query Satisfiability
+  - theorem: satisfiability of first-order formulas is undecidable
+    - co-r.e. in general
+    - r.e. for finite databases
+  - theorem: domain-independence of first-order queries is undecidable
+    - you cannot write a program to answer "is this db domain-independent?"
+- Range-Restricted Queries
+  - see defn slide 38
+  - want to ensure finite input ==> finite output
+  - conjunction: answer to p1 is finite, p2 is finite, so intersection of them is finite
+  - equality with conjunction: if one of the equality variables is in p1 then the output is finite
+  - existential:
+  - disjunction: we require that the free variables (FV) or p1 = the FV(p2); solves the problem of having ANY value fill one of the variable values
+  - negations must be stuck in a conjunction: p1 and not(p2); FV(p2) must be a subset of the FV(p1)
+  - NOTE: 3 types of conjunction (regular, with equality, with negation)
+  - ==Theorem: range-restricted ==> domain-independent==
+- What have we lost?
+  - (P(x,y) AND Q1(x)) OR (P(x,y) and Q2(y)) (GOOD)
+  - <==>
+  - P(x,y) AND (Q1(x) OR Q2(y)) // BAD, FV(Q1(x)) = x is not contained in FV(Q2(y)) = y
+  - **Look at Q1(x) OR Q2(y)**
+    - one way to solve this is (Q1(x) AND ActiveDomain(y)) or (Q2(y) and ActiveDomain(y))
+    - ANDing x with the activeDomain(y) (all the possible values of y) restrict the values of x
+
+- computational properties
+  - evaluation of every query terminates
+  - data complexity:
+    - in the size of the database and for a fixed query
+    - runs in polynomial time
+    - using log space (for every query, you don't need to make copies of the database every, just needs a bunch of pointers to the db)
+    - AC_0 (constant time if CPUs running in parallel)
+  - combined complexity
+    - polynomial space
+- Query Evaluation vs Theorem Proving
+  - theorem proving: proving for all queries
+  - query evaluation: easier, just for this one query
+- Query Equivalence and DB Schema
+  - TODO
+- What Queries cannot be expressed in RC?
+  - built-in operations (ordering, arithmetic, string stuff)
+  - counting
+  - reachability/connectivity
+    - much harder
+
+
+
+## Lec 03: SQL (Sept 17)
+
+- good: conjunctive queries, set operations
+- bad: multiset semantics; null values
+- ugly: committee design standards 
+- major parts
+  - DML (Data Manipulation Language): query and update
+    - also, embedded SQL (JDBC); useful for application development
+    - help reduce injection attacks (SQL statements compiled ahead of time, can't send strings to attack)
+  - DDL (Data Definition Language): define schema for relations; create objects
+  - DCL (Data Control Language): access control
 
 
 
 
 
 
+
+## Assignment Talk
+
+### A1
+
+- "course with department D"
+  - convoluted rule through PROFs ? (TERRIBLE)
+  - missing "dept" in course? if cnum is CS247 then dept is CS; just use SUBSTR --> state your assumptions (YUP)
+    - use SUBSTR(X,Y,"CS") pretend there's a substring table
+  - put 2 attributes as the key for course, the course number and the depart; lots of repercussions  (need to apply to rest of diagram) (NOT GREAT)
+- q3: "among" means for ALL the students that have achieved the highest grade (maybe multiple)
+- q6: the max and min for all classes for a given term where that class is in a course taught by a CS or CO professor; all courses in terms
+- q10: take all pairs of professors
 
 
 
