@@ -396,4 +396,97 @@ for ... {
   - Inherits from type `uBaseCoroutine` magically
     - Can give it a name, adjust the stack size (uses that name for error messages)
     - You can ask who resumed you, which coroutine resumed me?
-  - Only ever remembers the last resumer; no stack growth; just context switches
+  - Only ever remembers the **last resumer; no stack growth**; just context switches
+  - first resume is a co-call; always starts at the top of the coroutine main function. before it can do this it has to create the co-routine stack.
+  - when deleted, a co-routines stack unwinds and all destructors are executed. even if it is running through an infinite loop, when you are finished with the object then it will be deleted and everything will be okay
+  - ==do NOT use catch(...) in a co-routine==
+  - ==you CAN talk to a coroutine after its main ends... but just make sure those public member routines do NOT call `main` as that will cause an error==
+  - trick: put `resume()` in the coroutine constructor (for example, to get the ready for the first input)
+  - most of the time, you only need to put variables in the `main`, but if you want them to be accessible inside of the destructor then they need to be class private variables
+  
+- Correct Coroutine Usage
+
+  - flag variables aren't like they used to be; they look different now, and we still want to avoid them; need to let the coroutine do the work (it knows its previous state)
+
+  ```
+  for i from 0 to 10
+  	if i is even // --> this is a state calculation, no zen no chill
+  		even += digit
+  	if i is odd // --> this is a state calulcation, no zen no chill
+  		odd += digit
+  	suspend()
+  ```
+
+  ```
+  fn1 fn2
+  fn1 = 0
+  fn = 0
+  fn1 = fn
+  suspend()
+  fn = 1, fn2 = fn1, fn1 = fn
+  suspend()
+  for (;;)
+  	fn = fn1 + fn2
+  	fn2 = fn1
+  	fn1 = fn
+  	suspend() // this is zen
+  ```
+
+- coroutine construction
+
+#### 3.2 uC++ EHM:
+
+- exception handling mechanism
+- superset of C++
+- **must use a specific type to throw** (CPU caught fire, disk explosion, etc)
+
+#### 3.3 Exception Type
+
+- u++ restricts exception types to those defined by`_Event`
+- has all the properties of a class
+
+#### 3.4 Inherited Members
+
+- msg is printed if the exception is not caught
+- `sourceName` find out who sent the exception
+- you can get the ADDRESS of the source (must be sure that the source still exists) and you can send something back to it
+- defaultTerminate, defaultResume, you get to decide what to do if this is not caught
+- two full passes ? first go and see if someone can fix it, then see if someone can recover
+
+#### 3.5 Raising
+
+- `_Throw`
+- `_Resume` [exception type] [ `_At` uBaseCoroutineID]
+- _At allows the specified exception or the currently propagating exception tobe raised at another coroutine or task
+- you can only resume an exception at someone else; you can't throw at someone else
+- when you resume at someone else, it does NOT unwind their stack
+
+```
+class B
+class D extends B
+void f(B t)
+	throw t
+D m
+f(m)
+// f throws a B, not a D. truncates the information to the base class
+
+if you did _Throw t using uC++ then it will throw a D!!! So you can catch a child class by throwing a child class
+```
+
+
+
+#### 3.6 Handlers
+
+- termination: just done with catch clauses; _Throw -> _Catch
+- resumption: _Resume --> _CatchResume (try to fix things)(must appear BEFORE catch clauses)
+- ==handlers are routines. when you run a handler it doesn't get shoved in the middle of the stack, it gets put at the top of the stack==
+- In Foo / CatchResume example, you can access i even though its out of the scope of the CatchResume (because that is a routine, put at top of stack, i is WAY down the stack) but magic lets it work...
+- resumption handler cannot perform a break, continue, return, or rethrow; 
+- recall: _CatchReturn DO NOT rewind the stack!! if they can leave, then that's a static return, but a _CatchResume is a dynamic return
+- ??? recall that when you throw in a handler... it doesn't look at the other handlers in that current scope ???? ish
+- this is a mess ;(
+- default resume does a throw of R??? noone can fix it, then it goes back to top of stack and throws, so it can match with a catch; **so you get 2 changes to first try and fixup and, if that fails, then throw**
+
+#### 3.7 Nonlocal Exceptions
+
+- 
