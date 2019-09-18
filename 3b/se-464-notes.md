@@ -616,6 +616,114 @@ class PizzaFacade {
 
 
 
+#### Proxy Pattern
+
+- control and manage access to object they are protecting
+
+```java
+interface Internet {
+	void connectTo(String serverHost)
+}
+class RealInternet implements Internet {
+  void connectTo(String serverHost) { 
+    print("connected to real internet")
+  }
+}
+class ProxyInternet implements Internet {
+  private Internet internet = RealInternet()
+  List<String> bannedSites
+  void connectTo(String serverHost) {
+    if serverHost in bannedSites
+      throw error
+    else internet.connectTo(serverHost)
+  }
+}
+```
+
+
+
+#### Composite
+
+- partitioning design pattern that describes a group of objects that is treated the same way whether it is a single instance of a collection of instances of that object type
+
+```java
+abstract class StoryCollection {
+  abstract void printDescription()
+  abstract void addToCollection(StoryCollection c)
+}
+class Book extends StoryCollection {
+  String name
+ 	public Book(String n) { this.name = n }
+  void printDescription() {
+    print("I'm a book: " + name)
+  }
+}
+class Series extends StoryCollection {
+  List<StoryCollection> stories
+  void addToCollection(StoryCollection c) {
+    this.stories.add(c)
+  }
+  void printDescription() {
+    stories.forEach(story -> story.printDescription())
+  }
+}
+```
+
+
+
+#### Flyweight Pattern
+
+- provides ways to decrease object count
+- used when we need to create a large amount of similar objects ($> 10^5$)
+- objects must be **immutable**
+- use a hashTable to have keys point to instances of objects
+- intrinsic states: states that can be shared for the different instances of the same object (ex: text editor, each letter is (char, font, size). 'B' is no different from any other 'B')
+- extrinsic state: can't be shared. Now, each letter is (char, font, size, row, col). row and col can't be shared for 2 different 'B's
+  - ==so, you have 26 char objects (or, more because of font and size, but still not too many). you get the object, then you assign the row and col, and then you print.==
+  - ==don't need to create thousands and thousands of objects which need to be stored in memory==
+
+```java
+interface Player {
+	void assignWeapon(String w)
+	void mission()
+}
+class Terrorist implements Player {
+	private final String TASK = "PLANT A BOMB"; // intrinsic
+	private final String weapon; // extrensic
+	void assignWeapon(String w) { this.weapon = w}
+	void mission(print("Terrorist with weapon " + weapon))
+}
+class CounterTerrorist implements Player {
+	private final String TASK = "DIFFUSE BOMB"; // intrinsic
+	private final String weapon; // extrensic
+	void assignWeapon(String w) { this.weapon = w}
+	void mission(print("CounterTerrorist with weapon " + weapon))
+}
+class PlayerFactory {
+  private static HashMap<String, Player> playerMap
+  public static Player getPlayer(String type) {
+    if type in playerMap.keys
+      return playerMap.get(type)
+    else
+      if type is "Terrorist"
+        Player p = new Terrorist()
+        playerMap.put("Terrorist", p)
+     else
+        Player p = new CounterTerrorist()
+        playerMap.put("CounterTerrorist", p)
+  }
+}
+main {
+  for i from 0 to n
+    // always returns one of 2 objects only, not n
+    Player p = PlayerFactory.getPlayer(randomType())
+    p.assignWeapon(randomWeapon())
+    p.mission() // send them on their mission
+}
+```
+
+
+
 
 
 ## Readings
