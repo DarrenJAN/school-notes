@@ -462,7 +462,7 @@ go back to NSW. try a different domain value. can be red
 
 
 
-- filtering: arc consistency
+- filtering: **arc consistency**
 
   - forward checking propagates information from assigned to unassigned variables, but it cannot detect all future failures early
   - run a pre-processing step to get consistency across variables
@@ -494,12 +494,133 @@ go back to NSW. try a different domain value. can be red
 - look for independent subproblems
 
   - ex: tasmania is not connected to other components in australia map
-
-  - idea: break down the graph into its connected components; solve each component separately
-
+- idea: break down the graph into its connected components; solve each component separately
   - big savings: if each component has $c$ variables then there are $n/c$ components and ==worst case cost is now $O(d^c \times n/c)$==
+- Tree Structures
+- no loops
+  - CSPs can be solved in $O(nd^2)$ if there are no loops in the constraint graph
+  - $d^2$ because for each node you need to check all of its relationships d times
 
-    
+- Non-Tree Structures
+
+  - Cutsets
+
+    - choose a subset S of variables such that the constraint graph becomes a tree when S is removed
+    - for each possible valid assignment to the variables in S
+      - remove from the domains of remaining variables all values are are inconsistent with S
+      - if the remaining CSP has a solution, return it
+    - runtime $O(d^c \times (n - c)d^2)$
+    - $d^c$ because there are c variables in your cutset and there are d domain assignments you can do for each variable
+    - $(n - c)d^2$ because its not just a tree, and there are $n - c$ remaining variables that need to be assigned
+
+  - **Tree Decomposition**
+
+    - create a new graph that will be a tree by introducing mega-nodes
+    - each mega-node is going to contain a subset of the original nodes in the graph
+    - properties
+      - each variable occurs in at least 1 mega-node
+      - if 2 vars are connected by a constraints, then they must appear together in at least one mega-node
+      - if a var appears in different mega-nodes, then it must appear in all between them in the path
+    - want to make the subproblems as small as possible
+      - tree width is largest subproblem - 1
+
+    - runtime is $O(nd^{w + 1})$
+
+- recall: variables are nodes in these constraint graphs
+
+
+
+## Chapter 5: Constraints and Local Search
+
+- intro
+  - recall that before, solution was typically a path to the goal
+  - but, for many problems, the path is unimportant
+- informal characterization
+  - constraints must still be satisfied
+  - cost function helps us find a good solution
+  - searching all possible states is NOT possible
+  - often easy to find some solution, but not the best solution (no problem hard)
+- N Queens example
+  - instead of starting from scratch, start with queens on the board
+  - works well except for certain ratio of constraints to variables (**critical ratio**)
+- TSP
+  - constructive method: start from scratch
+  - iterative improvement method: start with a solution (suboptimal) and then improve it
+
+### Iterative Improvement Methods
+
+- imagine all possible solutions laid out on a landscape
+
+- find the highest (or lowest) point
+
+- simple method
+
+  - start at some point (potential solution)
+  - generate all possible points to move to
+  - if set not empty, move to a point
+  - else, restart (you are stuck)
+
+- **Hill Climbing (Gradient Descent)**
+
+  - ==main idea: always take a step in the direction that improves the current solution value the most==
+  - (variation of Best first search)
+  - impl
+
+  ```
+  start with some initial configuration S, with value V(S)
+    generate MoveSet(S) = {m1, ..., mN}
+    Smax = max(V(mi))
+    if V(Smax) < V(S) return S // local optimum, not a GLOBAL optimum
+    S = Smax (navigate to node)
+    repeat from line 2
+  ```
+
+  - why "gradient ascent"? well, for f(x1, x2), if you want an optimal value, you take the $\nabla f(x1,x2) = 0$ (take derivative with respect to x1 ,x2)
+  - in math, $x' = x' + \alpha \nabla f(x')$
+  - Performance
+    - easy to program; no memory of where we have been
+    - not complete; not optimal; ==it can get stuck in local optima/plateaus==
+    - plateau solver: allow for sideways moves
+    - local maxima / minimum solution: record it, then randomly restart
+
+- runtime distribution
+
+  - Normal Distributions
+  - Exponential Decay $P[X > t] = Ce^{-t^2}$
+  - Heavy Tail Distributions $P[X > t] = Ct^{-\alpha}$
+
+- simulated annealing:
+
+  - escape local maxima by allowing downhill moves (consider sub-optimal moves)
+
+  ```
+  start with some initial configuration S, with value V(S)
+    generate MoveSet(S) = {m1, ..., mN}
+    Si = random from movement(S)
+    deltaV = V(Si) - V(s)
+    if deltaV > 0 
+    	then S = Si // go to Si node
+    else
+    	then S = si with probability p // how to choose p??
+    repeat from line 2
+  ```
+
+- how to choose p?
+- selecting p smartly in Simulated Annealing
+  - if $V(S_{new}) > V(S)$ then definitely move to $S_{new}$
+  - else if $V(S_{new}) < V(S)$ then move to $S_{new}$ with some probability
+  - Boltzmann Distribution $p = e^{\frac{\Delta V}{T}}$
+  - T is the temperature parameter; starts high and decreases over time towards 0
+  - high T: 
+    - exploratory phase: even bad moves have a change of being picked
+  - low T: 
+    - exploitation phase: bad moves have a low probability of being chosen
+
+
+
+
+
+
 
 ​		
 
