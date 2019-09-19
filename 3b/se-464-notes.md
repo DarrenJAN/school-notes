@@ -726,6 +726,32 @@ main {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+***
+
 ## Readings
 
 ###[What should a Software Engineering Course look like?](http://tomasp.net/blog/2019/software-engineering/)

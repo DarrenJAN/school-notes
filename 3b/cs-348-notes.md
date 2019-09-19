@@ -74,7 +74,7 @@
 
 
 
-## Lec 02: The Relational Model (Sept 10, 12)
+## Lec 02: The Relational Model (Sept 10, 12, 17)
 
 - How to ask the right questions?
   - Ex: Find all pairs of natural numbers that add to 5 --> {(x,y) | x >= 0 and y >= 0 and x + y = 5}
@@ -283,7 +283,7 @@
 
 
 
-## Lec 03: SQL (Sept 17)
+## Lec 03: SQL (Sept 17, 19)
 
 - good: conjunctive queries, set operations
 - bad: multiset semantics; null values
@@ -294,8 +294,155 @@
     - help reduce injection attacks (SQL statements compiled ahead of time, can't send strings to attack)
   - DDL (Data Definition Language): define schema for relations; create objects
   - DCL (Data Control Language): access control
+- Data Types
+  - varchar(n) variable length string (at most n)
+- Example schema: `AUTHOR(aud integer, name char(20))`
 
+- `SELET DISTINCT <results> FROM <tables> WHERE <condition>`
 
+- Variables vs Attributes
+
+  - usually have many columns; in relational calculus you would need to use lots of variable names
+  - corelations in SQL: for every table you only need to invent variable names for what you want, SQL will generate rest of variables for you
+  - `{ (p.AID, .NAME : AUTHOR(p.AID, p.NAME\}​`
+
+- Example: List all publications with at least two authors
+
+  ```sql
+  select distinct r1.publication
+  from wrote [as] rl, wrote r2 // table name and correlation variable
+  where r1.publication = r2.publication
+  and r1.author != r2.author
+  ```
+
+- Example: List titles of all books
+
+  ```sql
+  select distinct title
+  from publication, book // did not declare correlation variable
+  											 // used table name as corr. var. itself
+  where publication.pubid = book.pubid
+  ```
+
+- **FROM Clause (summary)**
+
+  - `FROM R1 [[as] n1], ..., Rk[[as] nk]`
+  - ==where `Ri` is the table, [] means optional, so you don't need `ni` unless you have duplicate table names, and the [as] is optional, too==
+  - ==clause represents the CONJUNCTION of R1 AND ... AND Rk==
+  - all ni need to be distinct
+
+- **SELECT Clause (summary)**
+
+  - `SELECT DISTINCT e1[[AS] n1], ..., ek [[AS] nk]`
+  - you can give names ni to the attributes in the answer
+  - e1 is the variable name, n1 is the new name we have given it to use in our output
+
+- Example: for every article list the number of pages
+
+  ```
+  select distinct pubid as id, 
+  			 endpage-startpage+1 as numpages
+  	from article
+  ```
+
+- **WHERE Clause**
+
+  - additional conditions on tuples that qualify for the answer
+    - standard atomic conditions =, !=, <. <=, ...
+    - **conditionals may involve expressions**
+      - similar conditions as in the SELECT clause
+
+- Example: find all journals printed since 1997
+
+  ```
+  select * from journal where year >= 1997
+  ```
+
+- Boolean Connectives: AND, OR, NOT
+
+- Complex Queries in SQL:
+
+  - so far we can write only EXISTS, AND queries
+  - remaining:
+    - OR, NOT (expressed using SET operations)
+    - forall: re-write using negation and EXISTS; same for `==>` and `<==>`
+
+- **Set Operations**
+
+  - note: answers to select blocks are relations (sets of tuples); we an apply set operations on them
+  - union: Q1 UNION Q1
+  - difference: Q1 EXCEPT Q2 (everything in q1 that's not in q2)
+    - ==p1 and not(p2) ==> we said earlier that the FV(p1) must be a subset of FV(p2)==
+    - so, we just change it to p1 and not(p1 and p2)
+    - now it meets the requirement above
+  - intersection: Q1 INTERSECT Q2
+  - ==Q1, Q2 must have union-compatible signatures; same number and types of attributes==
+    - this means that the free variables are the same on both sides
+    - but it's flexible; can do 1 column of smallint with 1 column of largeint
+
+- Example: Union >> List of all publication ids for books or journals
+
+  ```sql
+  (select distinct pubid from book)
+  union
+  (select distinct public from journal);
+  ```
+
+- Nesting of Queries
+
+  - we can use select blocks as arguments of set operations
+  - but what if we need to use a set operation inside of a select block?
+
+- Solution: Naming Sub-Queries
+
+  - queries denote relations
+  - we provide a naming mechanism that allows us to assign names to results of queries; can be used later in place of base relations
+
+  ```
+  with foo1 [opt schema 1] AS <query 1 goes here>
+  	...
+  	foon [opt schema n] AS <query n goes here>
+  	...
+  	query that uses foo1 and foon as table names
+  ```
+
+- example: list of all publication titles for books or journals
+
+  ```
+  with bookorjournal(publid) as
+  	(
+  		(select distinct pubid from book)
+  		UNION
+  		(select distinct pubid from journal)
+  	)
+  select distinct title
+  from publication, bookorjournal
+  where publication.pubid = bookorjournal.pubid
+  ```
+
+- can also do it inline!
+
+  ```
+  select distinct title
+  from publication,
+  	(
+  		(select distinct pubid from book)
+  		UNION
+  		(select distinct pubid from journal)
+  	) as bj
+  where publication.pubid = bj.pubid
+  ```
+
+- can't we just use OR instead of UNION?
+
+  ```
+  select distinct title
+  from publication, book, journal
+  where pub.id = book.id
+  or pub.id = journal.id // what if no journals?
+  ```
+
+  - if journals is empty, then FROM PUBL, BOOK, JOURNAL will return empty set, because FROM is a CONJUNCTION
 
 
 
