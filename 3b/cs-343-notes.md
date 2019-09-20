@@ -489,4 +489,37 @@ if you did _Throw t using uC++ then it will throw a D!!! So you can catch a chil
 
 #### 3.7 Nonlocal Exceptions
 
+- `_Resume`, ..., `_At`
+- resume exception A at c (Coroutine c)
+- you've sent an exception to that Coroutine
+- non-local exceptions and texting:; sent a text message E over to friend c
+- E gets hooked onto c... then you call c (call a member function to make it resume)
+- recall: not concurrent yet; only 1 thing running at once right now
+- suppose you had just called suspend from coroutine... when you wake up from suspend() it checks if you have received an error texted to you... if so, then you resume the text message.. once you've handled the error (catchresume)... then you go back to suspend and continue from next line
+- if A sends B a _Resume E, then B is the one that resumes it, not A
+- you have to OPT IN to getting these messages; you don't need to to opt out
+- `_Enable` allows nonlocal exceptions
+- exceptions are queued up, delivered in FIFO order
+- _Resume E means you will go down your stack (throw it, look for a handler)
+- "you catch it with a catch resume" --> in this example, he doesn't have a catch resume.
+- 1. it looks for a catch resume
+  2. if it goes down stack and doesn't find it, it will go back to top and throw and try and recover???
+- handlers are routines; routines have params;
+- if coroutine terminates, then stack is cleared, and so are all the exceptions that have been hooked
+
+- magically throw an exception to another coroutine?
+  - throw e, gets to bottom of stack, not handled, so it throws the default terminate, and it terminates the program... but, uC++ says NO, we still have options. so it will ignore the default terminate and for this special coroutine case it will instead do an `_resume unhandled exception`.  
+  - forces you to do the right thing; the resumer is the one that can probably recover the best
+  - this is where you hook an exception from FAULT loc to the SOURCE
+  - **Exception UnhandledException are always enabled**
+
+
+
+#### 3.8 Memory Management
+
+- each coroutine has its own stack; default is 64K; if you want it to be larger then you need to say so in ints constructor (recall each coroutine inherits from uBaseCoroutine)
+- `verify()` checks for stack overflow and if error then prints a message
+
+#### 3.9 Device Driver
+
 - 
