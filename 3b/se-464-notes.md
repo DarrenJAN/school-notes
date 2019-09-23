@@ -180,10 +180,9 @@
       - Location transparency (scalability: don't want to care where that other component (DB) is; efficiency: DO want to know where it is)
     - Topology
       - keep frequent collaborators close; ex: don't pass GBs of data through multiple layers
-
-  - Complexity
-
-    - Proportional to size of system; internal structure
+- Complexity
+  
+  - Proportional to size of system; internal structure
     - Components
       - Separate concerns
       - Isolate functionality from interaction
@@ -196,37 +195,51 @@
     - topology
       - Eliminate unnecessary dependencies
       - If you have many components, the **compose** groups of related components into larger components; **zoom out**
-
   - Scalability / Heterogeneity:
 
     - Scalability: capability of a system to be adapted to meet new size or scope requirements
-    - Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
+  - Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
     - Portability: ability of a system to properly execute on multiple platforms
     - Components
       - Keep components focused (==so you can find bottlenecks==)
       - Distribute data sources (different data centres around the world)
       - Replicate data: don'y only have 1 DB that stores the information; have different data centres around the world, each replicate the data; migrate changes over time (issue with concurrent modifications)
-
+  
     - Connectors
-      - Be explicit: don't use shared memory as a communication platform (doesn't scale)
+    - Be explicit: don't use shared memory as a communication platform (doesn't scale)
       - Direct vs indirect: easier to scale if indirect (didn't hard-code the connection)
-
+  
     - Topology
-      - Place data close to customer
+    - Place data close to customer
       - Think about who owns the data, about what moves around and where it stays
-
   - Evolvability
-
-    - Ability to change to satisfy new requirements and environments
+  
+  - Ability to change to satisfy new requirements and environments
     - Components
-      - 
+    - 
     - Connectors
       - 
     - Topology
+  - Dependability
+    - examples
+      - reliability: system will perform without failure
+      - availability: probability system is available at a moment in time
+      - robustness:
+      - fault-tolerance:
+      - survivability:
+      - safety:
+    - components
+      - support exception handling
+      - control external component dependencies
+    - connectors
+      - provide interaction guarantees
+    - topology:
+      - avoid single points of failure
+      - enable backups
 
 
 
-## Lec 04: Design Patterns
+## Lec 04/5: Design Patterns
 
 - composition vs aggregation
   - composition: 
@@ -724,7 +737,66 @@ main {
 
 
 
+## Lec 06: Architectural Styles
 
+- Architectural Pattern: set of architectural design decisions that are applicable to a recurring design problem, and parameterized to account for different software development contexts in which that problem appears
+
+  - ex: Three-Tiered Pattern
+    - Front
+    - Middle
+    - Back
+  - ex: MVC
+  - ex: Sense-Compute-Control
+
+- Architectural Styles: 
+
+  - certain design choices regularly result in solutions with superior properties
+  - a named collection of architectural design decisions that
+    - are applicable to a given development context
+    - constrain architectural design decisions that are specific to a particular system within that context
+    - elicit beneficial qualities in each resulting system
+  - good properties
+    - structure system such that it makes it easy to evolve in the future
+  - rarely see "pure" architectural styles used
+  - Style Analysis Dimensions
+    - design vocabulary 
+    - allowable structural patterns?
+    - underlying computation model: focus more on communication or more on how data gets exchanged
+    - essential invariants: what properties should always hold?
+    - common use examples
+    - pros and cons
+
+- Architectural Styles types
+
+  - Dataflow: stages of processing; focus on how the data flows through that system
+
+    - how it gets manipulated along the way
+
+  - shared memory: shared repository through which you share information
+
+  - interpreter: need flexibility of having a configuration language; some interpreter that configures your system; code gets interpreted at point in system that makes most sense
+
+  - implicit invocation: event systems; don't care which component responds to that event
+
+  - Layered Style
+
+    - each layer exposes an API to be used by above layers
+    - each layer provides services to higher layers, and interacts with lower layers
+    - do not expose implementation details
+    - example: operating system
+    - advantages:
+      - increasing abstraction levels
+      - can have different implementations of layers (evolvability)
+    - disdvantages
+      - not universally applicable
+      - performance
+
+  - Client-Server 
+
+    - servers do not know number or identities of clients
+    - clients know server's identity
+
+    
 
 
 

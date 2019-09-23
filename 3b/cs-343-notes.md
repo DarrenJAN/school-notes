@@ -477,8 +477,8 @@ if you did _Throw t using uC++ then it will throw a D!!! So you can catch a chil
 
 #### 3.6 Handlers
 
-- termination: just done with catch clauses; _Throw -> _Catch
-- resumption: _Resume --> _CatchResume (try to fix things)(must appear BEFORE catch clauses)
+- termination: just done with catch clauses; ==_Throw -> _Catch==
+- resumption: ==_Resume --> _CatchResume== (try to fix things)(must appear BEFORE catch clauses)
 - ==handlers are routines. when you run a handler it doesn't get shoved in the middle of the stack, it gets put at the top of the stack==
 - In Foo / CatchResume example, you can access i even though its out of the scope of the CatchResume (because that is a routine, put at top of stack, i is WAY down the stack) but magic lets it work...
 - resumption handler cannot perform a break, continue, return, or rethrow; 

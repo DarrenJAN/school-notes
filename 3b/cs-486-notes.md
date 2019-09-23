@@ -606,6 +606,7 @@ go back to NSW. try a different domain value. can be red
   ```
 
 - how to choose p?
+
 - selecting p smartly in Simulated Annealing
   - if $V(S_{new}) > V(S)$ then definitely move to $S_{new}$
   - else if $V(S_{new}) < V(S)$ then move to $S_{new}$ with some probability
@@ -615,6 +616,74 @@ go back to NSW. try a different domain value. can be red
     - exploratory phase: even bad moves have a change of being picked
   - low T: 
     - exploitation phase: bad moves have a low probability of being chosen
+  - if T is decreased slowly enough then simulated annealing is theoretically guaranteed to reach optimal solution
+  
+- genetic algorithms
+
+  - individual: an encoded candidate solution
+  - each individual has a fitness
+  - population: set of individuals
+  - populations change over generations by applying operators to them (selection, mutation, crossover)
+
+## Chapter 6: Adversarial Search
+
+- there will be another agent that changes the environment as we search
+
+### Games
+
+- easy to evaluate
+- types of games
+  - perfect vs imperfect information
+  - deterministic vs stochastic
+    - d: change in state is fully controlled by the players
+    - s: partially determined by chance
+- game search challenge
+  - what makes this hard? there is an opponent which wants to win and make you lose
+  - need to take this into account when choosing moves
+  - MAX player wants to maximize its utility
+  - MIN player (enemy)
+- utility function: helps us determine who won / lost / if it's a draw
+- optimal strategies
+  - optimal solution is sequence of moves leading to a goal state
+  - MAX strategy
+    - specify the move for all possible states arising from MIN's response (max goes first, then min goes, and now max has a pre-defined choice given the current state of the board)(tic tac toe example)
+  - what does optimal mean? strategy that leads to outcomes at least as good as any other strategy, given that MIN is playing optimally
+- game thoery
+  - formal way of reasoning about interactions between multiple agents
+  - game
+    - players, N
+    - possible strategies or actions, $S_i$
+    - utility functions $u_i(s_1, \dots, s_n)$ // utility of agent i depends on all strategies of all players
+  - nash equilibrium: 
+    - mutual best response
+    - vector which specifies a strategy for every agent
+    - if an individual decides to play NOT according to the given NE then it ruins everything
+- subgame perfect equilibria
+- existence of SPE
+
+### Minimax Search
+
+- MINIMAX-VAL =
+  - utility(n) if n is a terminal state
+  - $MAX_{s \in Succ(s)} (MINIMAXVALUE(s))$ if n is a MAX node
+  - ... for min node
+- complete: yes
+- time complexity: need to go through entire tree $O(b^m)$
+- space complexity: $O(bm)$ (just doing DFS basically)
+- optimal: yes
+  - SPE iff assuming optimal adversary
+
+### Alpha-beta Pruning
+
+- pruning: eliminate large parts of the game tree from consideration
+- alpha: value of highest choice we have found so far on path for MAX
+- beta: value of lowest choice we have found so far on path for MIN
+
+### Evaluation Functions
+
+### Coping with Chance
+
+
 
 
 
@@ -678,4 +747,3 @@ go back to NSW. try a different domain value. can be red
   - Prudence. Everyone involved in its development must exercise caution
   - Responsibility. Must not lessen the responsibility of human beings when decisions must be made (silly)
   - Sustainable development. Help to sustain the planet
-
