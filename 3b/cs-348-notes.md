@@ -286,16 +286,22 @@
 ## Lec 03: SQL (Sept 17, 19)
 
 - good: conjunctive queries, set operations
+
 - bad: multiset semantics; null values
+
 - ugly: committee design standards 
+
 - major parts
   - DML (Data Manipulation Language): query and update
     - also, embedded SQL (JDBC); useful for application development
     - help reduce injection attacks (SQL statements compiled ahead of time, can't send strings to attack)
   - DDL (Data Definition Language): define schema for relations; create objects
   - DCL (Data Control Language): access control
+  
 - Data Types
+  
   - varchar(n) variable length string (at most n)
+  
 - Example schema: `AUTHOR(aud integer, name char(20))`
 
 - `SELET DISTINCT <results> FROM <tables> WHERE <condition>`
@@ -443,6 +449,93 @@
   ```
 
   - if journals is empty, then FROM PUBL, BOOK, JOURNAL will return empty set, because FROM is a CONJUNCTION
+  
+- Summary of First-Order SQL
+
+  - captures all of relational calculus (RC)
+  - shortcomings
+    - some queries are had to write
+    - no counting
+    - no path in graph (recursion)
+
+### Syntactic Sugar
+
+- WHERE subqueries
+
+  - so far, WHERE clause cannot introduce new variables (must use variables from FROM tables)
+  - what kind of yes/no questions can you ask about sets?
+    - is it empty or not empty?
+    - does it contain some element?
+  - EX: select distinct title from publication where pubid in (select pubid from article)
+
+- Parametric Subqueries
+
+  - before: all variables in WHERE clauses come from the FROM tables
+  - you can communicate variables as params into those where clauses
+
+- Examples
+
+  ```
+  select *
+  from wrote r
+  where exists (
+  	select * from wrote as s
+  	where r.publication = s.publication
+  	and r.author <> s.author // <> == != 
+  // same publication, diff author, therefore it was at least 2 authors
+  )
+  ```
+
+- more levels of nesting
+
+  - recall: these subqueries in the where clause are just yes, no queries with params; we cannot use those values as output in our outer SELECT statement; we can just use them to compare
+
+- Ex: all authors who always publish with someone else (the same person)
+- Summary of WHERE clause
+  - slide 50
+
+### Updates
+
+- tables are large but updates are small ==> incremental updates
+- commands: INSERT, DELETE, UPDATE
+- INSERT
+  - `INSERT INTO table_name[attr1, ..., attrk] VALUES (vl,...,vk)`
+  - recall that [...] means its optional
+  - `INSERT into table_name(Q)` where Q is some query
+- DELETE
+  - `DELETE FROM r WHERE condition`; deletes all tuples that match condition
+  - deletion using cursors (later) ==> only way to delete one out of two duplicate tuples
+- UPDATE
+  - `UPDATE r SET <update statement> WHERE <condition>`
+
+
+
+> Recall: no values from WHERE clause can "escape" and be used in output
+
+
+
+- Support for Transactions
+  - transactions starts with first access of the database until it sees **COMMIT** (make changes permanent) or **ROLLBACK** (discard changes)
+  - read SQL specification: there are certain commands that start a transaction (select, etc) but there are some that do NOT start a transaction
+  - NOTE: DB2 has an AUTO COMMIT feature turned on automatically
+
+### Aggregates
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
