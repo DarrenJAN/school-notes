@@ -856,8 +856,8 @@ Look at A --> D --> 1 // min can force me to get at least a 1
   - Protection of Privacy and Intimacy. Prevent data intrusion
   - Solidarity
   - Democratic Participation. Must be subjected to democratic scrutiny, debate, and control.
-  - Equity. Must contribute to just and equitable society. (Silly)
+  - Equity. Must contribute to just and equitable society
   - Diversity Inclusion. Must be compatible with maintaining social and cultural diversity
   - Prudence. Everyone involved in its development must exercise caution
-  - Responsibility. Must not lessen the responsibility of human beings when decisions must be made (silly)
+  - Responsibility. Must not lessen the responsibility of human beings when decisions must be made
   - Sustainable development. Help to sustain the planet

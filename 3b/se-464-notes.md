@@ -796,7 +796,137 @@ main {
     - servers do not know number or identities of clients
     - clients know server's identity
 
-    
+
+
+
+## Lec 07: Architecture Styles 2
+
+- Virtual Machine: provides abstraction that lets other services use it without having to worry about implementation
+
+- Dataflow: some graph network that represents how data flows throughout system
+
+  - Not just a layered architecture flipped sideways
+  - One focuses on APIs (layered)
+  - Datflow focuses on data and how it moves
+
+- Pipe and Filter: many tiny programs that communicate through a common API
+
+- Shared memory: 
+
+  - Sure, small programs use shared memory, but that isn't shared memory architecture
+
+  - Blackboard:
+
+    - Central data structure: the blackboard
+
+    - Components operating on the blackboard
+
+    - System is entirely driven by the blackboard state
+
+    - It triggers interaction between the components
+
+    - Typically used for AI systems, compiler architecture
+
+    - Don't setup any communication between individual components
+
+    - Only indirect communication
+
+    - Ex: compiler
+
+      - parser
+      - Lexical analysis
+      - optimization
+      - assembler
+
+      - Code generation
+      - Sounds like a pipe and filter? Different phases which pass along information
+        - But then you have a symbol table
+        - And an Abstract Symbol Tree
+        - Cyclic dependencies between components
+
+  - Rule-Based
+
+    - Inference engine parses user input and determines whether it is a fact/rule or a query
+    - If it is a fact or rule, it adds this entry to the knowledge base
+    - Otherwise, it queries the knowledge base for the applicable rules and attempt to resolve the query
+    - Becomes very difficult when large number of rules
+    - Ex: datalog (type of first order analysis)
+      - High level description language?
+      - Rule-based system?
+      - Individual data rules describe some aspect of your static analysis
+
+  - More examples:
+
+    - Calculator 
+      - Shared representation: larger mathematical expression
+      - Each operator looks at the total expression and sees if it can solve and modify any smaller components
+    - Database as backend?
+      - Depends; is the interaction of all these micro services always through the database? Probably not
+
+  - disadvantages
+
+    - Concurrency is an issue, locks, waiting
+
+- Interpreter style
+
+  - Interpreter parses and executes input commands, update the state maintained by the interpreter
+  - components
+    - Command interpreter
+    - Program state
+    - User interface
+  - Ex:
+    - Command line interface (terminal)
+    - Web browser (displays visuals by interpreting Javascript)
+    - Pdf viewers
+  - Mobile code
+    - Javascript vs pdf viewers?
+      - Usually pdf is local data
+      - Javascript is mobile code, download it and execute it as part of a website
+
+- Implicit invocation
+
+  - Event announcement instead of method invocation
+  - Listeners register interest in and associate methods with events
+  - x happened, whomever wants to listen to x gets notified
+  - Don't hardcode dependency between event and component
+  - Publish and subscribe
+    - Game server publishes events
+  - Event-based stytle
+    - Shared message bus
+    - Each component can put a message on the bus
+    - Queueing system
+    - Each component and look at the event, take it off, handle it, put it back on
+    - Just care on the event, not on where that event came from
+
+- Peer to peer
+
+  - Distributed database? maybe
+  - Peers acts as either clients or servers
+  - Peers:
+  - Connectors:
+  - Data elements:
+
+- Distributed objects:
+
+  - COBRA
+  - REST API / Microservices
+    - Components in any programming language, exchange information over standard HTTP protocols to affect state
+
+- Design Recovery
+
+- Syntactic Clustering
+
+- Greenfield Design
+
+  - Product statement, come up with a solution
+  - Blank slate
+  - Literature searching: research to learn about technologies
+  - Morphological charts: draw trees and how they evolve
+  - Removing mental blocks:
+
+
+
+
 
 
 
