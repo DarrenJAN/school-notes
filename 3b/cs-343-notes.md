@@ -522,4 +522,71 @@ if you did _Throw t using uC++ then it will throw a D!!! So you can catch a chil
 
 #### 3.9 Device Driver
 
+#### 3.9.3 Producer-Consumer
+
+- producer needs to know who the consumer is, so producer is constructed with the consumer
+- in the semi-co routine version, producer wouldn't need to be a coroutine
+- false statement from before: when a coroutine goes off end of main, it suspends and resumes at resumer
+  - wrong
+  - instead, it automagically goes to end of starter, which is coroutine that first resumed
+  - so prod started cons, so prod is the starter
+  - coroutine knows who that starter and resumer is
+  - so go to end of main, you suspend to the STARTER
+  - if I start you, and I resume you, then I cant tell the difference when you come back to me (starter and resumer are the same)
+  - but what if the 2 are different?
+- who started prod? (main did)
+
+#### 3.10 Full Coroutines
+
+- full-coroutine has a cycle
+
+- come in to front:
+
+  - make some coroutine inactive (the current coroutine)
+  - `uThisCoroutine` tells you which coroutine you woke up in, or which coroutine you are going to sleep in
+  - `uThisCoroutine` tells you which stack you are in (who does it belong to)
+
+- back part:
+
+  - suspend() --> wake up the last resumer (hidden away inside the coroutine)
+  - resume() --> wake up this
+
+  ```
+  create fc
+  call fc.mem()
+  that calls resume() // this is fc, uThisCoroutine() is main
+  // you only do context switches at suspends and resumes
+  enter front of resume()
+  make something inactive (which is uThisCoroutine, which is main in this CONTEXT)
+  make something active (make this active, which is fc)
+  context switch to fc
+  create the stack; enter fc::main, uThisCorotuine now points to this
+  now enter resume() (#2)
+  make something inactive (this)
+  make something active (this)
+  // context switch in and out back and forth to itself
+  
+  ```
+
+- anytime you want to create a cycle, you need to have a special case that takes the two ends of the cycle and connects them
+- stopping it hard too, because a coroutine goes back to its starter
+- its ok to delete a co-routine that still has a stack; it will clean up its stack
+
+##### Ping Pong
+
+- first resume is magic, remembers who the starter is (main)
+
+```
+ping came into cycle, called resume()
+```
+
+- when pong ends, it goes to end of main, goes back to start (ping), and pong deletes its stack
+  - then ping finishes, runs off end of main, and goes back to its starter (which is main)
+  - then main deletes both ping and pong, which are just objects at that point (because both of them have run off the end of their main and their stacks are gone)
+- if ping ends first
+  - runs off end of ping::main, goes back to starter (main)
+  - main then deletes ping and pong
+  - ping is an object (ran off its main)
+  - pong is a coroutine (has not run off its main)
+  - but this is okay :) 
 - 

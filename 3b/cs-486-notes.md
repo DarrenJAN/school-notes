@@ -439,6 +439,7 @@ go back to NSW. try a different domain value. can be red
 
 - ordering: **most constrainING variable**
 
+  - TIE BREAKER for most constrained variable
   - choose variable with most constraints on remaining variables
   - ex: most neighbours (if there are constraints between all neighbours, like in Map Colouring)
 
@@ -667,21 +668,134 @@ go back to NSW. try a different domain value. can be red
   - utility(n) if n is a terminal state
   - $MAX_{s \in Succ(s)} (MINIMAXVALUE(s))$ if n is a MAX node
   - ... for min node
-- complete: yes
-- time complexity: need to go through entire tree $O(b^m)$
-- space complexity: $O(bm)$ (just doing DFS basically)
-- optimal: yes
+  - sub-game perfect equilibrium outcomes
+- performance
+  - complete: yes
+  - time complexity: need to go through entire tree $O(b^m)$
+  - space complexity: $O(bm)$ (just doing DFS basically)
+  - optimal: yes
   - SPE iff assuming optimal adversary
+- what is the size of the game tree generated? 
+  - $m$ levels in the game tree ==> $m$ moves in the game
+- summary 
+  - assume it already exists, we traverse it in DFS-manner
+  - go down to terminal node; check the outcome (win, lose)
+  - derive utility from perspective of MAX agent
+  - take that information, bring it back up the tree
+  - strategy: which action to take for every possible state it is in
+  - if MIN player does not play according to the equilibrium, then it is possible that there exists a better strategy for the MAX agent to play
+  - does not JUST apply to zero-sum two-player games
+  - multiple agent ==> utility vectors instead of utility values
+  - ==this is the IDEAL, perfect process. But, it is very expensive==
 
 ### Alpha-beta Pruning
 
+- add-on to minimax search
 - pruning: eliminate large parts of the game tree from consideration
-- alpha: value of highest choice we have found so far on path for MAX
-- beta: value of lowest choice we have found so far on path for MIN
+- alpha: value of best choice we have found so far on path for MAX
+- beta: value of best choice we have found so far on path for MIN
+- insights
+  - some actions are really stupid - so don't continue searching that part of the tree?
+- implementation
+  - use alpha and beta to determine if you can prune
+
+
+
+```mermaid
+graph TD;
+	A-->B;
+	A-->C
+	A-->D
+  B-->3
+	B-->11
+	B-->8
+	C-->2
+	C-->30
+	C-->12
+	D-->14
+	D-->5
+	D-->1
+```
+
+```
+Look at A --> B --> 3 ====> [3, infinity]
+Look at A --> C 
+	STOP (dont search 30 or 12), min can force me to get at least a 2
+Look at A --> D --> 14 // need to keep searching
+Look at A --> D --> 5 // need to keep searching
+Look at A --> D --> 1 // min can force me to get at least a 1
+```
+
+- properties
+  - results in the same outcome as full minimax search
+  - how much can be pruned while searching? worst case, nothing.
+- real-time decisions
+  - still not good enough -> need to search down to terminal state to get terminal nodes to get utility values
+  - need to make decisions quickly
+  - solution? heuristic evaluation function + cutoff tests
 
 ### Evaluation Functions
 
+- apply an evaluation function to a state
+  - if terminal state, function returns actual utility
+  - else, function returns estimate of expected utility
+  - must be fast to compute
+- creating an evaluation function
+  - expert knowledge (talk to grandmasters)
+  - learn from experience (machine learning)
+  - clusters of pieces, relative positions, etc
+- often, some sort of **weighted function**
+- cutting off search
+  - don't need to search to bottom of the tree
+  - arbitrarily - but deeper is better
+  - quiescent (quiet) state: usually okay to terminate 
+  - singular extensions
+    - search deeper when you have a move that is clearly good
+    - can avoid the **horizon effect**
+      - haven't searched far enough, get surprised by some bad state
+  - how deep to go?
+    - x ply means search down x levels from start
+    - novice: search down 5 ply
+    - master: 10-ply with alpha-beta pruning
+- checkers
+  - is solved
+  - they have brute-forced the game tree, and have the optimal solution sitting in a db
+
 ### Coping with Chance
+
+- stochastic game
+  - need to consider best/worst cases + probability that they will occur
+  - introduce a 3rd player to minimax, called "chance" or "nature"
+  - "chance" makes moves just like MAX and MIN, world will transition accordingly
+  - expectiminimax: minimax but at chances nodes compute the expected value
+  - recall: expected value of a random variable x is $E[X] = \sum_{x \in X}(P(x)x)$
+  - exact values matter in expectiminimax
+
+### Monte-Carlo Tree Search (MCTS)
+
+- build search tree according to outcomes of simulates players
+- slowly build up a search / "statistics" tree
+- steps
+  - **selection**: look through already-generated search tree
+    - each node: 
+      - whose turn it was
+      - number times we have seen this node
+      - number of times we have reached a winning state passing through this node
+    - move using some policy: Upper Confidence Bounds
+      - $v_i + C \sqrt{\frac{ln(N)}{n_i}}$
+      - $v_i$ is the expected value of the node given the values we have seen so far = `numWins/numVisits`
+      - exploration bonus: 
+        - N number total runs so far
+        - $n_i$ is number of times we have visited this state
+        - $n_i$ is small ==> bonus is LARGE
+        - $n_i$ is large ==> bonus is SMALL
+        - haven't seen it often before? i'm inclined to explore it more
+  - **expansion**: 
+    - eventually, we have no statistics about some node. So, chose one of its children to expand
+  - **simulation**: from that node, simulate a game
+    - use a **rollout policy** play out to the end of the game (choosing actions at random), or something more sophisticated. SIMPLE policy, FAST policy
+  - **back-propagation**: 
+    - use that information from simulation and update statistics for all node from the child back to the root
 
 
 
