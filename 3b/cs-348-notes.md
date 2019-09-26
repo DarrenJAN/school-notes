@@ -283,7 +283,7 @@
 
 
 
-## Lec 03: SQL (Sept 17, 19)
+## Lec 03: SQL (Sept 17, 19, 24)
 
 - good: conjunctive queries, set operations
 
@@ -492,6 +492,7 @@
 
 - Ex: all authors who always publish with someone else (the same person)
 - Summary of WHERE clause
+  
   - slide 50
 
 ### Updates
@@ -521,13 +522,193 @@
 
 ### Aggregates
 
+- Aggregate (column) functions are introduced
+  - Find number of tuples, find min or max values of an attribute, add values of an attribute (over the whole relation)
+  - canNOT be expressed in relational calculus
+  - Can apply to pieces of the tables (groups of tuples)
+  - ==Syntax looks similar, but it is totally different==
+  - ==All non-aggregate variables (x1,..., xk) that appear in the SELECT clause must also appear in the GROUP BY clause==
+
+```
+SELECT x1,...,xk, agg1, ..., aggn
+FROM Q
+GROUP BY x1,..., xk
+```
+
+- example
+
+```
+for each publication coun the number of authors
+select publication, count(author)
+from wrote
+group by publication
+
+// here, publication is NOT part of the aggregation so it must appear in the group by
+
+// what about publications with 0 authors?
+
+SOLUTION:
+
+another select clause (unioned) to get all publications that don't have authors
+```
+
+```
+SELECT author, sum(e - s + 1) as pages
+FROM (
+	SELECT w.author, startpage as s, endpage as e
+	FROM wrote as w, article as a
+	WHERE pubid = publication // ==== a.pubid = w.publication
+)
+GROUP BY author
+// HAVING pages >= 70
+
+what if we want only pages >= 70?
+
+do this
+
+SELECT * FROM (
+  SELECT author, sum(e - s + 1) as pages
+  FROM (
+    SELECT w.author, startpage as s, endpage as e
+    FROM wrote as w, article as a
+    WHERE pubid = publication // ==== a.pubid = w.publication
+  ) as t1
+  GROUP BY author
+) as t2
+WHERE pages >= 70
+
+but this is stupid and silly.
+
+use HABING
+```
+
+
+
+- HAVING clause
+  - WHERE can't impose conditions on values of aggregates
+
+```
+all publications with 1 author
+select publication, count(author)
+from wrote
+group by publication
+having count(author) = 1
+```
 
 
 
 
 
+## Lec 04: SQL 2 (Ordering, Duplicates, NULL) (Sept 26)
+
+### Ordering
+
+- Ordering results
+
+  - Can't assume any order of rows in tables
+  - Can't assume any order of intermediate result in query
+  - But you can use ORDER BY
+  - `ORDER BY e1 [dir1], ..., ek [dirk]`, `diri = ASC | DESC, ASC default`
+
+  - ==ORDER BY, needs to be at end==
+
+- Aside
+
+  - LIMIT 1 is bad -> allowed to return an arbitrary row each time
+  - TOP 1 is bad -> if there are multiple tops, allowed to return arbitrary one each time
+
+### Duplicate Semantics
+
+- Multisets and Duplicates
+
+  - SQL lets you use a MULTISET/BAG semantics instead of SET semantics
+  - Bolt, bolt, bolt, bolt, nut, nut =====> bolt (count 4), nut (count 2)
+
+- Range-Restricted Queries for Multisets
+
+  - Using DISTINCT
+  - A finite valuation (tuple) can appear k times (k > 0) as a query answer
+  - **DB**, theta, k entails phi reads "finite evaluation theta appears k times in phi's answer"
+  - Slide 9 ???
+
+  ```
+  T(x,y)
+  1 2
+  1 2
+  1 3
+  1 4
+  ====
+  T(x,y)
+  1 2 (2)
+  1 3 (1)
+  1 4 (1)
+  
+  All x such that there exists a y such that T(x,y)
+  returns 1, 4 times
+  ```
+
+  - ==IMPORTANT m - n entails phi - v; m entails phi, n entails v AND m > n==
+  - ==What is going on?==
+
+- Ex: One problem with duplicates
+
+  - (A(x) and B(x)) or C(x) === (A(x) or C(x)) AND (B(x) or C(x))
+  - Assume all A,B,C contains a (but in different quantities) (n, m, l respectively)
+  - LHS Result is (n m) + 1 // conjunction is product, disjunction is plus
+  - RHS Result is (n + l)(m + l) THESE ARE NOT EQUIVALENT
+
+- SELECT DISTINCT 
+
+  - Duplicate elimination operator
+
+- Bag Operations
+
+  - UNION ALL
+  - EXCEPT ALL
+  - INTERSECT ALL
+
+- EX
+
+  ```
+  select r.g
+  from s
+  where r.a in ( select b from s)
+  
+  different than
+  select r.b
+  from r, s
+  where r.a = s.b
+  
+  // if s contains duplicate b values, then for every r.a values equal to that b value then it will return ALL those duplicates from s
+  ```
 
 
+
+### NULL values
+
+- What is a null value?
+
+  ```
+  PHONE
+  NAME OFFICE HOME
+  john 123    ?
+  ```
+
+  - Does John have a phone? Or we do we just not know John's phone number?
+  - "Value inapplicable" --> this is what most NULLs mean
+    - Bad schema design; should instead separate into 2 tables for Name->OFFICE  and Name -> HOME, and then John would not have an entry in the HOME
+    - Why don't we do this? Efficiency
+  - "Value unknown" 
+    - John does have some home number, but we don't know what it is
+    - Does John have a home phone? Yes
+    - Can you give me John's home phone? No
+    - Many possibilities / possible worlds
+    - Solution: use certain answers such that the answer is the same in all worlds
+
+- What to do with NULLs in SQL?
+
+  - Nodes, edges. Is there an edge such that those 2 nodes have same colours?
+  - If node colours are all ?, then it gets crazy hard to figure out does there exist a colour evaluation for each ?1, ?2, ?3, ... that satisfies the predicate?
 
 
 

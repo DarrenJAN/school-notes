@@ -589,4 +589,73 @@ ping came into cycle, called resume()
   - ping is an object (ran off its main)
   - pong is a coroutine (has not run off its main)
   - but this is okay :) 
+
+
+
+## Chapter 4: skipped
+
+
+
+## Chapter 5: Concurrency
+
+- Thread: independent sequential execution path through a program
+  - Scheduled for execution separately and independently from other threads
+  - Sequential execution
+  - Exists in "theory", our application does not SEE it or touch it or manipulate it
+- Process: program component (like a routine) that has its own thread
+  - Usually has its own memory, has its own address space
+  - A human is a process with its own address space
+- Task: small process; similar to a process except
+  - Reduced along some particular dimension (boat vs ship)
+  - Tasks share common memory
+  - Sometimes called a light weight process (LWP)
+  - Tasks appear IN an address space
+  - Al of the thoughts going on inside a human are the tasks in that human
+- Parallel Execution: 2 or more operations occur simultaneously, needs multiple CPUs
+- Concurrent Execution: any situation in which execution of multiple threads appears to be performed in parallel
+  - NOTE: coroutines are NOT concurrent, but they have their own stack (so, multiple stacks but only one thread)
+  - Next, we will go to multiple stacks AND multiple threads
+  - A concurrent program can run on a computer with 1 CPU
+  - Ideally, you write a concurrent program and it runs on multiple CPUs
+
+### 5.1 Why Write Concurrent Programs?
+
+- Sometimes its the best way to solve a problem; need to take advantage of all of the cores that computers now have
+- How to divide a problem into multiple tasks?
+
+### 5.2 Why Concurrency is Difficult...
+
+- To understand
+- To specify
+- To debug
+  - Different speeds, different orders, execution is not repeatable
+  - "Heisenbug" -> the act of using debug statements (looking at your program) changes it
+
+### 5.3 Concurrent Hardware
+
+- Tasks can access the same shared memory
+- Tasks can be on different CPUs
+- Network vs distributed system
+  - Different laptops, want them each to interact, you can have parallelism but there are separate address spaces, no shared memory
+
+### 5.4 Execution States
+
+```mermaid
+graph LR;
+	NEW-->READY
+	READY-->RUNNING
+	RUNNING-->READY
+	RUNNING-->HALTED
+	RUNNING-->BLOCKED
+	BLOCKED-->READY
+	
+```
+
+- `inc I` instruction, increments I, and transitions can only occur before or after instruction, not during (not during loads, adds, set assembler code)
+  - Recall: can only do arithmetic in registers
+
+### 5.5 Threading Model
+
+- Defines relationship between threads and CPUs
 - 
+
