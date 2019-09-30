@@ -926,6 +926,55 @@ main {
 
 
 
+## Let 08: Architecture Modelling
+
+- What is an architecture model?
+  - Recall: all architecture is design, but not all design is architecture
+  - Artifact that captures some or all of the design decisions that comprise a system's architecture
+- How do we choose what to model?
+  - Which decisions and concepts
+  - Which level of detail
+  - How much right / formality
+- Examples of stuff to model
+  - Static and dynamic aspects
+  - Function and non-functional aspects
+- Important Characteristics of Models
+  - Ambiguity: open to more than one interpretation
+  - Accurate: correct, conforms to fact
+  - Precise: sharply exact
+- Views and Viewpoints:
+  - Model could be too large, complex, confusing to put into a single model / document
+  - So, create several coordinated models
+  - Viewpoint: user interaction
+  - Viewpoint: system administrator
+- Consistency Among Views
+  - Views often contain overlapping and related design decisions
+  - Want views to be consistent -> all contain design decisions that are compatible (one truth, one true total system model design)
+- Common Types of Inconsistencies
+  - Direct (model A says 3 x, model B says 2x)
+  - Refinement (high level view and low-level view conflict)
+  - Static vs dynamic
+  - Functional vs non-functional
+- Evaluating Modelling Approaches
+  - Scope and purpose; what does it help you model?
+  - Basic elements
+  - Style
+  - Dynamic modelling
+  - Non-functional aspects
+  - Concise ? Time it takes to understand ?
+- Examples
+  - Natural Language; not concise; can't understand quickly;
+  - UML (Unified Modelling Language)
+    - Common vocabulary
+    - Disadvantages: need to ensure consistency among views 
+  - Diagrams to Review
+    - Static structure
+      - Component, deployment, class diagrams
+    - Dynamic behaviour
+      - Sequence, use case, state machine diagrams
+
+
+
 
 
 
