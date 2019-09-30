@@ -577,27 +577,26 @@ go back to NSW. try a different domain value. can be red
   ```
 
   - why "gradient ascent"? well, for f(x1, x2), if you want an optimal value, you take the $\nabla f(x1,x2) = 0$ (take derivative with respect to x1 ,x2)
-  - in math, $x' = x' + \alpha \nabla f(x')$
   - Performance
     - easy to program; no memory of where we have been
     - not complete; not optimal; ==it can get stuck in local optima/plateaus==
     - plateau solver: allow for sideways moves
     - local maxima / minimum solution: record it, then randomly restart
-
+  
 - runtime distribution
 
   - Normal Distributions
   - Exponential Decay $P[X > t] = Ce^{-t^2}$
   - Heavy Tail Distributions $P[X > t] = Ct^{-\alpha}$
 
-- simulated annealing:
+- **simulated annealing:**
 
   - escape local maxima by allowing downhill moves (consider sub-optimal moves)
 
   ```
   start with some initial configuration S, with value V(S)
     generate MoveSet(S) = {m1, ..., mN}
-    Si = random from movement(S)
+    Si = random from MoveSet(S)
     deltaV = V(Si) - V(s)
     if deltaV > 0 
     	then S = Si // go to Si node
@@ -611,12 +610,12 @@ go back to NSW. try a different domain value. can be red
 - selecting p smartly in Simulated Annealing
   - if $V(S_{new}) > V(S)$ then definitely move to $S_{new}$
   - else if $V(S_{new}) < V(S)$ then move to $S_{new}$ with some probability
-  - Boltzmann Distribution $p = e^{\frac{\Delta V}{T}}$
+  - **Boltzmann Distribution** $p = e^{\frac{\Delta V}{T}}$
   - T is the temperature parameter; starts high and decreases over time towards 0
   - high T: 
-    - exploratory phase: even bad moves have a change of being picked
+    - **exploratory phase**: even bad moves have a chance of being picked
   - low T: 
-    - exploitation phase: bad moves have a low probability of being chosen
+    - **exploitation phase**: bad moves have a low probability of being chosen
   - if T is decreased slowly enough then simulated annealing is theoretically guaranteed to reach optimal solution
   
 - genetic algorithms
@@ -667,7 +666,7 @@ go back to NSW. try a different domain value. can be red
 - MINIMAX-VAL =
   - utility(n) if n is a terminal state
   - $MAX_{s \in Succ(s)} (MINIMAXVALUE(s))$ if n is a MAX node
-  - ... for min node
+  - MIN ... if n is a MIN node
   - sub-game perfect equilibrium outcomes
 - performance
   - complete: yes
@@ -799,11 +798,91 @@ Look at A --> D --> 1 // min can force me to get at least a 1
 
 
 
+## Chapter 7: Machine Learning
 
+- Learning
+  - Ability to improve one's behaviour based on experience
+  - Range of behaviours expanded; speed and accuracy improved
+- Definition: A computer program learns if its performance at tasks T, as measured by some performance measure P, improves as it gains experience
+- Common Learning Tasks
+  - Supervised Classification
+  - Unsupervised Learning
+    - Look for patterns / natural classes in large, un-labelled data set
+  - Reinforcement Learning (rewards and punishments)
+    - What action to take under certain circumstances
+  - Transfer Learning (learn from an expert)
+  - Active Learning (seek to learn)
 
+- Feedback
+  - Supervised: what has to be learned is specified for each example
+  - Unsupervised: needs to discover categories and patterns
+  - Reinforcement: feedback occurs after taking a sequence of actions
+- Representation
+  - Richer the representation, the more useful it is for subsequent problem solving
+  - Richer the representation, the more difficult it is to learn
+  - Examples: Polynomial Function, Linear Thresholds, Decision Trees, Neural Network
+- Measuring Performance
+  - Need a performance measure to judge and evaluate the learning
+  - Don't measure how well you are doing on the data in front of you
+  - You want to learn to be able to solve OTHER sets of new data, on other problem sets
+- Bias
+  - Can have bias in our data, or bias that we have engineered into our systems
+  - Bias: a tendency to prefer one hypothesis over another
+- Learning as Search
+  - Components: a representation, data, and bias ===> we have a search problem
+  - Search through space of possible representations looking for the representation that best fits the data given the bias
+  - Can't do a systematic search (too large)
+  - Instead: use an iterative improvement algorithm
+- Notes on Data
+  - Is not perfect (labelled incorrectly, incomplete)
+  - Don't overfit: find patterns in data where there is no actual pattern
+- Supervised Learning
+  - Terms
+    - Input features: $X_1, \dots, X_n$ (**this set of features will describe 1 example**)
+    - Target features f(X) or $Y_1, \dots, Y_k$ (this set of target features described 1 example)
+    - Training examples (pairs of input features, correct target features for each example)
+    - Test examples, only input is given
+    - Goal: predict the values for the target features for the test examples
+      - Classification: $Y_i$ are discrete
+      - Regression: $Y_i$ are continuous
+    - ==MUST keep training and tests separate==
+  - Implementation
+    - Want to return a hypothesis function h(x) that hopefully approximates f(x) (f(x) is the true, god-given function, where it already knows exactly what the output is supposed to be)
+- Inductive Learning Hypothesis
 
+> Any h(x) found to approximate the target function well over a sufficiently large set of training examples will also approximate the target function well over any unobserved examples
 
-
+- Inductive Learning
+  - Construct / adjust h to agree with f on training set (curve fitting)
+  - You can have several hypothesis fit the given labels; prefer the simplest hypothesis that is consistent with the data
+- Evaluating Performance of a Supervised Learning Algorithm
+  - Y is a target feature, e is an example
+  - Y(e) is the true value of feature Y for example e
+  - Y*(e) is the predicated value of feature Y for example e
+  - Error: some function involving Y(e) and Y*(e) (absolute error, sum of squares error, etc)
+    - T is set of all target features
+    - E is set of all examples
+    - Absolute Error: $\sum_{e \in E} \sum_{Y \in T} | Y(e) - Y^*(e)|$
+    - Sum of Squares Error: $\sum_{e \in E} \sum_{Y \in T} (Y(e) - Y^*(e))^2$
+- Receiver Operating Curve (ROC)
+  - Not all errors are equal
+    - Predict patient has a disease when they actually do not
+    - Predict patient does not have a disease when they actually do
+  - Actual A, Predicted P
+  - A(T) and P(T) => True Positive
+  - A(T) and P(F) => False Negative
+  - A(F) and P(T) => False positive
+  - A(F) and P(F) True Negative
+  - Sensitivity = TP / (TP = FN)
+  - Specificity = TN / (TN + FP)
+  - Precision = TP / (TP + FP)
+  - F-Measure: 2 * precision * recall / (precision + recall)
+- Decision Trees
+  - Classify instances by sorting them down the tree from root to leaf
+  - Nodes correspond to a test of some attribute
+  - Each branch corresponds to some value an attribute can take
+  - Algorithm: start at root. At each node, test attribute to that node, take branch corresponding to value of that attribute, stop at leaf
+- Inducing a Decision Tree (Implementation)
 
 ​		
 
