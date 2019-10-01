@@ -709,16 +709,109 @@ having count(author) = 1
 
   - Nodes, edges. Is there an edge such that those 2 nodes have same colours?
   - If node colours are all ?, then it gets crazy hard to figure out does there exist a colour evaluation for each ?1, ?2, ?3, ... that satisfies the predicate?
+  - table without nulls; is this graph 3 colour? just search for an edge where the edge point colours are the same
+  - but what if we allow null? then it has to guess how to assign the colours to the nodes. if for all possible cases you find a bad edge, then return NO. else, return YES. (this is all for null unknown). If we can solve this, then we can solve an intractable problem, best algorithms are exponential. ==so NPH. so no SQL implements value unknown for nulls==
+  
+- More to do with NULL in SQL
+
+  - general rule: NULL as a parameter to an operation makes the result NULL
+  - set operations
+    - unique special value for duplicates, just ONE NULL value (not different from each other)
+  - aggregate operations
+    - doesn't count;
+  - predicates / comparisons
+    - **Three-valued logic**
+
+- Comparison Revisited 
+
+  - 1 == NULL ? Uknown ? UNKNOWN is the 3rd truth value (TRUE, FALSE, UNKNOWN)
+
+<img src="./images/cs348-2.png" alt="alt text" style="zoom:100%;" />
+
+- UNKNOWN in WHERE clause
+
+  - WHERE `<cond>` IS TRUE | IS FALSE | IS UNKNOWN
+
+- Counting
+
+  - if some table has a row with a URL as null, then count(*) vs count (URL) can return 3, 2
+
+- ex:
+
+  ```
+  select aid, publication
+  from author left join wrote
+  									on aid=author
+  									
+  // lenient to authors
+  
+  vs
+  
+  UNION ALL
+  	SELECT aid, 0 (the number zero)
+  	FROM author WHERE aid not in (select author from wrote)
+  ```
+
+- OUTER JOIN
+  - allow null-padded answers that fail to satisfy a conjuct in a conjunction
+  - `FROM R <j-type> JOIN S ON C`
+  - j-type is FULL, LEFT, RIGHT, or INNER
 
 
 
+## Lec 05: Application Programming
 
+- don't want to write SQL; you want some better programming langauge to interact and connect for you
+- write SQL in a string? only find out errors at run time
+  - watch out for sql injection attacks
 
+### Embedded SQL (in C)
 
+- considerations
+  - how can SQL be parameterized?
+    - how to pass params, how to get results, errors?
 
+- declarations
 
+  - `EXEC SQL INCLUDE SQLCA`;
+  - `EXEC SQL <sql statement>`;
 
+- HOST variable
 
+  - how do we communicate values between C and SQL?
+  - identifiers (in C, variables; in SQL, params)
+
+  ```
+  EXEC SQL BEGIN DECLARE SECTION;
+  declarations of variables to be used
+  in SQL statements go here
+  EXEC SQL END DECLARE SECTION;
+  ```
+
+  - put a : in front of a host variable to use it inside of a query
+
+- ERRORS
+
+  - check sqlcode, or use exception handling with go to's
+
+- Prepare you application
+
+  - pre process compile ..
+  - use the makefile from the website
+
+- Real SQL Statements
+
+- NULLS ?
+
+  - use INDICATOR variable
+
+- Dealing with mutliple return results
+
+  - basically like reading one by one from a file (CURSOR)
+  - CURSOR holds the result of a query as if it was a file
+  - 
+
+### Stored Procedures
 
 
 

@@ -864,7 +864,7 @@ Look at A --> D --> 1 // min can force me to get at least a 1
     - E is set of all examples
     - Absolute Error: $\sum_{e \in E} \sum_{Y \in T} | Y(e) - Y^*(e)|$
     - Sum of Squares Error: $\sum_{e \in E} \sum_{Y \in T} (Y(e) - Y^*(e))^2$
-- Receiver Operating Curve (ROC)
+- Receiver Operating Characteristic Curve (ROC Curve)
   - Not all errors are equal
     - Predict patient has a disease when they actually do not
     - Predict patient does not have a disease when they actually do
