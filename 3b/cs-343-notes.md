@@ -592,11 +592,92 @@ ping came into cycle, called resume()
 
 
 
-## Chapter 4: skipped
+## Chapter 4: More Exceptions (Oct 1)
 
+- Derived exceptions
 
+  - There is a hierarchy of exceptions (File -> IO -> Exception, etc)
+  - Now if I catch IO, then I can also catch any children of IO (like File, Network)
+  - Now 1 exception --> many possible catchers
+  - ==Now, ordering is important==
 
-## Chapter 5: Concurrency
+- Catch by value or by reference?
+
+  ```
+  struct B {}
+  struct D : public B {}
+  
+  try {
+  	throw D()
+  } catch (B e) { // D is truncated into a B (child parts chiopped off)
+  
+  }
+  
+  try {
+  	throw D()
+  } catch (B & e) { // caught by reference, will preserve that it is a D
+  	is e a D ? you can cast and check, it still has that information
+  	dynamic_cast...
+  }
+  ```
+
+- Recall: `_Throw` does NOT truncate
+
+- Catch Any
+
+  - `catch(...)`
+
+- Cool
+
+  - Catch errors my reference, and also store information inside of errors by reference. That way you can send a struct, catch resume it, change a value, and then resume it from the next line, but its error-causing value has been changed
+
+- Exception list
+
+  - Part of a routine's prototype which specifies which exception types may propagate from the routine to its caller
+
+  - ```
+    // java
+    int foo() throws DivideByZeroException, FooException, ..., ... {
+    
+    }
+    ```
+
+  - Checked exceptions: happen at compile time
+    - What's wrong with this? Java developers just ignore them (catch(Exception e) {})
+      - Also, can't write generic functions template<class T>....
+      - What if different T's throw different exceptions?
+      - Pointers, virtual, resumption are dynamic calls dynamic returns
+      - Also bad for inheritance. Parent function doesn't throw. Child function does. What a mess
+  - Unchecked exceptions: happen at run time
+
+### 4.5 Destructor
+
+- You can raise exception from destructor in c++ ???
+
+- Currently, all destructors are marked as noexcept
+
+- `~C() noexcept(false) { throw E(); }`
+
+- ```
+  try {
+  	C x;
+  } catch (E) { // when x reaches the end of the bracket, its destructor is called
+  	// so then it is caught here
+  	
+  }
+  ```
+
+- Destructors are the ONLY thing that can intervene during propagation (going down stack, try to match exception with a catch clause)
+
+- While it's going down, it doesn't execute any code, unless its a destructor
+
+- Propagating down, run a destructor, it throw, and now you have 2 exceptions going down!!!!
+
+- What do you do with > 1 exceptions?
+
+  - How do you start another exception?
+
+## Chapter 5: Concurrency (Sept 26)
 
 - Thread: independent sequential execution path through a program
   - Scheduled for execution separately and independently from other threads
@@ -657,5 +738,47 @@ graph LR;
 ### 5.5 Threading Model
 
 - Defines relationship between threads and CPUs
+- Can go down a level, and have a virtual machine
+- Can go up a level, and have nano threads
+- Why have user threads? Application to kernel boundary is very expensive; but from user threads to user scheduler, we don't need to go through the kernel, much lighter weight. Also, locking is much faster there too
+
+### 5.6 Concurrent Systems
+
+1. Give concurrent program to a parallel compiler, and it does magic (IMPLICIT)
+
+   1. A sequential program can never take advantage of parallelism
+   2. Must transform sequential to concurrent
+
+   3. These magic compilers only work on certain types of problems
+
+2. Write some of it in concurrent mindset, give hints about what should be concurrent, then let the magic compiler do it (IMPLICIT, but slightly less)
+3. White concurrency through explicit constructs (EXPLICIT)
+
+- As concurrency increases so does the complexity
+
+### 5.7 Speedup
+
+- Program Speedup is $S_c = T_1/T_c$ where C is number of CPUs and $T_1$ is the sequential execution
+- Typically we have non-linear (log, sort) speedup
+  - Bottlenecks
+- Always tiny bits of sequential code in a parallel program
+- Ex
+  - Matrix multiplication
+  - Multiply all in parallel
+  - But you need to read it in sequentially
+  - Need to sum up totals, and print, and that is sequential too
+- Amdahl's Law:
+  - $S_C = \frac{1}{(1 - P) + P/C}$
+- Critical Path: the path of operations which is the bottleneck for code; if you want to speed up your code, you need to speed up the critical path
+- Sometimes your scheduler will mess everything up for you always :/
+
+
+
+### 5.8 Thread Creation
+
 - 
+
+
+
+
 
