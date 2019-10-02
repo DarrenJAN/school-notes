@@ -877,12 +877,124 @@ Look at A --> D --> 1 // min can force me to get at least a 1
   - Specificity = TN / (TN + FP)
   - Precision = TP / (TP + FP)
   - F-Measure: 2 * precision * recall / (precision + recall)
-- Decision Trees
+
+### Decision Trees
+
+- General
   - Classify instances by sorting them down the tree from root to leaf
   - Nodes correspond to a test of some attribute
   - Each branch corresponds to some value an attribute can take
   - Algorithm: start at root. At each node, test attribute to that node, take branch corresponding to value of that attribute, stop at leaf
+  - If you have continuous data, you need to find a way to discretize it
 - Inducing a Decision Tree (Implementation)
+  - Examples: each example e has a list of attributes and a label
+  - Attributes (features)
+  - Default classification
+  - Best = best_attribute
+    - Each attribute can take on multiple values, like, OUTLOOK can take on Sunny, Rain, Overcast ($v_1, v_2, v_3$)
+
+- Restaurant Wait or Not Decision Tree Example
+
+  - Root = Patrons? Or Root = Food Type?
+
+  <img src="./images/cs486-8.png" alt="alt text" style="zoom:100%;" />
+
+- Entropy
+
+  - Measure of unpredictability
+  - Have an underlying stochastic source generating your data
+  - Entropy: average rate at which information is produced
+  - X is a random variable, $\{ x_1, \dots, x_n\}$
+  - Probability of X ==> $P(X) = $ probability X = x_i ??
+  - I is information, is entropy?
+  - $H(x) = I(X) = \sum_{i=1}^n -P(x_i)log_2P(x_i)$
+  - We assume 0*log(0) = 0
+  - Heads or Tails: I(1, 0) = 0 (low entropy)
+  - Heads or Tails: I(0.5,0.5) = 1 (high entropy)
+  - X = (0.9H, 0.1T)
+  - I(X) = -0.9log(0.9) - 0.1log(0.1) = 0.46
+
+- Information Gain
+
+  - Compute expected entropy for each subset of the attribute?
+  - remainder(A) is the expected information we have, once we have sorted our examples by the attribute A
+
+  ```
+  Let Attribute A have possible values a1, ..., an
+  then remainder(A) = sum(probability(a1) * I(a1))
+  so if there are 10 samples, and A = a1, a2, a3
+  and a1 = T T F
+  and a2 = T T T
+  and a3 = T F F F
+  then remainder(A) = 
+  3/10 * I(2,1) + 3/10 * I(1,0) + 4/10  * I(1,4)
+  ```
+
+  
+
+  - Choose your attribute by using your Information Gain measure
+    - IG(A) = I(...,...) - remainder(A)
+    - I(...,...) is initial information
+  - Choose attribute which has the highest information gain; the attribute which is reducing the amount of information that we have left further in our process
+
+- Back to restaurant example...
+
+  - Before we start, there are 6 Ts and 6 Fs
+  - Root = Patron [None(2F), Some(4T), Full(2 T, 4 F)]
+  - Root = 
+
+  ```
+  IG(Patron) = I(0.5,0.5) - Remainder(Patron)
+  	= 1 - Remainder(Patron)
+  	= 1 - ([P(NONE)I(NONE)] + [P(SOME)I(SOME)] + [P(FULL)I(FULL)])
+  	= 1 - ((2/12)(I(0.1))  + (4/12)(I(1,0))  +  (6/12)(I(2/6, 4/6)))
+  	= 1 - ((2/12)0 + (4/12)0 + 0.459)
+  	= 1 - 0.459
+  	= 0.541
+  IG(Type) = I(0.5,0.5) - Remainder(Type)
+  	= 1 - Remainder(Type)
+  	= 1 - (2/12*I(1,1) + 2/12*I(1,1) + 4/12*I(1,1) + 4/12*I(1,1))
+  	= 1 - 1
+  	= 0
+  So patron is best
+  ```
+
+
+
+### Assessing Performance
+
+- Test Set and Training Set
+  - Collect a large set of examples, divide them into 2 disjoint sets (training and test sets)
+  - Apply learning algorithm to training set to get $h$
+  - Measure percentage of examples in the test set that are correctly classified by $h$
+  - Typically, as training set grows, accuracy increases
+  - ==Algorithm CANNOT look at the test set, each time you want to evaluate performance you need to use a different test set==
+- Overfitting
+  - Big L
+- Avoiding Overfitting
+  - Regularization:
+    - Prefer small decision trees over large ones so add a complexity penalty to the stopping criteria (each attribute has a penalty, encourages smaller trees)
+    - Pseudo counts: add data based on prior knowledge
+- Cross Validation
+  - Split data into test and training set
+  - Split training set into training and validation set
+  - Validation is a pretend test set
+  - ==K-Fold Validation: divide training set into K subsets, pull it out, train on rest, test on that subset, "leave one out" validation==
+
+### Linear Classifiers
+
+- Classification with linear thresholds
+  - Data in the form $(x, f(x)$ where $x \in R^n$ (a point on any hyper-dimensional plane), and $f(x)$ is YES or NO; it's a classification
+  - Define **w*x** where w is a weight vector $w_0, \dots, w_{n + 1}$ and **x** is our data $x_1, \dots, x_n$ and **w*x** = $w_0 + w_1x_1 + \dots w_nx_n$
+  - Learning problem: find the weights **w** such that $h_w$ is a good classifier
+  - $Loss(h_w) = $ Sum of squares of error
+- Gradient Descent
+  - For a single example, $loss = (y - h_w(\bar{x}))^2$ // y is label
+  - $\frac{\partial h_w}{\partial w_c} = 2(y - h_w(\bar{x}))(-x_c)$ // x bar is entire weight vector, x_c, w_c is just an element and the weight of that individual element
+  - Perceptron update rule
+    - If y is 1 but $h_w$ says that it's a negative sample (0) then we adjust the weight by $x_i$ and $\alpha$. 
+
+
 
 ​		
 
