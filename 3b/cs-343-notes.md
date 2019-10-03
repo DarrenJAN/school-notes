@@ -776,9 +776,143 @@ graph LR;
 
 ### 5.8 Thread Creation
 
-- 
+- COBEGIN/COEND
+
+  - Define something that we, as the programming, believe can be done concurrently
+  - Everything inside of it should be able to be done at the same time
+  - Implicit; can't assume anything about order or speed
+  - After the COEND, you know everything has between them has finished
+  - Can communicate using global variables
+
+- General notes
+
+  - All programs start with an initial thread given by the OS
+  - Does the initial thread participate in the concurrency? Usually no; it blocks and waits for all of them to finish
+  - What if we don't know how many child threads we will have? Because each of the threads we create at the root level... themselves make more threads
+  - Solution? Recursive loop, call with n - 1 each time..
+  - What if we want N?
+    - If you do it inside of a for-loop, then they just run 1 by 1, and so that is sequential
+  - Structure of thread graph is RESTRICTED
+
+- START/WAIT
+
+  - Start: I want to create a new thread, run routine p, and call it with x
+  - wait(y) wait for that routine y to finish
+  - When you do START(z), the main thread can continue
+
+  ```
+  void foo(int x) ...
+  int bar(int x) ...
+  
+  main:
+  
+  initial thread ...
+  auto p = START(foo, 5)
+  initial thread continues ...
+  auto f = START(bar, 8)
+  initial thread continues...
+  WAIT(p) // wait for p to finish, initial waits
+  ...
+  i = WAIT(f) // wait for f to finish
+  ```
+
+  - Start **EXPLICITLY** creates the thread; you define how many threads are created
+  - Wait **EXPLICITLY** waits for the thread
+  - Structure of thread graph is UN-RESTRICTED
+  - More powerful than COBEGIN/COEND
+  - Goals: threads, synchronization, communication
+
+- THREAD OBJECT
+
+  - Convert it into an object form using start, wait, cobegin, coend
+  - Shares some properties of the coroutine
+    - Has its own stack
+    - Have to eagerly create the stack (can't wait for first resume)
+    - Because it might be scheduled any team by the scheduler (the thread that it creates)
+  - The initial thread has to wait at the curly brace for all of its children to finish
+  - Create the initial thread on the heap (the _Task)
+    - How do you know when to delete the object? What if it has threads that are still running?
+
+  ```
+  madness 1: { int i,j,k; }
+  madn
+  ess 2: T * t = new T; delete t; // T is a _Task
+  but here... we are allowing it
+  ```
+
+### Concurrency v2: Actors
+
+- Each actor has a mailbox
+- An actor can pull messages from its mailbox. Each message might say "here is some work I want you to do"
+- Part of performing the message's task might be to send another message, might send it to another actor, or to itself
+- A message might also tell it to create more actors
+- How do you actually decide what to do?
+- You have a thread pool
+- Threads will fine actors that has waiting messages, animate the actor (let it do work)
+- After x messages for an actor, the thread pool might move on to another actor
+- Thread pool usually created on the side; we don't need to touch it
+- How do we do this in uC++ ?
+  - Messages
+    - Just a data structure
+  - Actors
+  - Recall: we have to do the garbage collection!
+  - Thread pool takes a message and an actor and calls `actor.receive(message)`
+    - Actor needs to handle all different types of messages
+
+```
+Case(StrMsg, msg) {
+	msg_d->val // msg_d is created automagically, is of type StrMsg
+} else Case(...)
+
+but ALSO
+
+Case(StrMsg, foofoo) {
+	foofoo_d->val // foofoo_d is created automagically, is of type StrMsg
+} else Case(...)
+```
+
+- Actor wants to stay alive? Return `Nodelete`
+- Someone send me a stop message? Return `Delete`
+
+```
+int main() { // like COBEGIN / COEND
+uActorStart(); // start actor system, creates the thread pool
+// use | to send a message
+*new Hello() | *new StrMsg( "hello" ) | uActor::stopMsg; 
+*new Hello() | *new StrMsg( "bonjour" ) | uActor::stopMsg; 
+uActorStop(); // wait for all actors to terminate
+}
+```
+
+- ==Recall: we don't know anything about the order in which messages will be serviced by actions==
+- ==messages are sent IN ORDER per each actor==
+- ==actors don't have a stack; the threads have the stack; can't time-slice an actor==
+
+- Now with stack allocation...
+  - Create both messages and actors on the stack... 
+  - When you know you are on the stack, then you use ==Finished== instead of Deleted
+
+### 5.9 Termination Synchronization
+
+- So far, we have been waiting for things to die (wait for thread to die, wait for actor to die)
+- How can a thread terminate?
+  - Normally, with an error
+  - Can also be KILLED (by parent or sibling) // not in uC++
+
+### 5.10 Divide and Conquer (Algorithms)
+
+- Ex: sum up all values in a matrix
+  - Thread for each row
+  - But you sequentially read it in
+  - And you sequentially have to sum up all of the row totals
+  - `COFOR` a concurrent FOR loop
+  - You will EVENTUALLY have x threads (for each row) but will you get them all at once? We don't know
+  - Can do this with ACTORS instead
+  - Can also do this with _Tasks, you can add the subtotals as you go instead of waiting for all of them to finish
+    - Here, we created them on the heap (dynamic instantiation..., in array, each element initialized with a different value)
+    - What if the first one takes the longest? And we have to wait for it?
+      - Well, once we wait for the first one, the rest will all be done. So we can very quickly add up the rest. It is negligible 
 
 
 
-
-
+ 
