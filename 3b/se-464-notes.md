@@ -975,7 +975,30 @@ main {
 
 
 
+## Lec 08: Security
 
+- NFP: Security
+  - The protection afforded to an automated information system in order to attain the applicable objectives of preserving the integrity, availability, and confidentiality of information system resources (hardware, software, firmware, data)
+  - Confidentiality: prevent unauthorized parties from accessing information
+  - Integrity: only authorized parties can manipulate data
+  - Availability: accessible by authorized parties on all appropriate occasions
+- Design Principles for Security (9)
+  - Least Privilege: 
+    - Only the minimum necessary rights should be assigned to a subject that requests access to a resource and should be in effect for the shortest duration necessary (remember to relinquish privileges)
+  - Fail Safe Defaults
+  - Economy of Mechanism
+  - Complete Mediation
+    - ==Mediation == intervention / arbitration between user and object, middle step for validation==
+    - Requires access checks to an object each time a subject requests access
+    - Decreases chances of mistakenly giving elevated permissions
+    - If you only check permissions once, then attackers can exploit the system (what if the access control rights are decreased after user first accesses data)
+    - Caching permissions can improve performance, but at the cost of security
+  - Open Design
+  - Separation of Privilege
+  - Least Common Mechanism
+  - Psychological Acceptability:
+    - Make sure security algorithm is accepted by its users (what's the point if they just use a sticky note with the password)
+  - Defense in Depth 
 
 
 

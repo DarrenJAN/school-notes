@@ -805,13 +805,71 @@ having count(author) = 1
 
   - use INDICATOR variable
 
-- Dealing with mutliple return results
+- Dealing with multiple return results (Impedance mismatch)
 
-  - basically like reading one by one from a file (CURSOR)
+  - basically like reading one by one from a file (**CURSOR**)
   - CURSOR holds the result of a query as if it was a file
-  - 
+  - `EXEC SQL FETCH AUTHOR INTO :name, title, ...;`
+    - Supposed to be more :'s there according to the standard, but there is a bug in the preprocessor and so that will not compile
+    - Just takes one colon; everything after that is a host variable. Against the standard, but that's life
 
 ### Stored Procedures
+
+- A stored procedure executes application logic directly inside the DBMS process
+- Don't want to be transferring large amount of data back and forth (between application and the server)
+- Part of your application that runs ON the server
+- Advantages of stored procedures
+  - Minimize data transfer costs
+  - Centralize application code
+  - Logical independence
+
+
+
+## Lec 06: Dynamic SQL
+
+- Overview:
+
+  - Execute a string as a SQL statement
+  - How do we know if a string is a valid statement? 
+  - How do we execute?
+
+- PREPARE
+
+  - `EXEC SQL PREPARE stmt from :string`
+  - Stmt is NOT a host variable; it's an identified the statement used by the preprocessor
+
+- Using Parameters?
+
+  - Use the parameter marker "?" In the string
+  - then
+
+  ```
+  EXEC SQL EXECUTE stmt
+  	USING :var1 [, ..., :vark];
+  	// colons before the param names
+  ```
+
+- Unknown number / types of variables?
+  - Use a dynamic descriptor area
+- Putting it all together: `adhoc.sqc`
+  - Start up and prepare the statement
+  - init_da sets the `i` value; if it is greater than 0 then it is a query
+  - Else, if it is 0 then it's just a normal statement (not a query) and you can execute it (since it has no return values, not a special case)
+
+
+
+## Lec 07: ODBC
+
+- Want to talk to other databases? Tell your favourite database about the other ones, let it handle talking to the other ones
+- That's the old way
+- ODBC let's you talk to multiple databases
+- 3 fundamental objects
+  - environments
+  - connections
+  - Statements 
+- Have to set up a lot more stuff yourself
+
+
 
 
 
@@ -828,8 +886,8 @@ having count(author) = 1
 - q6: the max and min for all classes for a given term where that class is in a course taught by a CS or CO professor; all courses in terms
 - q10: take all pairs of professors
 
+### A2
 
-
-
+- `db2 -f name_of_file`
 
 
