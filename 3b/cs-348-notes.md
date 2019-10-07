@@ -850,6 +850,7 @@ having count(author) = 1
   ```
 
 - Unknown number / types of variables?
+  
   - Use a dynamic descriptor area
 - Putting it all together: `adhoc.sqc`
   - Start up and prepare the statement
@@ -889,5 +890,4 @@ having count(author) = 1
 ### A2
 
 - `db2 -f name_of_file`
-
 

@@ -993,6 +993,121 @@ Look at A --> D --> 1 // min can force me to get at least a 1
   - $\frac{\partial h_w}{\partial w_c} = 2(y - h_w(\bar{x}))(-x_c)$ // x bar is entire weight vector, x_c, w_c is just an element and the weight of that individual element
   - Perceptron update rule
     - If y is 1 but $h_w$ says that it's a negative sample (0) then we adjust the weight by $x_i$ and $\alpha$. 
+- Update Rule (Perceptron Update Rule)
+  - TODO
+- Ensembles
+  - So far we have been solving and learning using just 1 approach
+  - Choose a single hypothesis from a single hypothesis space
+  - Why not use many? Individuals may make mistakes, but ensembles have elections, committees
+  - Can use 3 regressions to do a classification (carve out a section in the graph)
+  - Can use more regressions to do more carvings
+- Ensembles implementation 1: Bagging
+  - Majority vote
+  - We assume each hypothesis will make an error
+  - We assume each hypothesis is independent
+  - Probability that $k$ make an error is $P^k(1 - p)^{n - k}$
+  - For majority to be wrong: $\sum_{k - ceil(n / 2)}^n P^k(1 - p)^{n - k}$
+  - Condorcet Jury Theorem
+- Bagging Examples: Random Forests
+  - Grow trees that have caps of number of features that they can look at
+  - Train trees on random subsets of your training data (entries of features)
+  - Trying trees on subsets of features (not all features)
+  - Classify using a majority of $k$ trees
+  - Trees are small, quick to train
+  - Mitigates the effects of over fitting
+- Ensembles implementation 2: Boosting
+  - Increase weight of good hypothesis, decrease weight of bad ones
+  - Bagging makes a number of assumptions (each hypothesis is equally correct, and independent)
+  - This isn't true
+  - Do a weighted majority using these weighted hypothesis
+  - implementation
+    - Start out with entire training set
+    - Evaluate your k hypothesis on it
+    - Some are right, some are wrong
+    - If it got an entry right, decrease the weight of that training entry
+    - If it got it wrong, increase the weight of the training entry
+    - Also change the weights of the hypothesis
+
+
+
+## Chapter 9-10: Neural Networks (more details in CS 480)
+
+- Intro 
+
+  - Machine Learning has been (so far): approximations of **functions** that describe data
+  - Sometimes the relationship between input and output can be REALLY complex
+  - We want to design methods for learning arbitrary, unknown (to humans) relationships
+  - Do not want to overfit the data
+
+- Neural Networks
+
+  - Maybe we can simulate human learning?
+  - Neurons have 2 states: firing or not firing (on or off)
+  - Rate at which it fires is what communicates information
+  - Learning is how efficiently signals transfer across synaptic functions
+
+- Artificial Neuron
+
+  - Input signals, each with weights
+  - Input Function (usually a weighted sum), $= in_i$
+  - Activation Function $ = g(in_i)$
+  - Output signals (fire or not) (these outputs will be weighted, too)
+  - Mimic firing in real neurons (fire 1 when you have right input, 0 for bad input)
+  - ==neurons are not adjusting or setting the weights of the signals==
+  - ==the learning algorithm itself is setting the weights==
+
+- Common Activation Functions
+
+  - Ex
+    - $g(x) = max(0,x)$
+    - $g'(x) \in \{0, 1 \}$
+  - ex
+    - sigmoid $g(x) = \frac{1}{1 + e^x}$
+    - $g'(x) = \frac{1}{1 + e^x}(1 - g(x))$
+  - ex
+    - $g(x) = \frac{e^{2x} - 1}{e^{2x} + 1}$
+    - $g'(x) - 1 - g(x)^2$
+
+- Ex Logic Gates
+
+  ```
+  // AND gate
+  x_1		x_2		out
+  1			1			1
+  0			1			0
+  1			0			0
+  0			0			0
+  
+  // same node
+  // threshold = 0
+  1_bias_link (w0) > node
+  x_1_link (w1) ---> node
+  x_2_link (w2) ---> node
+  
+  requirements:
+  w_0 + w_1 + w_2 >= 0
+  w_0 + w_1 < 0
+  w_0 + w_2 < 0
+  w_0 < 0
+  
+  
+  // OR gate
+  w_0 + w_1 + w_2 >= 0
+  w_0 < 0
+  w_0 + w_1 >= 0 
+  --> if x_1 is OFF then w_0 * 1 + w_1 * x_1 = w_0 + 0 < 0 (not activated)
+  --> if x_1 is ON then w_0 * 1 + w_1 * x_1 = w_0 + w_1 >= 0
+  w_0 + w_2 >= 0
+  ```
+
+- Network Structure
+  - Feed-Forward ANN (directed acyclic graph, no internal state; maps inputs to output)
+  - Recurrent ANN (directed cyclic graph, system with internal state, can remember information for future use)
+  - Input units (1 for each feature)
+  - Output unit (returns some value, a classification); often have multiple output units
+- Perceptron
+  - Single layer neural network
+  - Inputs and outputs; no inner nodes
 
 
 
