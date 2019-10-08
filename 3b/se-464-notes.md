@@ -1002,9 +1002,78 @@ main {
 
 
 
+## Lec 10: Design
 
-
-
+- Analysis
+  - Domain-level modelling of real world objects
+- Design
+  - Modelling of implementation objects
+- Design process: measure --> learn --> build --> repeat
+  - Are you just trying to understand the problem domain?
+  - Or are you now trying to focus on the implementation?
+- Motivation
+  - We want specific notations that let us represent these design ideas in code
+- Concepts
+  - Design patterns are for high-level re-use
+  - How do we know if a solution is elegant?
+  - abstraction
+    - Remove details while retaining essential properties of structure
+    - Designer can focus on key issues without being distracted by implementation
+    - Example of too much abstraction
+      - Debugging a visitor
+      - Double dispatch is hard to debug
+  - Static vs dynamic
+    - Increased abstraction == decreased control
+    - Composition instead of inheritance 
+- Design Principles
+  - STUPID Principles
+    - Singleton (shared global state is bad)
+    - Tight Coupling
+    - Untestable (large functions, can't mock)
+    - Premature Optimization (start to optimize A, but maybe A isn't even the bottle neck)
+    - Indescriptive Naming
+      - Do use nouns for class names
+      - Do use verbs for function names
+    - Duplication
+  - SOLID Principles: https://itnext.io/solid-principles-explanation-and-examples-715b975dcad4
+    - Single Responsibility Principle
+    - Open/Closed Principle
+      - Open for extensions closed for modifications
+      - Template method in super class, calls other methods, maybe some are implemented or some are abstract
+      - Then you have subclasses that can adapt the behaviour
+    - Liskov Substitution Principle
+      - You want subtypes to behave consistently with super types
+      - If you have a method in the super class that accepts all integers, then you DONT want to have a child class that implements the same function but throws if you pass in a negative integer
+    - Interface Segregation Principle
+      - Don't add extra methods to an interface if it doesn't relate to that interface
+      - Just make a new interface instead
+      - Pick the smallest implementation that provides what you need
+    - Dependency Inversion Principle
+      - Have dependencies between high level abstractions (have dependencies between Observer and Subject, not on concrete implementations)
+  - Lower-Level Principles
+    - Program to abstractions (interfaces), not to implementations (classes)
+    - Favour composition over inheritance
+  - Quality Attributes: Coupling
+  - Quality Attributes: Cohesion
+    - Coincidental
+    - Logical
+    - Temporal: all these operations occur at time x, put them in module X; all these other operations occur at time y, put them in module Y
+    - Communication
+    - Sequential
+    - Functional: every module has 1 functionality only
+- Spotting Incoherency
+  - An operation's description is full of 'and' clauses (do this and do that and then do this)
+  - An operation's description has many "if...then...else"
+- Cognitive Dimensions
+  - Premature commitment (decisions made with insufficient data)
+  - Hidden dependencies
+    - Who needs to update what elements of a data structure and in what sequence 
+  - Secondary notation
+    - UML diagrams; state machines; sequence diagrams
+  - Viscosity
+    - Resistance to change
+- Why do designs matter?
+  - Flexibility, reusability, shared vocabulary
 
 
 

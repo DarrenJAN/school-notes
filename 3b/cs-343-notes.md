@@ -772,8 +772,6 @@ graph LR;
 - Critical Path: the path of operations which is the bottleneck for code; if you want to speed up your code, you need to speed up the critical path
 - Sometimes your scheduler will mess everything up for you always :/
 
-
-
 ### 5.8 Thread Creation
 
 - COBEGIN/COEND

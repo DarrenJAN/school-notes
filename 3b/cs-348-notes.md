@@ -872,6 +872,66 @@ having count(author) = 1
 
 
 
+## Lec 08: Data Modelling and the Entity-Relationship Model
+
+### Graphical Notation
+
+- Entity: a distinguishable object (student) [BOX]
+- Attributes: describe properties of entities (student name)[CIRCLE]
+- Relationship: representation of the face that certain entities are related to each other [DIAMOND]
+- Example
+  - `[COURSE] ---- (Course Number)`
+  - `[COURSE] ---- <Course Number Relationship> --- [Integer]`
+  - forall x course(x) ==> exists y . coruse_nnumber(x,y) and integer(y)
+  - Formal x,y,z courseNum(x,y) and courseNum(x,z) ==> y = z
+- Multiple relationships and role names
+  - Role: function of an entity set in a relationship set
+  - Role name: an explicit indication of a role
+  - Include multiple lines from a relation to an entity where each line has a home name
+  - Always assume entity sets are disjoint, until you get into inheritance 
+
+### Constraints
+
+- each entity must be distinguishable from any other entity in an entity set of its attributes
+- Primary key: selection of attribute(s) which determine a particular entity (*underline*)
+- Relationship types:
+  - One to many:
+    - `Employe ---> <works in> --- department`
+  - One to one
+    - `employe --> manages <-- department`
+- General cardinality constraints
+  - `E ------- (lower, user) ----- <R>`
+  - `student --(3,5) -- <takes> -- (6,100) -- course`
+  - Table of entries, LHS = studentID; appears between 3 to 5 times
+  - RHS = courseID, appears between 6 to 100 times
+- Existence dependencies
+  - What if you want unique IDs per account, not unique IDs globally
+  - `[[ transaction ]] ---> << Log >> ---- account`
+  - So a transaction is related to an account via a log relationship. And a transaction is identified by its transaction id with respect to an account (so different accounts can have duplicate transaction IDs)
+
+### Extensions to ER Modelling
+
+- Structured attributes
+  - Address --> street, --> city, --> ....
+  - Really just means address_street, address_city, ...
+- aggregation
+  - Relationships can be viewed as higher level entities
+  - Make entities (objects) out of relationships
+  - Draw a box around the relationship and all its participating entities
+- specialization
+  - Triangle; inheritance
+  - `Graduate ----|> ---- Student`
+  - Also, COVERS means disjoint, OVERLAPS means not disjoint
+  - TRUCK ----|> COVERS ---- Vehicle
+  - CAR ----|> COVERS ---- Vehicle
+  - Means all vehicles are either a car or a truck, and there is no such thing as something which is both a car and a truck (it is disjoint)
+- disjointness
+  - Specialized entity sets are usually disjoint but can be declared to have entities in common
+- example
+  - E --(1,1) --<R>---(2,2)----E; either E is empty or E is infinite. Each E needs 2 R relationships entering it
+
+
+
 
 
 ## Assignment Talk

@@ -772,7 +772,7 @@ Look at A --> D --> 1 // min can force me to get at least a 1
 
 ### Monte-Carlo Tree Search (MCTS)
 
-- build search tree according to outcomes of simulates players
+- build search tree according to outcomes of simulated players
 - slowly build up a search / "statistics" tree
 - steps
   - **selection**: look through already-generated search tree
