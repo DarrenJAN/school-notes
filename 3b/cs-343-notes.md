@@ -911,6 +911,92 @@ uActorStop(); // wait for all actors to terminate
     - What if the first one takes the longest? And we have to wait for it?
       - Well, once we wait for the first one, the rest will all be done. So we can very quickly add up the rest. It is negligible 
 
+### 5.11 Exceptions
+
+- Raise an exception in a task (which has a stack) ? It goes down the stack
+- Can raise non-local exceptions at other tasks
+- example
+  - 2 tasks searching through a database to look for an item
+  - When tasks A finds it, then it resumes a StopEvent() at its partner (task B) to stop task B
+
+
+
+### 5.12 Synchronization and Communication During Execution
+
+- Need synchronization to transmit data between threads (need both to be ready)
+- Between 2 lines of code, another thread can run and change the global shared state
+- Need to carefully use global variables (in the producer, consumer example)
+
+
+
+### 5.14 Critical Section
+
+- Also need a way to define an atomic operation
+- Things that require mutual exclusion
+- Threads might access non-concurrent objects (files, linked lists)
+- Can't have 2+ threads changing values in a node
+  - Needs to be atomic; can only be modified by 1 thread at a time
+- atomic
+  - CANNOT be interrupted by other threads that can access the same data, affect the operation
+  - CAN be interrupted by the scheduler. While its paused, no other thread can run that affects the same data
+  - SAME operation and SAME object, THEN we have an issue
+
+- Want to minimize amount of mutual exclusion (make critical sections as small as possible) to maximize concurrency
+
+
+
+### 5.15 Static Variables
+
+- Static variables are bad when you have 1000s of objects, all of them need to access that static variable, and so that static variable is a critical section
+- T t[10]; // only 1 thread will ever initialize all 10 of them, call the default constructors
+  - 1 thread doing initialization of all default constructors
+  - If only 1 thread does it, then you can use a static tID += 1 in each constructor
+
+
+
+### 5.16 Mutual Exclusion Game
+
+- Safety: only 1 thread can be in a critical section at a time with respect to a particular object
+- Threads can run in any order, CPU ensures all threads make progress
+- Can only prevent other threads from accessing the critical section if its in the entry or exit code of the critical section
+- Liveness: can't postpone another thread forever
+  - Arrive at a doorway, argue about who goes through forever
+- Starvation: after a thread starts entry to the critical section, it must eventually enter
+  - Arrive at a doorway, other people keep going in front of you forever
+
+
+
+### 5.19 Hardware Solutions
+
+- Easier to use special instructions 
+- Atomic: read and write without being interrupted 
+- When A does an atomic operation on memory M, then the CPU stops any other thread or tasks from operating on M until it completes
+- Swap instruction
+
+
+
+## 6 Locks
+
+- 2 kinds: spinning or blocking
+- Spinning:
+  - Busy waits; loops checking for an event (lock to open)
+  - CPU wastes time constantly checking the event
+  - RULE: we do NOT busy wait
+  - Instead of checking and using up our time slice, we can YIELD and put ourself on the ready queue, and let the person who is in the critical section get time to run and finish (SINGLE CPU CASE)
+  - Multiple CPUs: guess that critical section thread is running on other CPU, guess that it might finish soon, and so spin for some duration (adaptable duration)(sometimes you can guess for how long you should spin)
+  - implementation
+    - softSpin: yield 
+    - hardSpin: keep checking
+    - spinLock: used for mutual exclusion
+    - uLock: used for synchronization and mutual exclusion // BETTER
+    - ==Lock for mutual exclusion always starts OPEN (1)==
+    - N independent critical sections ===> N locks
+- Blocking:
+
+
+
+
+
 
 
  
