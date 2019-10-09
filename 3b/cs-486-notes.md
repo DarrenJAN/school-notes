@@ -1105,65 +1105,132 @@ Look at A --> D --> 1 // min can force me to get at least a 1
   - Recurrent ANN (directed cyclic graph, system with internal state, can remember information for future use)
   - Input units (1 for each feature)
   - Output unit (returns some value, a classification); often have multiple output units
+  - Activation function g
 - Perceptron
   - Single layer neural network
   - Inputs and outputs; no inner nodes
+  - Might have multiple outputs (classifications, maybe a probability distribution)
+  - Can only learn linear separators
 
+<img src="./images/cs486-9.png" alt="alt text" style="zoom:50%;" />
 
+- Training Perceptrons
 
-​		
+  - Learning means adjusting the weights ==with the goal of minimizing the loss function, or error function==. K is an example in the training set
+  - What is our loss function? Sum of squares of error
+  - Learning Algorithm (gradient descent)
+    - Do it iteratively, as opposed to acting on all examples at once (could do that, but we don't because error function is a function of all examples)
+  - Stochastic Gradient Descent (SGD)
+    - Shuffle training data at random
+    - Execute Gradient Descent update algorithms for all examples in order (of that shuffled set)
 
+- Multilayer Networks
 
+  - Assume each layer is fully connected to previous and next layer
+  - XOR Example
 
+  ```mermaid
+  graph LR;
+  	c_1--1-->3
+  	X_1--w1,3-->3
+  	X_1--w1,4-->4
+  	X_2--w2,3-->3
+  	X_2--w2,4-->4
+  	c_2--1-->4
+  	3--w3,y-->Y
+  	4--w4,y-->Y
+  	b--1-->Y
+  	Y-->0_or_1_output
+  	
+  ```
 
+  ```
+  c1, c2, b are the biases
+  let C = [c_1, c_2]
+  let W_1 represent first layer conneections
+  let W_2 represent second layer connections
+  let activation function g(x) = max(0, x)
+  
+  recall our function: x_1 XOR x_2
+  x_1 	x_2		XOR
+  1			1			0
+  0			0			0
+  1			0			1
+  0			1			1
+  
+  Let W_1 =
+  1 1
+  1 1
+  
+  Let W_2 =
+  1
+  -2
+  
+  Let C = 
+  0
+  -1
+  
+  Let b = 0
+  
+  Example: x_1 = x_2 = 1
+  Node 3: g(x) = max(0, 1 + 1 + 0) = 2
+  Node 4: g(x) = max(0, 1 + 1 + -1) = 1
+  Node y: g(x) = max(0, 1*2 + -2*1) = 0 --> correct output
+  ```
+  - Training Multi-Layer Networks
+    - For weights from hidden to output later we can use gradient descent, because we know what y I supposed to be
+    - But for weights from input to hidden layer, we don't know what y is? So what is the error? What should the output value be?
+  - Back Propagation
+    - Each hidden layer has caused SOME of the error in the output layer
+    - Amount of error proportionate to the connection strength (weights)
 
+  ```mermaid
+  	graph LR;
+  	1-->3
+  	1-->4
+  	2-->3
+  	2-->4
+  	3-->5
+  	4-->5
+  ```
 
+  ```
+  1,2 are inputs
+  3,4 are hidden layer
+  5 is output, h(x). y is the true desired output for the given input X
+  
+  Step 0: Initial setup
+  - have some weight values w_i_j between 0 and 1 (random)
+  
+  Step 1: Forward Propagation
+  - input some values, compute output
+  
+  Step 2: Compute Error Function (Loss function) L
+  error = 0.5(y - h(x))^2
+  ```
 
+  
+  - Recall Chain Rule: $y, x$ vectors... $y = g(x)$. $z = f(y) = f(g(x))$
+  - $\frac{\partial z}{\partial x} = \frac{\partial z}{\partial y} \frac{\partial y}{\partial x}$
+  - $L(y, h_w(x)) = 0.5(y - h_w(x))^2$
+  - $= 0.5(y - g(W_{3,5}g(in_3) + W_{4,5}g(in_4)))$
+  - $in_3 = W_{1,3}x_1 + W_{2,3}x_2$
+  - $in_4 = W_{1,4}x_1 + W_{2,4}x_2$
+  - ...
+  - ==Only for weight 1,3==
+  - $\frac{\partial L(y,h_w(x))}{\partial W_{1,3}} = \frac{\partial L()}{\partial g(in_5)} \times \frac{\partial (g(in_5))}{\partial w_{1,3}}$
+  - $= (y - g(in_5))(-1) (\frac{g(W_{3,5}g(in_5) + W_{4,5}g(in_4))}{\partial W_{1,3}})$
+  - ...............
 
+  - $= -1(y - g(in_5)) \times g'(in_5) \times W_{3,5} \times g'(in_3)$
+  - What is this equation ???? It is the gradient descent update rule for weight $W_{1,3}$ only
+  - $in_x$ Is the weighted sum of the total links coming in to your node $x$
 
-
-
-
-
-
-
-
-
-
-
-***
-
-
-
-## Tutorial Readings
-
-### Tutorial 1 Readings
-
-#### Philosophers are building ethical algorithms to help control self-driving cars
-
-- Philosophers are working on real-life Trolly problem scenarios as self-driving cars will, inevitably, be put in similar situations in the future
-- Do you save the driver or the pedestrian? Which lives are worth more?
-- You could just jump in front of a moving self-driving car to have it crash and protect the pedestrian -> bad!
-- Usually people get to make an informed decision as to whether or not they want to be in an experiment. When self-driving cars come out, society won't be able to choose, they will be forced
-- Who is responsible when a self-driving car kills someone?
-- Can't fully imagine how it will change our lives
-
-#### The Montreal Declaration for a responsible development of AI REQUIRED
-
-- Main objectives:
-  - Develop ethical framework for development of AI
-  - Guide the digital transition so everyone benefits
-  - Open national and international forum to discuss it
-
-- Can "restrict the choices of individuals and groups", "lower living standard", "influence politics", "affect the climate and environment"
-- Principles
-  - Well-Being. Must permit the growth of well-being of all sentient beings
-  - Response for Autonomy. Should aim to increase people's control over their lives and their surroundings.
-  - Protection of Privacy and Intimacy. Prevent data intrusion
-  - Solidarity
-  - Democratic Participation. Must be subjected to democratic scrutiny, debate, and control.
-  - Equity. Must contribute to just and equitable society
-  - Diversity Inclusion. Must be compatible with maintaining social and cultural diversity
-  - Prudence. Everyone involved in its development must exercise caution
-  - Responsibility. Must not lessen the responsibility of human beings when decisions must be made
-  - Sustainable development. Help to sustain the planet
+- Deep Learning
+  - Neural networks with more than 1 hidden layer
+  - In theory we actually only need 1 hidden layer, but if you use multiple hidden layers then you can use fewer units
+  - Example: Parity Function
+    - Input vector X consists of 0s, 1s. Output is 1 if number of 1s is odd
+    - x_1 XOR x_2 XOR x_3 XOR x_4 ......
+    - Can do it with 1 layer, with $2^{n - 1}$ inner nodes
+    - Or can do it with multiple layerx

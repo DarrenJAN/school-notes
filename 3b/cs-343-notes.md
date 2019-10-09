@@ -990,7 +990,7 @@ uActorStop(); // wait for all actors to terminate
     - spinLock: used for mutual exclusion
     - uLock: used for synchronization and mutual exclusion // BETTER
     - ==Lock for mutual exclusion always starts OPEN (1)==
-    - N independent critical sections ===> N locks
+    - N independent critical sections ===> N locks 
 - Blocking:
 
 
