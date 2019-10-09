@@ -1077,6 +1077,122 @@ main {
 
 
 
+## Lec 11: Code Smells
+
+- SOLID Principles
+
+- Liskov Substitution Principle
+
+  - Subtypes should behave same as their parent types
+
+  - Conform to the same contract, but have different implementations
+
+  - Allow us to program against an interface, and rely that any concrete implementation will work (won't crash, throw unexpected errors, etc)
+
+  - Overloading: different method that has the same name, but does different stuff
+
+  - Overriding: this method might get selected at runtime based on dynamic types
+
+    - In java: param types must be the same (pretty much the same, child classes are allowed)
+
+  - ```java
+    class A {
+      RA m(PA p)..
+    }
+    class B extends A {
+      RB m(PB p)...
+    }
+    
+    RB extends RA
+    PA extends PB
+    
+    // in Java, param types must be the same
+    
+    int main() {
+    	A a = new B();
+    	RA foo = a.m(...)
+    }
+    ```
+
+  - Params: You can only go same or MORE general (PA in A, B extends A, and its function takes a PB, which is the parent of PA, and it is MORE GENERAL)
+
+  - Return type: you can only go MORE SPECIFIC
+
+    - Specify a return type of List
+    - In implementation, you return an ArrayList
+
+  - **Subclass**:
+
+    - **Less strict pre-conditions**
+    - **More-strict post-conditions**\
+
+- Visitor
+
+  - Data structure; want to apply operations on to it
+  - At some point, you make it available to different people, and each of them want to be able to affect it in different ways
+  - Want to allow external extensions; be able to add different interactions
+  - Element: accept(Visitor)
+  - Each visitor then implements visit
+  - What is it called double dispatch?
+    - Only have the accept methods once for each data structure
+    - That dispatches to the visitor
+    - Only need to implement functionality once in the visitor (for each different elemnt)
+    - 1 dispatch on the data structure to accept a visitor
+    - Another dispatch in the accept method to dispatch to the correct visitor
+  - Similar to the COMPOSITE DESIGN PATTERN
+    - Needs to provide visit functionality for each of them
+  - downsides
+    - Hard to debug
+    - Lots of overhead
+
+- Single, Double, Multiple Dispatch
+
+  - Single dispatch: only matters what runtime type of receiver 
+  - Finds what the most concrete method is for a given call
+
+- Code Smells
+  - Large classes and methods 
+  - Deep nesting of control structures (too much indentation; weird logic, breaks)
+  - Duplicate code
+  - Static state (state that is shared between all instances of a class; need to think of how all instances interact)
+  - No information hiding, bad encapsulation
+    - Difference? Information hiding; static visibility of names in your program (public protected private etc)
+    - Encapsulation is the runtime concept; its the public API that you expose and how those functions interact with the protected and private information
+      - Need to ensure public API still protects information
+      - ==Solution: defensive copying in a getter; return a copy; not a reference==
+      - ==Another solution: make a copy of input variables; don't want outside world to still have a reference to that data==
+  - Many params
+  - Casts to implementation classes
+
+- Refactoring
+  - Restructure existing code without changing its behaviour
+  - Renaming methods; moving methods
+  - Having good test coverage gives incidence in changes
+  - When you re-name a method, maybe you accidentally override a method from the super class
+
+- MVC / MVP / MVVM
+
+  - Why is MVC bad?
+    - Data structures shared?
+    - View just gets a pointer to a data structure from the model
+    - Tight coupling between the data structures between these components
+    - Bad re-use
+    - Tight coupling between view and controller
+
+  - Model View Presenter MVP
+    - Presenter only takes primate common data structures
+      - Glues model and view together; breaks down domain objects into primitives
+    - View:
+      - Only interacts with primitives
+      - Does not interact with domain logic
+      - Better separation
+  - Model View View Model
+    - Have another view model...
+
+
+
+
+
 
 
 

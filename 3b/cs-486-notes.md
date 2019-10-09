@@ -1233,4 +1233,4 @@ Look at A --> D --> 1 // min can force me to get at least a 1
     - Input vector X consists of 0s, 1s. Output is 1 if number of 1s is odd
     - x_1 XOR x_2 XOR x_3 XOR x_4 ......
     - Can do it with 1 layer, with $2^{n - 1}$ inner nodes
-    - Or can do it with multiple layerx
+    - Or can do it with multiple layers
