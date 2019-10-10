@@ -929,6 +929,79 @@ having count(author) = 1
   - Specialized entity sets are usually disjoint but can be declared to have entities in common
 - example
   - E --(1,1) --<R>---(2,2)----E; either E is empty or E is infinite. Each E needs 2 R relationships entering it
+- Summary
+  - [P] ====> P(x)
+  - `<R>` ===> R(x_1, ..., x_k)
+  - (A) ===> A(x,y)
+  - () attribute
+  - [] entity
+  - `<>` relationship
+  - Assume that if S inherits from Q, S inherits from R, and Q inherits from P, and R inherits from P, and P has an attribute A, then S only has ONE A, not TWO
+- Designing An E-R Schema
+
+- Attributes or Entity Sets?
+  - Ex: employee database, what to do with PhoneNumber
+  - Make it an attribute of an employee?
+  - Make it its own set? Relate it to an employee using a relationship
+  - Rules of thumb to use an entity set:
+    - Is it a separate object?
+    - Do we maintain information about it?
+    - Can several of its kind belong to a single entity?
+    - Does it make sense to delete one?
+    - Can it be shared by different entities?
+- Entity Sets or Relationships?
+- Binary vs N-Ary relationships?
+  - Accounts can exist without customers and branches (slide 31)
+  - `<CAB> --- other stuff` means they all exist
+  - [CAB] --- other relationships; that CAB could exist by itself
+  - Slide 32:
+    - B1, C1, A1
+    - CAB1, CAB2
+    - The 2 different CAB objects can be linked to the same triple of Branch, Account, Customer
+    - You typically do NOT want to allow this
+
+
+
+## Lec 09: Translating Entity-Relationship Diagrams to Relational Tables
+
+- ER to Relational Schema
+  - Each entity set maps to a new table
+  - Each attribute maps to a new table column
+  - Each relationship set maps to either new table columns OR a new table
+- Weak Entity Sets
+  - Need to contain the primary key of their dominant entities
+  - Ex
+    - Transaction is based on an account
+    - Account has an accountnum
+    - So transaction ALSO needs to have an account num (as well as a transaction num) as its 2 primary keys
+    - `[[Transaction]] -- << Log >> -- Account`
+- Representing Relationship Sets
+  - Columns contain
+    - Attributes of the relationship set
+    - Primary key attributes of EACH COMPONENT ENTITY SET
+  - Cardinality constraint (Middle case)
+    - `(key) -- [ENTITY] -- <Relationship> -- numerous other stuff`
+    - If entity to relationship is 1-1 then every entity maps perfectly to relationship tuples 
+    - Table E: contains key, as primary key
+    - Table R: contains E key as primary key
+    - 1 to 1 mapping between each entry in E to each entry in R (1-1)
+    - ==Then what its saying in you can just COMBINE THESE TABLES==
+    - Just make bigger tuples
+    - ==Don't need 2 different tables==
+  - Many to many
+    - Need to have a table for the relationship
+    - Team --- MATCH --- Location
+    - Match table contains: LHS keys, RHS keys, match attributes
+- Representing Aggrigation
+- Representing Specialization
+  - Why do we need the professor table?
+  - Because what if a professor doesn't supervise any graduate students?
+  - They still need to be able to exist
+  - Also, you want a separate professor table because you want to be able to add more properties to it later
+  - Also, if you add the telephone number to the graduate table instead (for the professor via professor name), then you will have lots of duplication if that professor supervises multiple students
+- 
+
+
 
 
 

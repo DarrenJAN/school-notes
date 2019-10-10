@@ -989,9 +989,70 @@ uActorStop(); // wait for all actors to terminate
     - hardSpin: keep checking
     - spinLock: used for mutual exclusion
     - uLock: used for synchronization and mutual exclusion // BETTER
-    - ==Lock for mutual exclusion always starts OPEN (1)==
+    - ==Lock for mutual exclusion always starts OPEN (1)==; acquire and release are in the same task
     - N independent critical sections ===> N locks 
+    - Need to be able to identify if a critical section is dependent or independent
+    - ==If 2 critical sections are independent then each one needs to have their own separate lock==
 - Blocking:
+  - Recall spinning locks: whenever you leave, you set a flag, or increment a counter, then you're gone. All of the responsibility to figure out if it is okay to get in is up to the acquirer. The releaser does very little work
+  - In blocking...
+  - Acquirer makes 1 check (does not spin); if it can't get in, then it goes to sleep
+  - Need to move all of the work to the releaser
+    - Need to adjust lock to finish using it; and then check for waiting people and wake them up
+  - Why would the releaser want to do this extra work?
+    - Other people will do it for me in the future
+    - Reduces the net amount of work that needs to be done
+  - Don't assume FIFO ordering of next block to run; CPU just needs to guarantee progress
+- Mutex Lock
+  - Recall uLock: does synchronization and mutual exclusion
+  - Most systems separate them
+  - Mutex: only used to provide mutual exclusion
+  - Single acquisition: only get it once while you own it
+  - Multiple: get it multiple times while you own it ("it" equals the current thread)
+  - "Implementation slide" blue code makes it a multiple acquisition
+  - ==Always start mutual excl. in the open position==
+  - "yieldNoSchedule" give up my time slice; don't put me on the ready queue; I'm already on "someone else's" queue
+  - "Yield" put yourself on the ready queue; give up your time slice
+  - Need to have mutual exclusion (atomicity) while you are doing all of these acquire checks
+    - So, you use your OWN spin lock to have mutual exclusion
+    - Spin inside of a while loop because just when you are about to get the lock; someone may come in and barge in and get it before oyu
+    - No guarantee of rule 5; you might wait forever
+    - Releaser: I will release you, and you have to fight with anyone else
+  - Does it work ==> NO NO NO NO NO
+  - RECALL: ==never go to sleep holding the lock, then no one else can hold it==
+  - So you need to release the lock...
+    - What if you get pre-empted before you can yieldNoSchedule
+    - Then you get put on ready queue twice by person that has interrupted
+    - The releaser put you on the ready queue too!
+  - Solution: pass in the lock when you call yield no schedule 
+  - Barging avoidance
+    - Don't let them access the critical section; put them on the bench instead
+    - Barging still occurs; but we redirect them
+    - Wake someone up; but don't tell anyone that the critical section is available (don't set avail = true)
+    - This makes us use an IF STATEMENT as opposed to a WHILE LOOP
+    - ==That way the scheduled thread is actually able to run once it returns from the ready queue==
+  - Barging prevention: What about continuous barging?
+    - Just don't release the lock either when you wake up
+    - Don't even let them get in
+
+- Mutex::::uOwnerLock
+  - Multi-acquisition lock
+  - Can be acquired multiple times; must release it as many times as you require it (for ONE thread)
+  - RAII
+- Mutex::::Stream Locks
+  - Ensures IO works correctly in uC++
+  - Cout is not thread safe! You could get segmentation faults
+  - uC++: osacquire (cout); is acquire (cin)
+  - Lets you read or write expressions with atomicity
+- Synchronization Lock
+  - Used solely to block tasks waiting for synchronization
+  - Weakest form of blocking
+  - You always go to sleep when you try and use it
+  - When you do a release when no one is waiting, it is lost (this has no state; doesn't remember anything)
+  - Sometimes called condition locks
+  - Sometimes used `wait / signal`
+  - implementation
+    - 
 
 
 
