@@ -1044,7 +1044,7 @@ uActorStop(); // wait for all actors to terminate
   - Cout is not thread safe! You could get segmentation faults
   - uC++: osacquire (cout); is acquire (cin)
   - Lets you read or write expressions with atomicity
-- Synchronization Lock
+- Synchronization Lock (==aka Condition Locks==)
   - Used solely to block tasks waiting for synchronization
   - Weakest form of blocking
   - You always go to sleep when you try and use it
@@ -1094,9 +1094,73 @@ class uCondLock {
 uCondLock x, y, *z; z = new uCondLock;
 ```
 
+- Tables example
 
+  - Mutex lock to provide mutual exclusion (for the podium)
+  - Waiting bench for people waiting long term (sync lock)
+  - Need state for if table is occupied or not
 
+  - ...
+  - Does this work? No
+    - We did not release the lock before we sat on the bench
+    - We are outside using the lock, and we made the same mistake
+    - Common mistake
+    - Happens internally when building the lock; externally when using the lock
 
+- How to fix?
+
+  - Release the lock then sit on the bench? Doesn't work either; you could be pre-empted
+  - Change acquire so that we can pass in the outside lock
+  - Before we go to sleep, tell the scheduler to release it
+  - Pages 107, 108
+
+- Now we are barging again
+
+  - New people can steal the lock and sit on the table, and beat people who were already waiting on the bench
+  - Barging avoidance? Don't tell people that the table is empty when you leave; lie instead; use a flag; people are still barging but they are being put on the bench instead
+  - Prevention: don't reset the flag AND don't release the lock
+  - The moment you say "I will wake him up" and you don't release the lock, then you need to leave immediately
+
+- Page 109
+
+  - Usually when ppl use a sync lock, they have a mutual exclusion lock
+  - Why does acquire still take an external lock? Before you go to sleep you want to ask questions, and to ask questions you need a mutual exclusion lock
+
+- Moral question:
+
+  - We were told that whole idea behind blocking locks is that we want to get rid of busy waiting
+  - You go and make 1 check and then go to sleep; much more efficient 
+  - NOTE: almost all of these implementations we have seen have spin locks!!! They busy wait anyways 
+  - If we can't get in, then we will only need to spin for the time it takes to do the 8 instructions; 10 nanoseconds, that's all
+  - If we had a spin-lock around the whole critical section, then we would spin for much longer
+  - We will ALWAYS need a SpinLock; it is the centre of the universe
+  - So we just want to minimize the spinning time
+
+- ConditionLock
+
+  - Wait atomically releases and blocks; re-acquires the lock when it returns
+  - Signal/broadcast do nothing for an empty queue
+
+- Example: Milk
+
+  - Working on the outside not the inside (using the locks, not building them)
+  - Do synchronization: we want to do S1 before we do S2
+  - When we have a blocking lock, we only do 1 check (not a loop)
+  - Need a flag to indicate that S1 is done; don't want a race
+  - Need mutual exclusion to ensure that a task calls WAIT before the other task calls SIGNAL
+  - This used to be so simple (using uLock) why is it so complex now?
+  - The spinning lock cheats: if you come in and you missed the signal, so it can just check again, or the next time, etc
+  - We aren't spinning here; we only have 1 chance
+  - If it's closed, you go to sleep, and never check again
+
+- Assignment 3 last question
+
+  - Bounded buffer
+  - Synchronization: because consumers and producers can only access the buffer at certain times / under certain conditions
+  - Mutual exclusion: because you don't want concurrent access to the buffer at the same time, could have massive memory errors
+  - Get rid of the starvation:
+    - Change something that HAS barging into something that does NOT have barging
+    - How to use techniques to eliminate barging
 
 
 
