@@ -604,6 +604,8 @@ go back to NSW. try a different domain value. can be red
 
 - **simulated annealing:**
 
+  > Want a ping-pong ball to go to deepest crevice. If we don't shake it, it will go to a local minimum. If we shake it too hard, it could bounce out of the global min. So we want to shake it such that it can escape local minimums but not the global minimum.
+
   - escape local maxima by allowing downhill moves (consider sub-optimal moves)
 
   ```
@@ -618,31 +620,43 @@ go back to NSW. try a different domain value. can be red
     repeat from line 2
   ```
 
-- how to choose p?
+  - how to choose p?
+  - selecting p smartly in Simulated Annealing
+    - if $V(S_{new}) > V(S)$ then definitely move to $S_{new}$
+    - else if $V(S_{new}) < V(S)$ then move to $S_{new}$ with some probability
+    - **Boltzmann Distribution** $p = e^{\frac{\Delta V}{T}}$
+    - T is the temperature parameter; starts high and decreases over time towards 0
+    - high T: 
+      - **exploratory phase**: even bad moves have a chance of being picked
+    - low T: 
+      - **exploitation phase**: bad moves have a low probability of being chosen
+    - if T is decreased slowly enough then simulated annealing is theoretically guaranteed to reach optimal solution
 
-- selecting p smartly in Simulated Annealing
-  - if $V(S_{new}) > V(S)$ then definitely move to $S_{new}$
-  - else if $V(S_{new}) < V(S)$ then move to $S_{new}$ with some probability
-  - **Boltzmann Distribution** $p = e^{\frac{\Delta V}{T}}$
-  - T is the temperature parameter; starts high and decreases over time towards 0
-  - high T: 
-    - **exploratory phase**: even bad moves have a chance of being picked
-  - low T: 
-    - **exploitation phase**: bad moves have a low probability of being chosen
-  - if T is decreased slowly enough then simulated annealing is theoretically guaranteed to reach optimal solution
-  
-- genetic algorithms
+- **genetic algorithms**
 
   - individual: an encoded candidate solution
   - each individual has a fitness
   - population: set of individuals
   - populations change over generations by applying operators to them (selection, mutation, crossover)
+  - Schema: a substring in which some of the positions are left unspecified
+    - Ex: in the 8-queens problem, the string is 8 integers from 1-8 inclusive, specifying the row to put the queen at for each column $I$ in the string
+    - A **schema** could be: `246*****`, and any string that matches that schema is called an **instance** of that schema
+
+
 
 ## Chapter 6: Adversarial Search
 
 - there will be another agent that changes the environment as we search
 
 ### Games
+
+- parts
+  - Initial state
+  - players(s) = for a state s, is the current player (they can make a move)
+  - actions(s) = for a state s, is the set of legal moves for the current player
+  - Results(state, move) is the next state after making a move on some current state
+  - Terminal test
+  - Utility function: determines the final numeric evaluation for a terminal state
 
 - easy to evaluate
 - types of games
@@ -703,6 +717,9 @@ go back to NSW. try a different domain value. can be red
 ### Alpha-beta Pruning
 
 - add-on to minimax search
+
+> Trick is that we can compute the correct minimax value without searching the entire tree
+
 - pruning: eliminate large parts of the game tree from consideration
 - alpha: value of best choice we have found so far on path for MAX
 - beta: value of best choice we have found so far on path for MIN
@@ -745,6 +762,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - still not good enough -> need to search down to terminal state to get terminal nodes to get utility values
   - need to make decisions quickly
   - solution? heuristic evaluation function + cutoff tests
+  - Only search down to some depth $d$ and then apply a heuristic for the estimated value of that state at depth $d$; drastically reduces how many states you need to search
 
 ### Evaluation Functions
 
@@ -782,6 +800,9 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - expectiminimax: minimax but at chances nodes compute the expected value
   - recall: expected value of a random variable x is $E[X] = \sum_{x \in X}(P(x)x)$
   - exact values matter in expectiminimax
+  - From textbook:
+    - Must include chance nodes that occur in between MAX and MIN nodes
+    - Instead we have to compute the expected minimax value (the minimax value x the chance that that is the next move that the opponent makes)
 
 ### Monte-Carlo Tree Search (MCTS)
 
@@ -825,7 +846,6 @@ Look at A --> D --> 1 // min can force me to get at most a 1
     - What action to take under certain circumstances
   - Transfer Learning (learn from an expert)
   - Active Learning (seek to learn)
-
 - Feedback
   - Supervised: what has to be learned is specified for each example
   - Unsupervised: needs to discover categories and patterns
@@ -849,18 +869,28 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 - Notes on Data
   - Is not perfect (labelled incorrectly, incomplete)
   - Don't overfit: find patterns in data where there is no actual pattern
-- Supervised Learning
-  - Terms
-    - Input features: $X_1, \dots, X_n$ (**this set of features will describe 1 example**)
-    - Target features f(X) or $Y_1, \dots, Y_k$ (this set of target features described 1 example)
-    - Training examples (pairs of input features, correct target features for each example)
-    - Test examples, only input is given
-    - Goal: predict the values for the target features for the test examples
-      - Classification: $Y_i$ are discrete
-      - Regression: $Y_i$ are continuous
-    - ==MUST keep training and tests separate==
-  - Implementation
-    - Want to return a hypothesis function h(x) that hopefully approximates f(x) (f(x) is the true, god-given function, where it already knows exactly what the output is supposed to be)
+
+### Supervised Learning
+
+> Given a training set of N examples (x_1, y_1), ..., (x_n, y_n) where each y_i is generated by an unknown function y=f(x), output a function h that approximates the true function f
+>
+> To evaluate the hypothesis h, we give it a test set that is distinct (separate) from the training set
+
+- Terms
+  - Input features: $X_1, \dots, X_n$ (**this set of features will describe 1 example**)
+  - Target features f(X) or $Y_1, \dots, Y_k$ (this set of target features described 1 example)
+  - Training examples (pairs of input features, correct target features for each example)
+    - Input is pairs of $(x_1, y_1), ..., (x_k, y_k)$
+  - Test examples, only input is given
+  - Goal: predict the values for the target features for the test examples
+    - Classification: $Y_i$ are discrete
+    - Regression: $Y_i$ are continuous
+  - ==MUST keep training and tests separate==
+- Implementation
+  - Want to return a hypothesis function h(x) that hopefully approximates f(x) (f(x) is the true, god-given function, where it already knows exactly what the output is supposed to be)
+- Types of Supervised Learning
+  - Classification: when the output is of a finite set of values
+  - Regression: when the output is a number
 - Inductive Learning Hypothesis
 
 > Any h(x) found to approximate the target function well over a sufficiently large set of training examples will also approximate the target function well over any unobserved examples
@@ -893,18 +923,28 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
 ### Decision Trees
 
+- Comments from textbook
+  - Good for some types of problems, bad for others (ex: the majority function (are half of the inputs true); requires an exponentially large decision tree)
+
 - General
   - Classify instances by sorting them down the tree from root to leaf
   - Nodes correspond to a test of some attribute
   - Each branch corresponds to some value an attribute can take
   - Algorithm: start at root. At each node, test attribute to that node, take branch corresponding to value of that attribute, stop at leaf
   - If you have continuous data, you need to find a way to discretize it
+  
 - Inducing a Decision Tree (Implementation)
   - Examples: each example e has a list of attributes and a label
   - Attributes (features)
   - Default classification
   - Best = best_attribute
     - Each attribute can take on multiple values, like, OUTLOOK can take on Sunny, Rain, Overcast ($v_1, v_2, v_3$)
+
+- Decision Tree Learning Algorithm:
+
+  - Greedy, divide and conquer approach
+  - At each stage, always test the most important attribute first (the attribute that makes the biggest difference in our classification; has the most distinct subgroups)
+  - Need to define `IMPORTANCE(attribute)` which returns how good that attribute is at making a difference in our classification; this requires using Information Gain / Entropy
 
 - Restaurant Wait or Not Decision Tree Example
 
@@ -914,20 +954,38 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
 - Entropy
 
-  - Measure of unpredictability
+  - ==Measure of unpredictability; uncertainty of a random variable==
   - Have an underlying stochastic source generating your data
   - Entropy: average rate at which information is produced
   - X is a random variable, $\{ x_1, \dots, x_n\}$
   - Probability of X ==> $P(X) = $ probability X = x_i ??
   - I is information, is entropy?
-  - $H(x) = I(X) = \sum_{i=1}^n -P(x_i)log_2P(x_i)$
+  - ==$H(x) = I(X) = \sum_{i=1}^n -P(x_i)log_2P(x_i)$==
   - We assume 0*log(0) = 0
   - Heads or Tails: I(1, 0) = 0 (low entropy)
   - Heads or Tails: I(0.5,0.5) = 1 (high entropy)
   - X = (0.9H, 0.1T)
   - I(X) = -0.9log(0.9) - 0.1log(0.1) = 0.46
+  - Example:
+    - Coin that always lands head up: has entropy of 0 (gain no information by observing that value)(not uncertain at all)
+    - Coin that is always 50/50: has entropy of 1 (extremely uncertain)
+    - Coin that lands heads 99% of the time: $H(0.99, 0.01) = -0.99*log(0.99) + -0.01*log(0.01) = 0.08$ (once again, don't get much information from seeing the result)
 
-- Information Gain
+- **Information Gain**
+
+  > The information gain on an attribute A is the expected reduction in entropy
+  >
+  > Recall: for probabilities $a, b$, entropy $H(a, b) = -a\log(a) -b\log(b)$
+  >
+  > Define: remainder(A) = $\sum_{i = 1}^n (\frac{p_i + n_i}{p + n} \times I(\frac{p_i}{p_i + n_i}, \frac{n_i}{p_i + n_i}))$
+  >
+  > $p$ = number of positive examples
+  >
+  > $n$ = number of negative examples
+  >
+  > remainder(A) is the sum of probabilities of each attribute value ($a_i \in A$) times the entropy of that attribute value
+  >
+  > $Gain(A) = I(\frac{p}{p + n}) - remainder(A)$
 
   - Compute expected entropy for each subset of the attribute?
   - remainder(A) is the expected information we have, once we have sorted our examples by the attribute A
@@ -943,12 +1001,8 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   3/10 * I(2,1) + 3/10 * I(1,0) + 4/10  * I(1,4)
   ```
 
-  
-
   - Choose your attribute by using your Information Gain measure
-    - IG(A) = I(...,...) - remainder(A)
-    - I(...,...) is initial information
-  - Choose attribute which has the highest information gain; the attribute which is reducing the amount of information that we have left further in our process
+  - ==Choose attribute which has the highest information gain; the attribute which is reducing the amount of information that we have left further in our process==
 
 - Back to restaurant example...
 
@@ -983,7 +1037,15 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Typically, as training set grows, accuracy increases
   - ==Algorithm CANNOT look at the test set, each time you want to evaluate performance you need to use a different test set==
 - Overfitting
-  - Big L
+  - Example: suppose you have some massive training set that you use to try and predict the result of a die roll (attributes include die colour, time of day, die weight). ==This is over-fitting to that training set, and can be expected to have a high error rate on a test set==
+  - Causes 10-25% decrease in accuracy on average
+  - Terms; these things cause test errors
+    - Bias: error due to algorithm finding an imperfect model (ex: model is too simple)
+    - Variance: error due to lack of data
+    - Noise: error due to data depending on features that were NOT modelled
+    - Bias-Variance Trade Off:
+      - Complicated model ==> not enough data; low bias, high variance
+      - Simple mode ==> lots of data; high bias, low variance
 - Avoiding Overfitting
   - Regularization:
     - Prefer small decision trees over large ones so add a complexity penalty to the stopping criteria (each attribute has a penalty, encourages smaller trees)
@@ -1001,26 +1063,42 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Define **w*x** where w is a weight vector $w_0, \dots, w_{n + 1}$ and **x** is our data $x_1, \dots, x_n$ and **w*x** = $w_0 + w_1x_1 + \dots w_nx_n$
   - Learning problem: find the weights **w** such that $h_w$ is a good classifier
   - $Loss(h_w) = $ Sum of squares of error
+  
 - Gradient Descent
   - For a single example, $loss = (y - h_w(\bar{x}))^2$ // y is label
   - $\frac{\partial h_w}{\partial w_c} = 2(y - h_w(\bar{x}))(-x_c)$ // x bar is entire weight vector, x_c, w_c is just an element and the weight of that individual element
   - Perceptron update rule
     - If y is 1 but $h_w$ says that it's a negative sample (0) then we adjust the weight by $x_i$ and $\alpha$. 
+  
+  ```
+  w = any point in parameter space
+  loop until convergence
+  	for each w_i in w do
+  		w_i = w_i - alpha * partial Loss(w)/ partial w_i
+  		// alpha is the learning rate
+  ```
+  
+  
+  
 - Update Rule (Perceptron Update Rule)
+  
   - TODO
+  
 - Ensembles
   - So far we have been solving and learning using just 1 approach
   - Choose a single hypothesis from a single hypothesis space
   - Why not use many? Individuals may make mistakes, but ensembles have elections, committees
   - Can use 3 regressions to do a classification (carve out a section in the graph)
   - Can use more regressions to do more carvings
-- Ensembles implementation 1: Bagging
+  
+- Ensembles implementation 1: **Bagging**
   - Majority vote
   - We assume each hypothesis will make an error
   - We assume each hypothesis is independent
   - Probability that $k$ make an error is $P^k(1 - p)^{n - k}$
   - For majority to be wrong: $\sum_{k - ceil(n / 2)}^n P^k(1 - p)^{n - k}$
   - Condorcet Jury Theorem
+  
 - Bagging Examples: Random Forests
   - Grow trees that have caps of number of features that they can look at
   - Train trees on random subsets of your training data (entries of features)
@@ -1028,8 +1106,10 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Classify using a majority of $k$ trees
   - Trees are small, quick to train
   - Mitigates the effects of over fitting
+  
 - Ensembles implementation 2: Boosting
   - Increase weight of good hypothesis, decrease weight of bad ones
+  - Increase weight of incorrectly-identified training entry; decrease the weight of a correctly-identified training entry
   - Bagging makes a number of assumptions (each hypothesis is equally correct, and independent)
   - This isn't true
   - Do a weighted majority using these weighted hypothesis
@@ -1043,7 +1123,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
 
 
-## Chapter 9-10: Neural Networks (more details in CS 480)
+## Chapter 9-10: Neural Networks
 
 - Intro 
 
@@ -1061,9 +1141,10 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
 - Artificial Neuron
 
-  - Input signals, each with weights
+  - Input signals, each with weights, $a_i$
   - Input Function (usually a weighted sum), $= in_i$
-  - Activation Function $ = g(in_i)$
+    - $in_i = \sum w_{i,j} a_j$
+  - Activation Function $a_i = g(in_i)$
   - Output signals (fire or not) (these outputs will be weighted, too)
   - Mimic firing in real neurons (fire 1 when you have right input, 0 for bad input)
   - ==neurons are not adjusting or setting the weights of the signals==
@@ -1093,9 +1174,9 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   
   // same node
   // threshold = 0
-  1_bias_link (w0) > node
-  x_1_link (w1) ---> node
-  x_2_link (w2) ---> node
+  1_bias_link (w0) --> output_node
+  x_1_link (w1) -----> output_node
+  x_2_link (w2) -----> output_node
   
   requirements:
   w_0 + w_1 + w_2 >= 0
@@ -1114,16 +1195,20 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   ```
 
 - Network Structure
+  
+  - ANN = artificial neural network
   - Feed-Forward ANN (directed acyclic graph, no internal state; maps inputs to output)
   - Recurrent ANN (directed cyclic graph, system with internal state, can remember information for future use)
   - Input units (1 for each feature)
   - Output unit (returns some value, a classification); often have multiple output units
   - Activation function g
+  
 - Perceptron
   - Single layer neural network
   - Inputs and outputs; no inner nodes
   - Might have multiple outputs (classifications, maybe a probability distribution)
   - Can only learn linear separators
+  - If there are $m$ outputs, you can really think of it like $m$ distinct neural networks
 
 <img src="./images/cs486-9.png" alt="alt text" style="zoom:50%;" />
 
@@ -1160,8 +1245,10 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   ```
   c1, c2, b are the biases
   let C = [c_1, c_2]
-  let W_1 represent first layer conneections
+  let W_1 represent first layer connections
+  	2 inputs, 2 inner nodes ==> 4 weights total, 2x2 matrix
   let W_2 represent second layer connections
+  	2 inputs (the hidden nodes) and 1 output implies 2x1 matrix
   let activation function g(x) = max(0, x)
   
   recall our function: x_1 XOR x_2
@@ -1193,6 +1280,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Training Multi-Layer Networks
     - For weights from hidden to output later we can use gradient descent, because we know what y I supposed to be
     - But for weights from input to hidden layer, we don't know what y is? So what is the error? What should the output value be?
+    - What do we use as our error function? Usually 1/2 the sum of squared errors (1/2 such that when we take the ^2 deviated )
   - Back Propagation
     - Each hidden layer has caused SOME of the error in the output layer
     - Amount of error proportionate to the connection strength (weights)
@@ -1222,7 +1310,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   error = 0.5(y - h(x))^2
   ```
 
-  
+
   - Recall Chain Rule: $y, x$ vectors... $y = g(x)$. $z = f(y) = f(g(x))$
   - $\frac{\partial z}{\partial x} = \frac{\partial z}{\partial y} \frac{\partial y}{\partial x}$
   - $L(y, h_w(x)) = 0.5(y - h_w(x))^2$
