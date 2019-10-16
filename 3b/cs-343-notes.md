@@ -1052,7 +1052,49 @@ uActorStop(); // wait for all actors to terminate
   - Sometimes called condition locks
   - Sometimes used `wait / signal`
   - implementation
-    - 
+
+```c++
+class uOwnerLock { 
+  public:
+    uOwnerLock();
+		unsigned int times() const; // num times acquired by owner
+  	uBaseTask *owner() const; // returns owner task or nullptr
+    void acquire(); // acquires if open, else acquiring task blocks
+  
+    // one attempt to acquire, does not block
+    // returns true if lock got acquired, false otherwise
+		bool tryacquire();
+		void release(); // releases waiting tasks in FIFO order
+};
+// initialized to OPEN
+uOwnerLock x, y, *z; z = new uOwnerLock;
+- owned by task that acquires it; all other tasks attempting to acquire the lock block until the owner releases it
+- can be acquired multiple times by the owner
+- must have matching number of releases
+
+
+class uCondLock { 
+  public: 
+  	uCondLock();
+		bool empty(); // are there tasks blocked on the queue
+  
+  	// atomically blocks the calling task
+    // re-acquires its argument owner-lock before returning
+		void wait( uOwnerLock &lock ); // acquire
+  
+    // checks if there is a waiting task and, if so, unblocks a 
+    // waiting tasks from the queue of the condition lock
+    // waiting tasks are released in FIFO order
+  	void signal(); // release
+  
+    // all waiting tasks are unblocked
+		void broadcast();
+};
+// initialized to CLOSED
+uCondLock x, y, *z; z = new uCondLock;
+```
+
+
 
 
 

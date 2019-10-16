@@ -11,8 +11,6 @@
     - A2 out Oct 2, due Nov 6
     - A3 out Nov 6, 
 
-
-
 ## Intro
 
 - What is AI?
@@ -118,7 +116,7 @@
 
 
 
-#### DFS
+#### DFS (LIFO)
 
 - recall: we transform our problem graph into our search graph
 
@@ -129,18 +127,21 @@
     - time complexity is equivalent to the number of nodes traversed
   - space complexity
     - store **path** from start -> current node (at most m)
-    - store **fringe**, these are the unexplored siblings of each node on the path (b for each node on the path)
+    - store **fringe**, these are the unexplored siblings of each node on the path (b for each node on the path) (there are $m$ levels, and on each level we store at most $b$ nodes, so $O(bm)$)
     - $\in O(bm)$
 
 <img src="./images/cs486-2.png" alt="alt text" style="zoom:30%;" />
 
 <img src="./images/cs486-3.png" alt="alt text" style="zoom:30%;" />
 
-#### BFS
+#### BFS (FIFO)
 
-- time complexity: $O(b^{d + 1})$ where $d$ is the depth of the goal node; total number of nodes traversed until the shallowest solution is found
-- space complexity: $O(b^{d + 1})$
+- time complexity: 
+  - $O(b^d)$ where $d$ is the depth of the goal node
+  - total number of nodes traversed until the shallowest solution is found
+- space complexity: $O(b^{d})$
 - optimal if all edges equal
+- Memory is a bigger problem here than time
 
 #### Iterative Deepening Search
 
@@ -148,20 +149,24 @@
 - outer loop which inreases depth of how far you are willing to search (do DFS but only expand down to some depth, then increase depth and repeat)
 - Complete: yes
 - optimal: will find the shallowest goal node fastest
-- time complexity: $O(b^d)$
-- space complexity: uses less space than BFS; $\in O(d)$ where $d$ is the depth of the goal. it is only ever engaged in a depth-first search, so only needs to store nodes which represent the current path it is exploring. since it is optimal, and finds the shallowest goal at depth $d$, then the length of this path is only ever $d$
+- time complexity: $O(b^d)$,
+- space complexity: uses less space than BFS; $\in O(bd)$ where $d$ is the depth of the goal. it is only ever engaged in a depth-first search, so only needs to store nodes which represent the current path it is exploring. since it is optimal, and finds the shallowest goal at depth $d$, then the length of this path is only ever $d$
 - comparisons:
   - $b = 10, d = 5$
   - N(BFS) = 1,111,000
   - N(IDS) = 125,000
 
-#### Cost-Sensitive Search: Uniform Cost Search
+#### Cost-Sensitive Search: Uniform Cost Search (Priority Queue)
 
-- expand cheapest node first
+- expand cheapest node first (use a cost function; in BFS, the cost function is just the depth)
+- Sort the frontier using a priority queue
 - complete: yes
 - optimal: yes (as long as they aren't all 0; no negative costs)
 - biased on little paths that have low-cost actions and puts-off larger costs branches
 - Uses minimum-cumulative cost as the priority in the priority queue, as opposed to depth as the priority in the queue for DFS
+- Goal test when a node is selected for expansion instead of when it is first generated (why? Multiple goal nodes can be generated and added on to the frontier; but the goal node that is selected for expansion is only selected when it is at the front of the queue, and therefore it has the minimum cost)
+
+<img src="./images/cs486-10.png" alt="alt text" style="zoom:100%;" />
 
 ## Chapter 3: Informed Search
 
@@ -242,7 +247,7 @@
 
 - NOTE: with a good heuristic, when A* finds the goal state (removes it from front of queue) then that is the optimal path
 
-- Admissible Heuristics
+- ==Admissible Heuristics==
 
   - An optimistic heuristic, always under-estimating
   - A heuristic function $h(n)$ is ==admissible== if $0 \leq h(n) \leq h^*(n)$ where $h^*(n)$ is the TRUE, god-given value
@@ -257,7 +262,7 @@
 
 - Example
 
-  Let G be optimal goal. Let G2 be suboptimal goal. cost(G) < cost(G2). Let n be on queue and is on path to G. Assume G2 is on queue and assume G2 is selected.
+  Let G be optimal goal. Let G2 be suboptimal goal. cost(G) < cost(G2). Let n be on queue and is on path to G. Assume G2 is on queue and assume G2 is selected (which it shouldn't be)
 
   Recall g(x) is distance from start to x, h(x) is heuristic from x to goal
 
@@ -306,19 +311,17 @@
   C* = cost of optimal solution, constant
   recall: f(n) = g(n) + h(n)
   A* expands all n where f(n) < C* 
-  = g(n) + h(n) < C*
+  ==> g(n) + h(n) < C*
   ==> h(n) < C* - g(n) // g(n) using either heuristic is the same!
   ==> h1(n) < h2(n) < C* - g(n) // because h2(n) > h1(n)
   
-  if a node was expanded in the h2 heuristic then it must ALSO have been expanded in the h1 heuristic
+  conclusion: 0o a node was expanded in the h2 heuristic then it must ALSO have been expanded in the h1 heuristic
   ```
 
 - Designing Heuristics
   - Relax the problem
   - Pre-compute solution costs of sub-problems and store them in a pattern-database
   - Tradeoff between accuracy of heuristic (and therefore amount of search) and amount of computation needed to compute it
-
-
 
 ## Chapter 4: Constraint Satisfaction Problems (CSPs)
 
@@ -331,7 +334,7 @@
     - successor function: anything that let you move from one state to another
   - CSP
     - subset of search problems
-    - states have a specific definition; defined by variables $X_i$ with values from domains $D_i$
+    - states have a specific definition; defined by **variables** $X_i$ with **values** from domains $D_i$
     - goal test: set of specific constraints
 - CSP Examples
   - Map Colouring
@@ -372,7 +375,7 @@
   - successor function: assign a domain value to some unassigned variable
   - goal test: complete assignment and constraints satisfied
   - BFS doesn't work well:
-    - too many starting states here ($|Variables| \times |Domain|$)
+    - too many starting states here ($|Domain Vals|^{|Variables|}$)
   - Commutativity
     - ==important: CSPs are commutative; order of actions does not effect outcome; can assign variables in any order==
 
@@ -421,7 +424,7 @@ go back to NSW. try a different domain value. can be red
 ```
 
 - Notes
-  - DFS with some small improvements
+  - DFS with some small improvements (can detect states that break constraints, and fail early)
   - correctness: will find a correct answer
   - ordering: which variables should be tried first?
   - filtering: can we detect failure early?
@@ -463,12 +466,16 @@ go back to NSW. try a different domain value. can be red
 
 
 
+- Note: node consistency
+
+  - A single variable is node consistent if all of the values in the variable's domain satisfy the variable's unary constraints
+  
 - filtering: **arc consistency**
 
   - forward checking propagates information from assigned to unassigned variables, but it cannot detect all future failures early
   - run a pre-processing step to get consistency across variables
   - arc: directed edge
-  - give domains D1, D2 an arc is consistent if for all x in D1 there is a y in D2 such that x and y are consistent with the given constraints
+  - Given domains D1, D2 an arc is consistent if for all x in D1 there is a y in D2 such that x and y are consistent with the given constraints
 
   ```mermaid
   graph LR;
@@ -535,7 +542,8 @@ go back to NSW. try a different domain value. can be red
 
 - intro
   - recall that before, solution was typically a path to the goal
-  - but, for many problems, the path is unimportant
+  - but, for many problems, the path is 
+  - Instead you just consider a single state (node) at a time
 - informal characterization
   - constraints must still be satisfied
   - cost function helps us find a good solution
@@ -564,24 +572,29 @@ go back to NSW. try a different domain value. can be red
 - **Hill Climbing (Gradient Descent)**
 
   - ==main idea: always take a step in the direction that improves the current solution value the most==
-  - (variation of Best first search)
-  - impl
+  
+  > Like trying to find the top of Mount Everest in a thick fog while suffering from amnesia
 
+  - (variation of Best first search); this is a greedy local search
+  - impl
+  
   ```
   start with some initial configuration S, with value V(S)
     generate MoveSet(S) = {m1, ..., mN}
-    Smax = max(V(mi))
-    if V(Smax) < V(S) return S // local optimum, not a GLOBAL optimum
+    Smax = max(V(move_set_i))
+    // instead of generating moveset, just call getHighestValSuccessor1(curr)
+  if V(Smax) < V(S) return S // local optimum, not a GLOBAL optimum
     S = Smax (navigate to node)
     repeat from line 2
   ```
-
+  
   - why "gradient ascent"? well, for f(x1, x2), if you want an optimal value, you take the $\nabla f(x1,x2) = 0$ (take derivative with respect to x1 ,x2)
   - Performance
     - easy to program; no memory of where we have been
     - not complete; not optimal; ==it can get stuck in local optima/plateaus==
     - plateau solver: allow for sideways moves
     - local maxima / minimum solution: record it, then randomly restart
+      - If the probability of finding the global maximum is $p$ then the number of restarts required is $1/p$
   
 - runtime distribution
 
@@ -718,11 +731,11 @@ graph TD;
 
 ```
 Look at A --> B --> 3 ====> [3, infinity]
-Look at A --> C 
-	STOP (dont search 30 or 12), min can force me to get at least a 2
+Look at A --> C --> 2
+	STOP (dont search 30 or 12), min can force me to get at most a 2
 Look at A --> D --> 14 // need to keep searching
 Look at A --> D --> 5 // need to keep searching
-Look at A --> D --> 1 // min can force me to get at least a 1
+Look at A --> D --> 1 // min can force me to get at most a 1
 ```
 
 - properties
