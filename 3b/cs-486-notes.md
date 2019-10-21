@@ -37,6 +37,18 @@
     - Static vs Dynamic: static means only we are changing the environment
     - Single Agent vs MultiAgent
 
+From Textbook:
+
+- Agent: anything that perceives its environment through sensors and acts on it using actuators
+- Percepts: anything an agent perceives
+- What is rational depends on 4 things
+  - The performance measure that defines agent success
+  - Agent's prior knowledge of the environment
+  - Allowed actions
+  - Percept sequence to date
+
+> DEFN Rational Agent: for each possible percept sequence, a RA selects an action that is expected to maximize its performance measure, given the evidence provided by the percept sequence and whatever built-in knowledge it has
+
 ## Chapter 2: Search
 
 ### Search Problem
@@ -924,8 +936,9 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 ### Decision Trees
 
 - Comments from textbook
-  - Good for some types of problems, bad for others (ex: the majority function (are half of the inputs true); requires an exponentially large decision tree)
-
+  
+- Good for some types of problems, bad for others (ex: the majority function (are half of the inputs true); requires an exponentially large decision tree)
+  
 - General
   - Classify instances by sorting them down the tree from root to leaf
   - Nodes correspond to a test of some attribute
@@ -1107,7 +1120,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Trees are small, quick to train
   - Mitigates the effects of over fitting
   
-- Ensembles implementation 2: Boosting
+- Ensembles implementation 2: **Boosting**
   - Increase weight of good hypothesis, decrease weight of bad ones
   - Increase weight of incorrectly-identified training entry; decrease the weight of a correctly-identified training entry
   - Bagging makes a number of assumptions (each hypothesis is equally correct, and independent)
@@ -1335,3 +1348,67 @@ Look at A --> D --> 1 // min can force me to get at most a 1
     - x_1 XOR x_2 XOR x_3 XOR x_4 ......
     - Can do it with 1 layer, with $2^{n - 1}$ inner nodes
     - Or can do it with multiple layers
+
+
+
+## Chapter 11: Intro to Bayes Nets
+
+- Review
+  - Discrete Random vars X,Y with finite domains $\{x_1, \dots, x_n \}$
+    - Random vars always capital
+  - P(X) is a distribution
+  - P(X=xi) = P(x_i) is a probability
+  - Joint distribution P(X,Y)
+  - Marginalization / Summing Out
+    - P(A and (B = x1 or B = x2 or B = x3)) = $\sum_{i = 1}^3P(A, B=xi)$
+    - Generalization of OR rule
+  - Conditional Probs (prob A given B)
+    - P(A|B) = P(A,B) / P(B)
+  - Bayes Rule
+    - P(A|B) = P(B|A) P(A) / P(B); this is a family of distributions, over all values of B
+    - Probability of A given that we have B evidence, is the posterior probability
+    - =aprox= alpha P(B|A) P(A) where P(A) is prior, P(B|A) likelihood
+
+- Intro
+
+  - Probabilistic inference: query to get the probability of something
+
+- Issues
+
+  - Specifying the full join distribution over a set of $k$ random variables with finite domain of size $n$ is $k^n$. Huge
+  - Calculating all of these probabilities is very slow
+
+- Terms
+
+  - Independence: two variables A and B are independent if P(A|B)=P(A) and P(B|A) = P(B) and P(A and B) = P(A)P(B)
+  - If we have $k$ variables then we only need $k$ numbers to represent the complete joint distribution
+  - Variable Independence ?
+  - Conditional Independence
+    - P(A|(B, C)) = P(A|C) for all A,B,C;
+    - Ex: A = GPA, B is midterm grade in AI, C is final grade in AI
+    - Basically: knowing how well you did in midterm is unneeded, since we already know your final grade in AI (which is all that matters, as that's what affects your GPA)
+
+- Example:
+
+  - P(S|L,G,C,E) = P(S|L)
+  - P(L|G,C,E) = P(L|G)
+  - P(G|C,E) = P(G|C)
+
+  ```
+  P(S,L,G,C,E) = P(S | L,G,C,E) * P(L,G,C,E) 
+  						 = P(S | L) * P(L,G,C,E) 
+  						 = P(S | L) * P(L | G,C,E) * P(G,C,E)
+  						 = P(S|L) * P(L|G) * P(G,C,E)
+  						 = P(S|L) * P(L|G) * P(G|C,E)*P(C,E)
+  						 = P(S|L) * P(L|G) * P(G|C) * P(C,E)
+  						 = P(S|L) * P(L|G) * P(G|C) * P(C|E) * P(E)
+  ```
+
+  ```
+  P(G)  = sum ci in C of P(G, C=ci)
+  			= sum ci in C of P(G|ci)P(ci)
+  			= sum ci in C of P(G|ci)*(sum ei in E of P(ci|ei)P(ei))
+  ```
+
+- Bayesian Network
+  - Graph structure of direct. Dependencies over a set of variables and a set of conditional probability distributions (CPTs) quantifying the strength of the influences

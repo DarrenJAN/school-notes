@@ -67,7 +67,7 @@
   - in practice, the descriptive architecture is modified directly
   - due to developer sloppiness, deadlines, lack of planning, need for optimizations
 - architecture degradation
-  - architecture drift: introduction of principal design designs into a system's descriptive architecture that are not included in the prescriptive architecture but do not violate any prescriptive design decisions
+  - architecture drift: introduction of principal design decisions into a system's descriptive architecture that are not included in the prescriptive architecture but do not violate any prescriptive design decisions
   - architecture erosion: into of design decisions that violate prescriptive plan
 - architecture recovery
   - hard to recover what the nonfunctional requirements were from source code
@@ -195,9 +195,10 @@
     - topology
       - Eliminate unnecessary dependencies
       - If you have many components, the **compose** groups of related components into larger components; **zoom out**
-  - Scalability / Heterogeneity:
+  
+- Scalability / Heterogeneity:
 
-    - Scalability: capability of a system to be adapted to meet new size or scope requirements
+  - Scalability: capability of a system to be adapted to meet new size or scope requirements
   - Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
     - Portability: ability of a system to properly execute on multiple platforms
     - Components
@@ -212,30 +213,32 @@
     - Topology
     - Place data close to customer
       - Think about who owns the data, about what moves around and where it stays
-  - Evolvability
   
+- Evolvability
+
   - Ability to change to satisfy new requirements and environments
     - Components
     - 
     - Connectors
       - 
     - Topology
-  - Dependability
-    - examples
-      - reliability: system will perform without failure
-      - availability: probability system is available at a moment in time
-      - robustness:
-      - fault-tolerance:
-      - survivability:
-      - safety:
-    - components
-      - support exception handling
-      - control external component dependencies
-    - connectors
-      - provide interaction guarantees
-    - topology:
-      - avoid single points of failure
-      - enable backups
+
+- Dependability
+  - examples
+    - reliability: system will perform without failure
+    - availability: probability system is available at a moment in time
+    - robustness:
+    - fault-tolerance:
+    - survivability:
+    - safety:
+  - components
+    - support exception handling
+    - control external component dependencies
+  - connectors
+    - provide interaction guarantees
+  - topology:
+    - avoid single points of failure
+    - enable backups
 
 
 
