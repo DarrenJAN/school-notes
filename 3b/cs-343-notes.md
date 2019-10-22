@@ -963,6 +963,106 @@ uActorStop(); // wait for all actors to terminate
   - Arrive at a doorway, argue about who goes through forever
 - Starvation: after a thread starts entry to the critical section, it must eventually enter
   - Arrive at a doorway, other people keep going in front of you forever
+- CONTINUED OCT 22
+
+
+
+### 5.17 Self-Testing Critical Section (oct 22)
+
+- Minimum number of checks to know if another person was in the shower? Just 1, at the end? What if Mary snuck in and snuck out in between checks ?
+- Well, when you enter the bathroom you have to WRITE YOUR NAME on the shared memory
+- So if you check at the end, you can see that she wrote her name somewhere
+
+### 5.18 Software Solutions
+
+- Use inside blackboard
+
+  - Techniques that work for ppl do not always work for computers
+
+  ```
+  // attempt 1
+  // inside blackboard
+  for i in 1000
+  	while lock is closed, wait
+  	lock is now open
+  	set lock to closed
+  	criticalsection()
+  	set lock to open
+  ```
+
+- Use outside blackboard
+
+  - This doesn't work. Why? Because two people can check at the same time that the door is unlocked, and then they both enter the bathroom at the same time, and then they both loc ketch door
+
+  ```
+  // attemp 2
+  // outside blackboard
+  // doesn't at all work for > 2 tasks
+  for i in 1000
+  	while (last == me)
+  	critical section
+  	last = me
+  ```
+
+  - Write name on outside of bathroom door instead of inside
+  - Whomever was last in the bathroom has to wait
+  - If you have to go to the bathroom twice in a row, then you can't go! You're waiting for the other person, but what if they left the house
+
+- Declare intent
+
+  - 2 blackboards
+  - Say I want to go in, and look at the other person's blackboard
+
+  ```
+  for i in 1000
+  	me = want in
+  	while (you == wantin) wait
+  	critical section
+  	me = dontwantin
+  ```
+
+  - If we both put your names on the blackboard at the same time, then we each think the other person is in the bathroom, and so we wait forever
+
+- Retract intent
+
+  - In the long run, will break itself due to context switches causing some lines to be ahead of other
+
+- Prioritized retract intent (man and woman approach a door, woman goes first)
+
+  - Woman can then hog the bathroom all day long
+  - Starvation
+
+- Dekker (modified retract intent) (blue fixed flickering)
+
+  - Used a 3rd blackboard
+  - 3rd one tells us who was last in the bathroom
+  - Use top 2 blackboard to specify intent
+  - 3rd is only for simultaneous arrivals
+  - Basically you switch priorities whenever there is a tie
+  - Recall rule 4: on simultaneous arrival you break the tie
+  - Recall rule 5: starvation ? Can I sneak up and put my intent back on before you see it and jump ahead of you?
+  - Doesn't work if you have flickers (JK Flip Flops) if you aren't careful
+  - Simultaneous WW: we both write to 3rd, first I write to 3rd, then drop intent; you can't write to 3rd until I drop my intent
+  - Can have flickering back and forth (in variable assignment) to cause spinning forever 
+
+- Peterson (modified declare intent)
+  - If there's a race, then the LOSER will have their name (over write) in last variable
+  - While you want to go in, and my name is last (so I lost the race) then I'll wait
+  - RW unsafe (required atomic read/write operations)
+  - Relies on mutual exclusion out of thin air, so DOES rely on hardware
+  - Bounded over-taking, if you leave and then come back, then you go to end of the line
+  - For multiple threads, 0 is high priority
+  - No one with high priority ahead oh me? No one with lower priority wanted in? Then I can go in ???
+  - Need 3 bits; 4 bits for RW safe
+- N Thread Bakery
+  - Blackboards; tickets 
+  - Walk in, say yo show me your tickets, I see the highest ticket number, and I add 1 to that, and put it on paper, and that's my ticket
+    - 2 ppl can do this at the same time, that's fine; tickets not unique
+  - 0 means that that person is in the room with me (selecting ticket); so I must wait
+  - When iterating, need to copy the ticket when you check it
+  - Ticket value cannot be allowed to increase forever (it would fail if so; this is unlikely to happen
+  - Maximal tree: most fair (try and make all tasks have do the same amount of work (number of comparisons)
+  - Minimal tree: go for speed
 
 
 
@@ -1161,6 +1261,8 @@ uCondLock x, y, *z; z = new uCondLock;
   - Get rid of the starvation:
     - Change something that HAS barging into something that does NOT have barging
     - How to use techniques to eliminate barging
+
+
 
 
 
