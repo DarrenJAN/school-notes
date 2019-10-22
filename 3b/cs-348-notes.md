@@ -999,7 +999,72 @@ having count(author) = 1
   - They still need to be able to exist
   - Also, you want a separate professor table because you want to be able to add more properties to it later
   - Also, if you add the telephone number to the graduate table instead (for the professor via professor name), then you will have lots of duplication if that professor supervises multiple students
-- 
+
+
+
+## Lec 9: Translating Entity Relationship Diagrams to Relational Tables
+
+- Foreign key
+  - EMP can only be made if the appropriate DEPT exists
+  - `on delete cascade` => if you delete the DEPT, then delete all employees in that DEPT too
+  - `on update restrict`: can only update the DEPT ID of en existing DEPT if it has no EMP
+  - Actions can be: RESTRICT (produce an error), CASCADE (propagate the delete), SET NULL
+- What if you want more than just primary and foreign keys?
+  - CHECK constraints
+  - `check (salary > 0)`
+- Views and View Management
+  - View: relation whose instance is determined by the instances of other relations
+  - Has schema, has attributes, has access controls, other views can be defined in terms of it
+  - Not a table, though
+  - They are VIRTUAL: only used for querying, not stored in db
+  - Or, sometimes, can be MATERIALIZED: the query that makes up the view is executed, the view constructed and stored in db
+    - Sits on a disk;
+    - Sometimes if you change the actual data (small changes) you can just construct a query to construct what are the necessary changes to the view, don't re-construct the whole view
+- Updating Views
+  - Ex: PersonalPastimes (view)
+  - Can't just insert (Darryl, Hockey) because we don't know Darry's country
+  - Can't just delete (Dave, Curling) because we can't delete Dave, and we can't delete Curling
+
+- Data control language
+
+
+
+## Lec 10: Normalization Theory
+
+- Supplied Items example
+
+  - Want to change a supplier name? Need to change it for all row entries in the table
+  - Insert a new item --> well, it's supposed to have a supplier but it doesn't
+  - Splitting them up seems good, but not too far; fully split is bad
+  - Completely combined is bad too
+  - What's the middle ground?
+  - Look for pairs of columns that are always matched together 
+    - Supplier number and supplier name, city always the same
+    - Item number and item name always the same
+
+- How to find and fix anomalies
+
+  - Find: We have some Integrity Constraints
+  - Fix: have schema decompositions
+
+- Functional Dependencies
+
+  - Express the fact that in a relation schema
+    - Some values of attributes uniquely determine the values of another set
+  - implications
+    - TODO
+
+- Example
+
+  ```
+  R(A1,...,An,B1,...,Bn)
+  F = { Ai -> Bi, Bi -> Ai for all 1 <= i <= n}
+  for every i we have to choose either Ai or Bi, so there are 2^n candidate keys
+  ```
+
+  
+
+
 
 
 

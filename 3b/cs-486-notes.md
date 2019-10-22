@@ -761,7 +761,10 @@ graph TD;
 ```
 Look at A --> B --> 3 ====> [3, infinity]
 Look at A --> C --> 2
-	STOP (dont search 30 or 12), min can force me to get at most a 2
+	STOP (dont search 30 or 12)
+	Here, min can force me to get at most a 2
+	But, one level up, at the max level, MAX can select at least a 3
+	so even if the next numbers under C were -1, or -100, max will still ignore them
 Look at A --> D --> 14 // need to keep searching
 Look at A --> D --> 5 // need to keep searching
 Look at A --> D --> 1 // min can force me to get at most a 1
@@ -775,6 +778,8 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - need to make decisions quickly
   - solution? heuristic evaluation function + cutoff tests
   - Only search down to some depth $d$ and then apply a heuristic for the estimated value of that state at depth $d$; drastically reduces how many states you need to search
+- Optimal order? When MAXs turn, views states from high to low. 
+  - When MINs turn, views states from low to high
 
 ### Evaluation Functions
 
@@ -1411,4 +1416,5 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   ```
 
 - Bayesian Network
+  
   - Graph structure of direct. Dependencies over a set of variables and a set of conditional probability distributions (CPTs) quantifying the strength of the influences

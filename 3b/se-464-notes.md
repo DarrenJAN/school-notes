@@ -426,7 +426,7 @@ main {
 
 #### Prototype Builder
 
-- instead of having a class and saying give me this class, you add fields and add methods to a data structure, and at some point you say "this is my object, it has everything I want" and from then on you just close that prototype
+- instead of having a class and saying give me this class, you add fields and add methods to a data structure, and at some point you say "this is my object, it has everything I want" and from then on you just clone that prototype
 
 
 
@@ -1194,9 +1194,48 @@ main {
 
 
 
+- Midterm Review
+  - Stakeholder Questions:
+    - What do they want?
+    - Do they all have a common understanding? No
+  - Views and NonFunc Proeprties
+    - 4+1; why do we need them?
+    - What's wrong with having different views? Inconsistencies 
+    - Non func props: tradeoffs?
+  - Design patterns
+    - Composition lets you change it at runtime (you have a reference to it)
+  - Architectural Styles
+  - Modelling
+  - Security
+    - Read chrome paper?
+  - Design Intro
+    - SOLID
+    - Coupling / Cohesion, different levels
+  - Code smells
+    - Liskov substitution principle
+    - Examples of bad codex
+    - Dispatch: when you call a function, which function is it actually at runtime?
+    - Double dispatch: visitor example; end function depends on runtime type of visitor AND acceptor
 
 
 
+## Design patterns we didn't know
+
+- State: finite state machine
+  - State ABC, and then different concrete implementations
+  - Repeatedly call state.handle(action).handle(action).handle(action) etc
+  - Handle returns the new state; always takes in some action
+- Memento design pattern
+  - Stacks with getState setState
+- Mediator
+  - Bunch of colleagues implement from college ABC
+  - Mediator HAS a bunch of colleagues
+  - Mediator acts as a broker
+  - C1 calls mediate(c1) and then it gets state from c1, and then refers to c2 to do stuff
+- Command
+  - Dynamically call methods (ex: from a string)
+  - Client, command, receiver
+- 
 
 
 
