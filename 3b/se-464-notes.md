@@ -1192,8 +1192,6 @@ main {
   - Model View View Model
     - Have another view model...
 
-
-
 - Midterm Review
   - Stakeholder Questions:
     - What do they want?
@@ -1235,11 +1233,78 @@ main {
 - Command
   - Dynamically call methods (ex: from a string)
   - Client, command, receiver
-- 
+
+## More on Arch Styles
+
+- LLIDIPS
+- For each:
+  - Component and connectors
+  - Allowed structural patterns
+  - Computational model
+  - Essential invariants
+  - Common examples
+  - Pors and cons
+  - Specialization
+
+#### Language-Based
+
+####Layered
+
+- Programs that can be decomposed into groups (layers) of subtasks; each layer provides services to next higher layer
+- EX: desktop applications; e commerce web apps
+- Simplifies design; different role players can work at different levels
+
+####Interpreter
+
+- Interprets programs written in a dedicated language (CFG, SQL)
+- Context <---- Client ----> Abstract Expression
+  - TerminalExpression
+  - NonTerminal Expression
+
+####Dataflow
+
+> Focused on the flow of data; data is transformed by a series of steps into output data
+
+- Batch sequential:
+  - Sequential programs are executed in order and the data is passed from one program to the next
+  - Con: no concurrency
+- Pipe and Filter:
+  - Multiple pipes and filters, with loops, more complex logic; data is passed through pipes; processing steps are enclosed in filters
+  - Ex: compilers; different filters perform lexical analysis, parsing, semantic analysis, code generation
+
+#### Implicit Invocation
+
+- Event based (shared event bus)
+  - Sources, event bus, and listeners
+- Publisher and subscriber
+
+#### Peer to Peer
+
+- Individual components called peers which function both as clients (request services) and servers (provide services)
+- Usage: file-sharing networks
+- Issues with data backup and recovery
+
+#### Shared Memory
+
+- Blackboard:
+  - Computational framework for systems that have large and diverse specialized modules and complex control strategies
+  - Different modules need to be combined to solve a problem
+  - Components: blackboard (global memory), knowledge sources (modules with their own representation), control component (selects and configures and executes modules)
+  - Ex: speech recognition, vehicle identification and tracking, sonar signal interpretation
+- Rule Based
+  - Store and manipulate knowledge to interpret information in a useful way
+  - Ex: expert system that uses rule to make deductions or choices (help a doctor make the right diagnosis)
 
 
 
+## Acronyms
 
+- Non Func Properties: ESCHPED (ess-sch-ped)
+  - Evolvability scalability complexity hetero_something portability efficiency dependability
+- Architectural Styles: LLIDIPS (lee-dips)
+  - Language based, layered, interpreter, data flow, implicit invocation, peer to peer, shared memory
+- Security: CIA
+  - ? ? ?
 
 
 

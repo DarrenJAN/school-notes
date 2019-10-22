@@ -989,7 +989,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
     - Coin that is always 50/50: has entropy of 1 (extremely uncertain)
     - Coin that lands heads 99% of the time: $H(0.99, 0.01) = -0.99*log(0.99) + -0.01*log(0.01) = 0.08$ (once again, don't get much information from seeing the result)
 
-- **Information Gain**
+- **Information Gain** (uses log_2)
 
   > The information gain on an attribute A is the expected reduction in entropy
   >
@@ -1001,7 +1001,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   >
   > $n$ = number of negative examples
   >
-  > remainder(A) is the sum of probabilities of each attribute value ($a_i \in A$) times the entropy of that attribute value
+  > remainder(A) is the sum of probabiliti es of each attribute value ($a_i \in A$) times the entropy of that attribute value
   >
   > $Gain(A) = I(\frac{p}{p + n}) - remainder(A)$
 
@@ -1032,7 +1032,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   IG(Patron) = I(0.5,0.5) - Remainder(Patron)
   	= 1 - Remainder(Patron)
   	= 1 - ([P(NONE)I(NONE)] + [P(SOME)I(SOME)] + [P(FULL)I(FULL)])
-  	= 1 - ((2/12)(I(0.1))  + (4/12)(I(1,0))  +  (6/12)(I(2/6, 4/6)))
+  	= 1 - ((2/12)(I(0,1))  + (4/12)(I(1,0))  +  (6/12)(I(2/6, 4/6)))
   	= 1 - ((2/12)0 + (4/12)0 + 0.459)
   	= 1 - 0.459
   	= 0.541
@@ -1083,7 +1083,10 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - $Loss(h_w) = $ Sum of squares of error
   
 - Gradient Descent
-  - For a single example, $loss = (y - h_w(\bar{x}))^2$ // y is label
+  
+  > Choose any starting point in the weight space, **w** = $w_1, \dots, w_n$ and then move to a neighbouring point that is downhill, repeating until we converge on the minimum possible loss
+  
+  - For a single example, $loss(w) = (y - h_w(x))^2$ // y is label
   - $\frac{\partial h_w}{\partial w_c} = 2(y - h_w(\bar{x}))(-x_c)$ // x bar is entire weight vector, x_c, w_c is just an element and the weight of that individual element
   - Perceptron update rule
     - If y is 1 but $h_w$ says that it's a negative sample (0) then we adjust the weight by $x_i$ and $\alpha$. 
@@ -1092,15 +1095,22 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   w = any point in parameter space
   loop until convergence
   	for each w_i in w do
-  		w_i = w_i - alpha * partial Loss(w)/ partial w_i
+  		w_i = w_i - alpha * partial Loss(w)/partial w_i
   		// alpha is the learning rate
   ```
   
   
   
-- Update Rule (Perceptron Update Rule)
+- Update Rule (Perceptron Update Rule) (used for classification, y is 0 or 1)
   
-  - TODO
+  - ==Perfect linear separator IFF the data is linearly separable==
+  - $w_i = w_i + \alpha (y - h(\bold{x}))x_i$
+  - 3 cases
+    - Y = h(x) then weight is not changed
+    - Y = 1 and h(x) = 0; then w_i is increased proportionally to $\alpha * x_i$
+      - Makes sense, h(x) is too small, we want to increase it using weight i
+    - Y = 0 and h(x) = 1; then w_i is increased proportionally to $-\alpha * x_i$
+      - Makes sense, h(x) is too large, we want to decrease it
   
 - Ensembles
   - So far we have been solving and learning using just 1 approach
@@ -1178,7 +1188,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
     - $g'(x) = \frac{1}{1 + e^x}(1 - g(x))$
   - ex
     - $g(x) = \frac{e^{2x} - 1}{e^{2x} + 1}$
-    - $g'(x) - 1 - g(x)^2$
+    - $g'(x) = 1 - g(x)^2$
 
 - Ex Logic Gates
 
@@ -1234,11 +1244,19 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
   - Learning means adjusting the weights ==with the goal of minimizing the loss function, or error function==. K is an example in the training set
   - What is our loss function? Sum of squares of error
+    - $E = \sum_k 0.5 (y_k - h_W(x)_k)^2$
   - Learning Algorithm (gradient descent)
     - Do it iteratively, as opposed to acting on all examples at once (could do that, but we don't because error function is a function of all examples)
   - Stochastic Gradient Descent (SGD)
     - Shuffle training data at random
     - Execute Gradient Descent update algorithms for all examples in order (of that shuffled set)
+
+- From textbook:
+
+  - Let $\Delta k = Error_k \times g'(in_k)$
+  - Where $Error_k$ Is the kth component of the error vector ***y - h_w***
+  - Now, $w_{j,k} = w_{j,k}+ \alpha \times a_j \times \Delta k$
+  - Where $a_j$ is the activation at node $j$ (ON or OFF)
 
 - Multilayer Networks
 
