@@ -1066,7 +1066,10 @@ uActorStop(); // wait for all actors to terminate
 
 #### 5.18.11 Arbiter
 
-
+- Bring in a 3rd task whose job is just to manage the critical section
+- Tasks manage intents: put a checkmark if you want to go in
+- Arbiter scans intents and if it finds someone that wants to go in, it waits for them, and once they come out, the arbiter continues scanning along
+- High cost; full time person spinning checking the critical section
 
 
 
@@ -1210,26 +1213,22 @@ uCondLock x, y, *z; z = new uCondLock;
     - We are outside using the lock, and we made the same mistake
     - Common mistake
     - Happens internally when building the lock; externally when using the lock
-
 - How to fix?
 
   - Release the lock then sit on the bench? Doesn't work either; you could be pre-empted
   - Change acquire so that we can pass in the outside lock
   - Before we go to sleep, tell the scheduler to release it
   - Pages 107, 108
-
 - Now we are barging again
 
   - New people can steal the lock and sit on the table, and beat people who were already waiting on the bench
   - Barging avoidance? Don't tell people that the table is empty when you leave; lie instead; use a flag; people are still barging but they are being put on the bench instead
   - Prevention: don't reset the flag AND don't release the lock
   - The moment you say "I will wake him up" and you don't release the lock, then you need to leave immediately
-
 - Page 109
 
   - Usually when ppl use a sync lock, they have a mutual exclusion lock
   - Why does acquire still take an external lock? Before you go to sleep you want to ask questions, and to ask questions you need a mutual exclusion lock
-
 - Moral question:
 
   - We were told that whole idea behind blocking locks is that we want to get rid of busy waiting
@@ -1239,12 +1238,10 @@ uCondLock x, y, *z; z = new uCondLock;
   - If we had a spin-lock around the whole critical section, then we would spin for much longer
   - We will ALWAYS need a SpinLock; it is the centre of the universe
   - So we just want to minimize the spinning time
-
 - ConditionLock
 
   - Wait atomically releases and blocks; re-acquires the lock when it returns
   - Signal/broadcast do nothing for an empty queue
-
 - Example: Milk
 
   - Working on the outside not the inside (using the locks, not building them)
@@ -1256,7 +1253,6 @@ uCondLock x, y, *z; z = new uCondLock;
   - The spinning lock cheats: if you come in and you missed the signal, so it can just check again, or the next time, etc
   - We aren't spinning here; we only have 1 chance
   - If it's closed, you go to sleep, and never check again
-
 - Assignment 3 last question
 
   - Bounded buffer
@@ -1265,6 +1261,72 @@ uCondLock x, y, *z; z = new uCondLock;
   - Get rid of the starvation:
     - Change something that HAS barging into something that does NOT have barging
     - How to use techniques to eliminate barging
+- Hardware vs Software:
+  - If you know how many threads, software solution is better
+
+#### 6.3.3 Barrier (Oct 24)
+
+- details:
+  - Synchronization lock; not a mutex lock
+  - Allows for temporal ordering
+  - Has memory; remembers things
+  - Works across tasks
+  - Uses a Coordinator: manage a bunch of workers,
+    - N threads ==> barrier must handle n + 1 threads, because we have a coordinator
+    - Coordinator lets the workers go back around, and initialize themselves, white IT does the close-down work.
+    - Else, with no coordinator, then workers might have to wait for last worker to arrive, and then they now ALL have to wait for close-down work (SLOW)
+  - Want to re-use threads, don't destroy them and create new ones
+- uBarrier
+  - Virtual void last() // called by last task to barrier
+  - Virtual void block() // wait for N threads to arrive
+  - reset(int) // reset number of tasks synchronizing; no one can be waiting
+  - No barging
+  - Inherit from it to specialize it
+  - Re-define last and block
+  - Good use case: matrix adder (sum of rows); make row adder tasks; add them up in order (1 to N); this is NOT adding them up in order of completion
+  - What if you add them up in order of completion?
+    - Sure, but we still delete them in sequential order, so critical path is still just as slow
+  - Example: page 112 and 113
+    - Accumulator: barrier
+      - After you block (wait for everyone else to finish), you wait, and then when you wake up, you kill the thread
+      - WARNING: an object should never delete itself
+      - So that won't work
+    - Adder: task
+
+#### 6.3.4 Binary Semaphore (Oct 24)
+
+- Details:
+  - 0 => closed; 1 => open; default = 1
+  - More powerful than sync lock because it has memory; in sync lock if you signal and no one is waiting, then that signal is wasted
+- P is to acquire; lock.P(); // waits if the semaphore counter is zero, gets it when its above 0, then it decrements it
+- V; increase the counter and unblock a waiting task (if present)
+- Synchronization: start with it closed
+- Mutual exclusion: start with it open
+- Implementation: same as mutual exclusion lock basically
+
+
+
+#### 6.3.5 Counting Semaphore (Oct 24)
+
+- Open, closed, other values too
+- ==You can have n tasks in the critical section==
+- Ex: a lock that allows 200 ppl into a classroom
+- Ex: allow 3 ppl into a bathroom at a time
+  - Still need locks on the individual stall doors
+  - Can use locks that allow multiple people into a bathroom
+  - And then use locks that only allow 1 person into a stall
+  - semaphoreVariable.V(x) // don't need to use a for loop
+- Ex: page 116
+- Implementation: if you let counter go negative, then it tells you how many ppl are waiting
+- uC++
+  - uSemaphore
+  - How to make it a binary one?
+
+
+
+#### 6.4 Lock Programming
+
+
 
 
 
