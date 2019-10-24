@@ -1064,6 +1064,10 @@ uActorStop(); // wait for all actors to terminate
   - Maximal tree: most fair (try and make all tasks have do the same amount of work (number of comparisons)
   - Minimal tree: go for speed
 
+#### 5.18.11 Arbiter
+
+
+
 
 
 ### 5.19 Hardware Solutions

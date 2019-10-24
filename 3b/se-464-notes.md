@@ -153,92 +153,91 @@
 ### F and NF Properties
 
 - FP: system shall do X
-
 - NFP: system shall be Y
-
 - NFP:
 
   - Constrain on the manner in which the system implements and delivers its functionality
   - High-level types: Product requirements, process requirements, external requirements
   - Examples: Efficiency; complexity; scalability
   - Lots of conflicts between stakeholder NFP desires
-
 - Design Guidelines for different NFPs
 
-  - Efficiency 
+#### Efficiency 
 
-    - Components 
-      - small (**high cohesion**)
-      - simple and concise interfaces
-      - separate data from processing components
-      - separate data from meta-data (keep movie names list separate from GB's of movies video data)
-      - **know which components are bottlenecks**
-    - Connectors 
-      - select connectors carefully (live in same memory? Communicate over server?)
-      - encourage async interactions
-      - careful of broadcast connectors (all other components will need to listen and be able to handle that info)
-      - Location transparency (scalability: don't want to care where that other component (DB) is; efficiency: DO want to know where it is)
-    - Topology
-      - keep frequent collaborators close; ex: don't pass GBs of data through multiple layers
-- Complexity
-  
-  - Proportional to size of system; internal structure
-    - Components
-      - Separate concerns
-      - Isolate functionality from interaction
-      - Ensure high cohesiveness
-    - connectors
-      - Isolate interaction from functionality
-      - Network connector: bitstream in, bitstream out
-      - Keep a simple network topology
-      - Restrict interaction; **good API design**
-    - topology
-      - Eliminate unnecessary dependencies
-      - If you have many components, the **compose** groups of related components into larger components; **zoom out**
-  
-- Scalability / Heterogeneity:
+- Components 
+  - small (**high cohesion**)
+  - simple and concise interfaces
+  - separate data from processing components
+  - separate data from meta-data (keep movie names list separate from GB's of movies video data)
+  - **know which components are bottlenecks**
+- Connectors 
+  - select connectors carefully (live in same memory? Communicate over server?)
+  - encourage async interactions
+  - careful of broadcast connectors (all other components will need to listen and be able to handle that info)
+  - Location transparency (scalability: don't want to care where that other component (DB) is; efficiency: DO want to know where it is)
+- Topology
+  - keep frequent collaborators close; ex: don't pass GBs of data through multiple layers
 
-  - Scalability: capability of a system to be adapted to meet new size or scope requirements
-  - Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
-    - Portability: ability of a system to properly execute on multiple platforms
-    - Components
-      - Keep components focused (==so you can find bottlenecks==)
-      - Distribute data sources (different data centres around the world)
-      - Replicate data: don'y only have 1 DB that stores the information; have different data centres around the world, each replicate the data; migrate changes over time (issue with concurrent modifications)
-  
-    - Connectors
-    - Be explicit: don't use shared memory as a communication platform (doesn't scale)
-      - Direct vs indirect: easier to scale if indirect (didn't hard-code the connection)
-  
-    - Topology
-    - Place data close to customer
-      - Think about who owns the data, about what moves around and where it stays
-  
-- Evolvability
+#### Complexity
 
-  - Ability to change to satisfy new requirements and environments
-    - Components
-    - 
-    - Connectors
-      - 
-    - Topology
-
-- Dependability
-  - examples
-    - reliability: system will perform without failure
-    - availability: probability system is available at a moment in time
-    - robustness:
-    - fault-tolerance:
-    - survivability:
-    - safety:
-  - components
-    - support exception handling
-    - control external component dependencies
+- Proportional to size of system; internal structure
+  - Components
+    - Separate concerns
+    - Isolate functionality from interaction
+    - Ensure high cohesiveness
   - connectors
-    - provide interaction guarantees
-  - topology:
-    - avoid single points of failure
-    - enable backups
+    - Isolate interaction from functionality
+    - Network connector: bitstream in, bitstream out
+    - Keep a simple network topology
+    - Restrict interaction; **good API design**
+  - topology
+    - Eliminate unnecessary dependencies
+    - If you have many components, the **compose** groups of related components into larger components; **zoom out**
+
+#### Scalability / Heterogeneity:
+
+- Scalability: capability of a system to be adapted to meet new size or scope requirements
+- Heterogeneity: a system's ability to be composed of, or execute within, disparate parts
+  - Portability: ability of a system to properly execute on multiple platforms
+  - Components
+    - Keep components focused (==so you can find bottlenecks==)
+    - Distribute data sources (different data centres around the world)
+    - Replicate data: don'y only have 1 DB that stores the information; have different data centres around the world, each replicate the data; migrate changes over time (issue with concurrent modifications)
+
+  - Connectors
+  - Be explicit: don't use shared memory as a communication platform (doesn't scale)
+    - Direct vs indirect: easier to scale if indirect (didn't hard-code the connection)
+
+  - Topology
+  - Place data close to customer
+    - Think about who owns the data, about what moves around and where it stays
+
+#### Evolvability
+
+- Ability to change to satisfy new requirements and environments
+  - Components
+  - 
+  - Connectors
+    - 
+  - Topology
+
+#### Dependability
+
+- examples
+  - reliability: system will perform without failure
+  - availability: probability system is available at a moment in time
+  - robustness:
+  - fault-tolerance:
+  - survivability:
+  - safety:
+- components
+  - support exception handling
+  - control external component dependencies
+- connectors
+  - provide interaction guarantees
+- topology:
+  - avoid single points of failure
+  - enable backups
 
 
 

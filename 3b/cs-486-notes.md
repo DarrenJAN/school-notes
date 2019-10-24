@@ -170,7 +170,7 @@ From Textbook:
 
 #### Cost-Sensitive Search: Uniform Cost Search (Priority Queue)
 
-- expand cheapest node first (use a cost function; in BFS, the cost function is just the depth)
+- ==expand cheapest node first (use a cost function; in BFS, the cost function is just the depth)==
 - Sort the frontier using a priority queue
 - complete: yes
 - optimal: yes (as long as they aren't all 0; no negative costs)
@@ -180,11 +180,13 @@ From Textbook:
 
 <img src="./images/cs486-10.png" alt="alt text" style="zoom:100%;" />
 
+
+
 ## Chapter 3: Informed Search
 
 ### Using Knowledge
 
-- uninformed search uses no knowledge about the problem (looks at cost or distnace, never looks ahead to the goal); very general and expensive
+- uninformed search uses no knowledge about the problem (looks at cost or distance, never looks ahead to the goal); very general and expensive
 - informed search
   - we often have additional knowledge about the problem
   - want to encode that knowledge into the nodes
@@ -269,7 +271,7 @@ From Textbook:
 
   - If the heuristic is admissible then A* with tree search is optimal
   - If we have a graph (**multiple paths to the goal**), then we require a stronger property for the heuristic function
-  - A heuristic is ==consistent== if $h(n) \leq cost(n,n') + h'(n)$
+  - A heuristic is ==consistent== if $h(n) \leq cost(n,n') + h(n')$
   - Cost of getting to goal state from n is less than cost of going from n to n' + cost of getting to goal state from n'
 
 - Example
@@ -482,6 +484,10 @@ go back to NSW. try a different domain value. can be red
 
   - A single variable is node consistent if all of the values in the variable's domain satisfy the variable's unary constraints
   
+- Filtering: **domain consistency**
+
+  - A variable x in X with possible values $D' \subseteq D$ is domain consistent if all values in $D'$ are allowed values for x. If some of them aren't, remove them to make it domain consistent. Should have at least 1 value.
+
 - filtering: **arc consistency**
 
   - forward checking propagates information from assigned to unassigned variables, but it cannot detect all future failures early
@@ -505,6 +511,8 @@ go back to NSW. try a different domain value. can be red
   - if you can't make an arc consistent, then there is no solution
   - works for 2 variables at a time
 
+  > For a relationship r(X,Y), the arc (X, r(X,Y)) is consistent if for all values x in X there is a y in Y such that r(X,Y) is constant
+
 - k-consistency
 
   - forall sets of k - 1 variables, and consistent assignment of values; a consistent value can always be found for any kth variable
@@ -523,19 +531,18 @@ go back to NSW. try a different domain value. can be red
 
 - Non-Tree Structures
 
-  - Cutsets
-
-    - choose a subset S of variables such that the constraint graph becomes a tree when S is removed
+  - **Cutsets**
+- choose a subset S of variables such that the constraint graph becomes a tree when S is removed
     - for each possible valid assignment to the variables in S
       - remove from the domains of remaining variables all values are are inconsistent with S
       - if the remaining CSP has a solution, return it
     - runtime $O(d^c \times (n - c)d^2)$
     - $d^c$ because there are c variables in your cutset and there are d domain assignments you can do for each variable
     - $(n - c)d^2$ because its not just a tree, and there are $n - c$ remaining variables that need to be assigned
-
-  - **Tree Decomposition**
-
-    - create a new graph that will be a tree by introducing mega-nodes
+    
+- **Tree Decomposition**
+  
+  - create a new graph that will be a tree by introducing mega-nodes
     - each mega-node is going to contain a subset of the original nodes in the graph
     - properties
       - each variable occurs in at least 1 mega-node
@@ -543,14 +550,14 @@ go back to NSW. try a different domain value. can be red
       - if a var appears in different mega-nodes, then it must appear in all between them in the path
     - want to make the subproblems as small as possible
       - tree width is largest subproblem - 1
-
-    - runtime is $O(nd^{w + 1})$
-
+  
+  - runtime is $O(nd^{w + 1})$
+  
 - recall: variables are nodes in these constraint graphs
 
 
 
-## Chapter 5: Constraints and Local Search
+## Chapter 5: Local Search (with some Constraints)
 
 - intro
   - recall that before, solution was typically a path to the goal
@@ -1372,7 +1379,11 @@ Look at A --> D --> 1 // min can force me to get at most a 1
     - Can do it with 1 layer, with $2^{n - 1}$ inner nodes
     - Or can do it with multiple layers
 
+<img src="./images/cs486-11.png" alt="alt text" style="zoom:100%;" />
 
+
+
+<img src="./images/cs486-12.png" alt="alt text" style="zoom:100%;" />
 
 ## Chapter 11: Intro to Bayes Nets
 

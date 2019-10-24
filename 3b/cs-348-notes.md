@@ -1004,6 +1004,7 @@ having count(author) = 1
 
 ## Lec 9: Translating Entity Relationship Diagrams to Relational Tables
 
+- TODO 
 - Foreign key
   - EMP can only be made if the appropriate DEPT exists
   - `on delete cascade` => if you delete the DEPT, then delete all employees in that DEPT too
@@ -1024,7 +1025,6 @@ having count(author) = 1
   - Ex: PersonalPastimes (view)
   - Can't just insert (Darryl, Hockey) because we don't know Darry's country
   - Can't just delete (Dave, Curling) because we can't delete Dave, and we can't delete Curling
-
 - Data control language
 
 
@@ -1062,8 +1062,212 @@ having count(author) = 1
   for every i we have to choose either Ai or Bi, so there are 2^n candidate keys
   ```
 
+- Amstrong's Axioms
+
+  - Reflexivity: Y contained in X entails X -> Y
+
+  - augmentation: X -> Y entails XZ -> YZ
+
+  - transitivity: X -> Y, Y->Z entails X -> Z
+
+  - Union: X->Y and X->Z entails X->YZ
+
+    ```
+    X -> Y ====> X -> XY (augmentation)
+    X -> Z ====> XY -> YZ
+    
+    X -> YZ (transitivity)
+    ```
+
+  - Decomposition: X->YZ entails X->Y
+
+  - -> means "determines"
+
+  - AB is "A union B"
+
+- Algorithm for Efficient Reasoning
+
+  ```
+  Compute+
+  set X' = X ====> X -> X'
+  	while true
+  		pick a Y -> Z from F such that
+  			Y contained in X' =====> X -> X'Y
+  			Z not contained in X'
+  			also, from the selection, 
+  				Y -> Z =====> X'Y -> ZY
+  			from transitivity we get X -> ZY
+  ```
+
+- Theorems
+
+  - X is a super key of R if and only if ComputeX+(X,F) = R
+  - X -> Y element of F+ if and only if Y contained in ComputeX+(X,F)
+
+- Computing a Decomposition
+
+  - Let R be a relation schema (a set of attributes)
+  - R1 to Rn is a decomposition of R if union of all of them = R
+  - A good decomposition does not  lose information or complicate checking of constraints
+
+- Lossless-Join Decompositions
+
+  - A decomposition { R1, R2 } of R is lossless if and only if the common attributes of R1 and R2 form a super key for one of them
+    - R1 intersect R2 -> R1 
+    - OR
+    - R1 intersect R2 -> R2
+
+  ```
+  R(x,y,z)
+  R1: all y,z, such that exists x : R(x,y,z)
+  R2: all x,y such that exists z : R(x,y,z)
+  is this true? for all x,y,z R(x,y,z) <==> R1 and R2
+  
+  ex: 1
+  suppose (a,b,c) in R
+  then (b,c) in R1
+  then (a,b) in R2
+  
+  ex: 2
+  suppose (b,c) in R1
+  suppose (a,b) in R2
+  then (a',b,c) in R // a' unknown
+  then (a,b,c') in R // c' unknown
+  
+  From lossless-join decomposition:
+  intersection of R1, R2 is the y column in R
+  i) y -> z then c = c'
+  or
+  ii) y -> x then a = a'
+  ```
+
+- Dependency Preservation
+
+  ```
+  FD1: A -> B (each B has 1 A)
+  FD2: B -> C
+  FD3: A -> C
+  
+  Decomp D1: R1 = (A,B), R2 = (B,C)
+  	enforces FD1 and FD2
+  Decomp D2: R1 = (A,B), R2 = (A,C)
+  	enforces FD1 and FD3
+  	
+  well, FD3 is just a natural consequence of FD1 and FD2
+  so D1 is better
+  
+  Both lossless:
+  
+  Preserving: the Func Dependencies from the selected schemas imply the rest of the func dependencies
+  ```
+
+- Avoiding Anomalies
+
+  - Fule of thumb: independent facts in separate tables
+  - Each relation schema should consist of a primary key and a set of mutually independent attributes
+
+- Boyce-Codd Normal Form (BCNF)
+
+  - Schema *R* is in **BCNF** (w.r.t. *F* ) if and only if whenever (*X* → *Y*) ∈ *F*+ and *XY* ⊆ *R*, then either 
+  - (*X* → *Y*) is trivial (i.e., *Y* ⊆ *X*), or 
+  - X is a superkey of *R* 
+  - A database schema {*R*1 , . . . , Rn } is in BCNF if each relation schema *R**i* is in BCNF. 
+
+  ```
+  R: s_no s_name s_city i_no i_name price
+  
+  Our initial design: 
+  s_no -> s_name, s_city // not a super key, must FIX
+  i_no -> i_name // not a super key, must FIX
+  s_no, i_no -> price // IS a super key
+  ```
+
+  - algorithm
+
+  ```
+  function ComputeBCNF (R, F )
+  begin
+  	Result := {R};
+  	whilesomeRi ∈Resultand(X →Y)∈F+
+  		violate the BCNF condition do begin
+  		Replace Ri by Ri − (Y − X );
+  		Add {X , Y } to Result;
+  	end;
+  return Result; 
+  end
+  ```
+
+  ```
+  we have 2 schemas to fix; we choose [s_no -> s_name, s_city]
+  (s_no is NOT a super key in R)
+  [s_no -> s_name, s_city] = A
+  becomes (using the algorithm)
+  [s_no -> s_name, s_city] and [s_no, i_no -> i_name, price]
+  s_no is a super key in A, DONE
+  
+  Note: A, B -> C, D is just a scheuma (A,B,C,D) where A,B is primary key
+  
+  not finished
+  
+  [s_no, i_no -> i_name, price]
+  becomes
+  [i_no -> i_name] // binary, done
+  and 
+  [s_no, i_no -> price]
+  ```
+
+- Example
+
+  ```
+  R: sin, pnum -> hours, ename, pname, ploc, allowance
+  
+  FD:
+  sin -> ename // doesn't use a superkey, must fix
+  pnum -> pname, ploc // doesn't use a superkey, must fix
+  ploc, hours -> allowance // doesn't use a superkey, must fix
+  
+  ```
+
+- 3rd Normal Form (3NF)
+
+  - Same as before, but now "each attribute of Y contained is a candidate key of R"
+
+  ```
+  ex:
+  R(A,B,C)
+  FD: AB -> C, C -> B (each attribute of Y (which is B) is contained in a candidate key of R, AB)
+  
+  R1(BC)
+  R2(AC)
+  ```
+
+- Minimal Cover
+
+  - Two sets of dependencies F and G are equivalent if and only if F+ == G+
+  - A set of dependencies F is minimal if:
+    - TODO
+
+- Finding Minimal Covers
+
+  - TODO
+
+- Computing 3NF Decomposition
+
+  - TODO
+  - example
+
+  ```
+  R(A,B,C,D); AC is key
+  A -> B;  ----> AB
+  C -> D;  ----> CD
+  candidate key -----> AC
+  
+  3NF: AB CD AC
+  ```
+
   
 
+- 
 
 
 
@@ -1071,21 +1275,4 @@ having count(author) = 1
 
 
 
-
-## Assignment Talk
-
-### A1
-
-- "course with department D"
-  - convoluted rule through PROFs ? (TERRIBLE)
-  - missing "dept" in course? if cnum is CS247 then dept is CS; just use SUBSTR --> state your assumptions (YUP)
-    - use SUBSTR(X,Y,"CS") pretend there's a substring table
-  - put 2 attributes as the key for course, the course number and the depart; lots of repercussions  (need to apply to rest of diagram) (NOT GREAT)
-- q3: "among" means for ALL the students that have achieved the highest grade (maybe multiple)
-- q6: the max and min for all classes for a given term where that class is in a course taught by a CS or CO professor; all courses in terms
-- q10: take all pairs of professors
-
-### A2
-
-- `db2 -f name_of_file`
 
