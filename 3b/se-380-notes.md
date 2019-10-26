@@ -29,7 +29,7 @@
 - Obtaining a TF from a State model:
   - Given $\dot{x}(t) = Ax(t) + Bu(t)$ and $y(t) = Cx(t) + Du(t)$
   - We get $sX(s) = AX(s) + BU(s)$ and $Y(s) = CX(s) + DU(s)$
-  - And get $\frac{Y(s)}{U(s} = [X(Is - A)^{-1}B + D]$
+  - And get $\frac{Y(s)}{U(s} = [C(Is - A)^{-1}B + D]$
 
 #### 2.9 Block Diagram Manipulation
 
@@ -53,9 +53,13 @@
 
 - <img src="./se380-images/7.png" alt="alt text" style="zoom:50%;" />
 
-
+- <img src="./se380-images/22.png" alt="alt text" style="zoom:50%;" />
 
 #### 3.2 Input Response
+
+- <img src="./se380-images/23.png" alt="alt text" style="zoom:50%;" />
+
+- but if $x_o$ is 0 then $x(t) = L^{-1}((sI - A)^{-1}BU(s))$
 
 - Recall convolution:
 
@@ -75,13 +79,15 @@
 
 #### 3.5 Bounded input Bounded output Stability
 
-- DEFN: a real-bounded signal $u(t)$ is bounded if tehre exists a $b > 0$ such that for all t, $u(t) \leq b$
+- DEFN: a real-bounded signal $u(t)$ is bounded if there exists a $b > 0$ such that for all t, $u(t) \leq b$
 - DEFN: a linear time-invariant system with input $u$ and output $y$ is BIBO stable if every bounded input $u$ produces a boudned output $y$
 - THEOREM: assume $G(s)$ is rational and strictly proper, then the following are all equivalent
   - system is BIBO stable
   - impulse response $g(t)$ is absolutely integrable (finite)
   - every pole of the transfer function $G(s)$ has a negative real part
-- THEOREM: if $G(s)$ is impropert then $G(s)$ is not BIBO stable
+- THEOREM: if $G(s)$ is improper then $G(s)$ is not BIBO stable
+- FACT: poles of $G(s) \subseteq $ eigenvalues of A
+- FACT: stability of state model $\implies$ BIBO stability
 
 #### Bringing Together Asymptotic and BIBO Stability
 
@@ -92,6 +98,56 @@
 - THEOREM: Final Value Theorem
   - If $sF(s)$ has all poles with Re(pole) < 0 then $f(t)$ approaches a constant which is  $lim_{t \rightarrow \infin} f(t) = lim_{s \rightarrow 0} s F(s)$
 - THEOREM: if $G$ is BIBO stable and $u(t) = b \times 1(t)$ for real constant $b$ then $y_{ss} = bG(0)$
+- THEOREM: Assume $G(s)$ is rational, proper, and has all its poles with Re < 0. Then the steady-state system response to the sinusoidal input $u(t) = cos(wt)$ is $y(t) = |G(jw)|cos(wt + \angle G(jw))$
+- DEFN: Assume $G(s)$ is rational, proper, and has all its poles with Re < 0
+  - the function $w \rightarrow G(jw)$ is the frequency response of G
+  - the function $w \rightarrow |G(jw)|$ is the magnitude response of G
+  - the function $w \rightarrow \angle G(jw)$ is the phase response of $G$
+
+#### 3.8 Graphical Respresentations of the Freq Response
+
+- Bode Plot
+
+  - Mangitude Plot: $20 log_{10}(|G(jw|)$ vs $log_{10}(G(jw))$ 
+  - Phase Plot: $\angle G(jw)$ vs $log_{10}(G(jw))$ 
+
+- Polar Plot
+
+  - $w \rightarrow \begin{bmatrix}Re(G(jw)) \\ Im(G(jw))\end{bmatrix}$
+
+- 4 different cases to consider
+
+  - **Case 1: Pure Gain**
+
+  <img src="./se380-images/10.png" alt="alt text" style="zoom:50%;" />
+
+  <img src="./se380-images/12.png" alt="alt text" style="zoom:50%;" />
+
+  - **Case 2: Zero at the origin**
+
+    - $G(s) = s^n$
+
+    <img src="./se380-images/13.png" alt="alt text" style="zoom:50%;" />
+
+    <img src="./se380-images/14.png" alt="alt text" style="zoom:50%;" />
+
+  - **Case 3: Real Zero**
+
+    - $G(s) = \tau s \pm 1$
+    - For bode magnitude plot, we approximate that db is 0 up until $w \leq 0.1/ \tau$
+    - For bode phase plot, we approximate that phase is 0 up until $w = 0.1 / \tau$ and that phase is 90 beyond $w > 10 / \tau$
+
+    <img src="./se380-images/15.png" alt="alt text" style="zoom:50%;" />
+
+    <img src="./se380-images/16.png" alt="alt text" style="zoom:50%;" />
+
+  - **Case 4: Complex Conjugate Zeroes**
+
+    - $G(s) = \frac{s^2}{w_n} + 2\frac{\zeta}{w_n}s + 1$
+
+    <img src="./se380-images/18.png" alt="alt text" style="zoom:50%;" />
+
+    <img src="./se380-images/17.png" alt="alt text" style="zoom:50%;" />
 
 ## Chapter 4: First and Second Order Systems
 
@@ -114,7 +170,6 @@
   - Critically damped: z = 1
   - Over damped: z > 1
 - <img src="./se380-images/4.png" alt="alt text" style="zoom:30%;" />
-
 - DEFN $\zeta$ or $z$: dampening ratio
 - DEFN $K$: steady state gain
 - DEFN $w_n$: undamped natural frequency
@@ -123,12 +178,13 @@
   - Poles at $s = -wz \pm jw\sqrt{1 - z^2}$
   - More imaginary implies more oscillations
   - <img src="./se380-images/5.png" alt="alt text" style="zoom:30%;" />
-
 - Over Damped Systems
   - Two real poles $b < -1, -1 < a < 0$, with z large enough it starts to look like a first order system
 - Critical Damped
 - DEFN steady state value $y_{ss}$ is value $y(t)$ converges to
 - DEFN settling time $T_s$ is time it takes $y(t)$ to get and stay within 2% of $y_{ss}$
+  - in order to meet a $T_s$ specification we require that a 2nd order system have all poles to the left of $-4/T_s$
+    - $pole \in \C : Re(pole) \leq \frac{-4}{T_s^{max}}$
 - DEFN Peak y val is $y_{max}$
 - DEFN Overshoot OS $= \frac{y_{max} - y_{ss}}{y_{ss}}$
 - Observation: more dampening --> z increases --> less overshoot
@@ -137,6 +193,44 @@
   - ==In order to meet a $T_s$ specification we require that all poles of $G$ has $Re(pole) \leq \frac{-4}{T_s}$==
 - ==EQN time to peak: $T_p = \frac{\pi}{w \sqrt{1 - z^2}}$==
   - Only depends on the imaginary part of the poles
+  - all poles must be such that $Im(pole) \geq \pi/T_p$
+
+
+
+## Chapter 5: Feedback Control Theory
+
+#### Closing the Loop
+
+- Steps:
+  - Have some design constraint (keep the pendulum upright)
+  - Derive the state-space model
+  - Find an equilibrium configuration
+  - Linearize
+  - Find the TF
+  - Find the poles
+
+#### Stability of Feedback Systems
+
+- **internal stability**
+
+  - set all inputs to 0 (reference input, disturbance input)
+  - get equations for $\dot{x_p}$ and $\dot{x_c}$ and then let $\dot{x_{cl}} = \begin{bmatrix}\dot{x_p} \\ \dot{x_c}\end{bmatrix}$
+
+  <img src="./se380-images/19.png" alt="alt text" style="zoom:50%;" />
+
+  - DEFN: internally stable. how to solve? all eigenvalues of $A_{cl}$ must have Re < 0
+
+  <img src="./se380-images/20.png" alt="alt text" style="zoom:50%;" />
+
+- **input-output stability**
+  
+  - 
+
+
+
+
+
+
 
 
 
@@ -146,4 +240,34 @@
 
 - For low pass systems, the bandwidth frequency range is the range $[0, w_{bw}]$
 
+- Cramer's Rule:
+
+  - Say we have $Ax = b$ where $A$ has columns $[a_1, \dots, a_n]$ and $x$ is the input matrix $x = \begin{bmatrix} x_1 \\ \dots \\ x_n\end{bmatrix}$
+  - then the solution for any $x_i$ is $x_i = \frac{det(a_1, \dots, a_{i-1}, b, a_{i + 1}, \dots, a_n)}{det(A)}$
+  - Ex:
+
+  <img src="./se380-images/21.png" alt="alt text" style="zoom:50%;" />
+
+- quadratic romula
   
+  - $x - \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$
+  
+- region of convergence for a laplace transform
+
+  - recall $F(s) = \int_0^{\infin}f(t) e^{-st}dt$ 
+  - converges for some values of s, but not others. this is the region of convergence (ROC)
+  - always on open, right half-plane of the form $s \in \C : Re(s) > a$ for some real number a
+  - important: within the ROC, F(s) has no poles
+
+- $cos(t) = \frac{e^{jt} + e^{-jt}}{2}$
+
+- impulse response: if we let the input be the impulse function $\delta(t)$ (dirac delta function, infinite at t = 0, 0 everywhere else). we know that $L\{ \delta(t)\} = 1$ so $Y(s) = G(s)U(s) = G(s)1$ so $y(t) = g(t)$ so $g(t)$ is the impulse response.
+
+
+
+#### Notes from doing problem sets
+
+- if $G(s)$ is over damped, then the response is not oscillatory ($\zeta > 1$)
+- eigenvalues of a diagonal matrix (a matrix with non-zero numbers only from top-left to bottom-right) are the diagonal elements
+- Want to prove that an improper system is unstable? (G(s), for example, = s) (degree numerator > degree denominator). Then use the input $u(t) = sin(t^2)$
+- 

@@ -110,8 +110,8 @@
 - Example of relational Databases: Bibliography
 
 - >  What is the difference between a relation name and a relation instance?
-  - relation name is what do you call it (part of meta-data, part of schema)
-  - Relation instance is the actual data
+  - relation name is what do you call it (part of meta-data, part of schema) R1
+  - Relation instance is the actual data **R2**
 
 - Common Visualization for Relational Database Schemata
 
@@ -999,10 +999,6 @@ having count(author) = 1
   - They still need to be able to exist
   - Also, you want a separate professor table because you want to be able to add more properties to it later
   - Also, if you add the telephone number to the graduate table instead (for the professor via professor name), then you will have lots of duplication if that professor supervises multiple students
-
-
-
-## Lec 9: Translating Entity Relationship Diagrams to Relational Tables
 
 - TODO 
 - Foreign key
