@@ -386,7 +386,7 @@ for ... {
 
 - Full-Coroutine:
 
-  - It's how you use it that makes it a full
+  - It's how you use it that makes it a full (calls others, forms a loop)
 
 - `_Coroutine`
 
@@ -826,15 +826,14 @@ graph LR;
   - Shares some properties of the coroutine
     - Has its own stack
     - Have to eagerly create the stack (can't wait for first resume)
-    - Because it might be scheduled any team by the scheduler (the thread that it creates)
+    - Because it might be scheduled any time by the scheduler (the thread that it creates)
   - The initial thread has to wait at the curly brace for all of its children to finish
   - Create the initial thread on the heap (the _Task)
     - How do you know when to delete the object? What if it has threads that are still running?
 
   ```
-  madness 1: { int i,j,k; }
-  madn
-  ess 2: T * t = new T; delete t; // T is a _Task
+  madness 1: { int i,j,k; } // crerating then allowing them to get deleted right away
+  madness 2: T * t = new T; delete t; // T is a _Task
   but here... we are allowing it
   ```
 
@@ -1035,7 +1034,7 @@ uActorStop(); // wait for all actors to terminate
 - Dekker (modified retract intent) (blue fixed flickering)
 
   - Used a 3rd blackboard
-  - 3rd one tells us who was last in the bathroom
+  - wrong?? : 3rd one tells us who was last in the bathroom
   - Use top 2 blackboard to specify intent
   - 3rd is only for simultaneous arrivals
   - Basically you switch priorities whenever there is a tie
@@ -1326,7 +1325,8 @@ uCondLock x, y, *z; z = new uCondLock;
 
 #### 6.4 Lock Programming
 
-
+- buffering
+  - 
 
 
 

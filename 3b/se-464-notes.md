@@ -1216,6 +1216,22 @@ main {
 
 
 
+## ... oct 28
+
+- inversion control
+  - abstract factory
+  - plug in the concrete class that should be instantiated
+  - service locator
+  - template method; abstract giving the detailed implementations
+- dependency injection
+  - an example of inversion control
+  - allows us to achieve this dependency inversion
+  - Eliminate initialization statements (Foo f = new ConcreteFoo())
+  - bootstraps object creation with a configured injector
+- dependency inversion principle
+
+
+
 ## Design patterns we didn't know
 
 - State: finite state machine

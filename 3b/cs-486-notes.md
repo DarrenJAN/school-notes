@@ -1424,6 +1424,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 
 - Example:
 
+  - For inference graph: `E --> C --> G --> L --> S`
   - P(S|L,G,C,E) = P(S|L)
   - P(L|G,C,E) = P(L|G)
   - P(G|C,E) = P(G|C)
@@ -1447,3 +1448,13 @@ Look at A --> D --> 1 // min can force me to get at most a 1
 - Bayesian Network
   
   - Graph structure of direct. Dependencies over a set of variables and a set of conditional probability distributions (CPTs) quantifying the strength of the influences
+  - A BN over a set of variables $\{ X_1, \dots, X_n\}$ has
+    - a DAG whose nodes are the variables
+    - a set of Conditional Probability Distributions (CPTs) of $P(X_i | Parents(X_i))$ for each $X_i$ where $Parents(X_i)$ returns all possible truth evaluations for each of its parents (3 parents ABC, then ex: A true, B true, C true; .... A true, B true, C false; ...)
+  - important semantic: every $X_i$ is conditionally independent of all of its nondescendents given its parents
+
+
+
+## Chapter 12: More Bayes Nets
+
+- 24: A --> C, B --> C, C --> D

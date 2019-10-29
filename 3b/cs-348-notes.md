@@ -1261,11 +1261,35 @@ having count(author) = 1
   3NF: AB CD AC
   ```
 
-  
 
-- 
+- [cont oct 29]
+  - midterm is up to lec 10 slide 16
 
+### Normal forms recap (slide set 10, oct 29)
 
+- slide 4: some issues with this table, inter-dependencies
+- functional dependencies: constraints which tell you about relationship between touples
+- functional dependency algorithm
+- lossless-join decomposition: if we split it apart, then we can get the pieces and put them together to get the orignal
+- avoiding anomolies: each set have a primary key and mutually independent attributes (not shared or stored in other tables)
+
+```
+sin pnum hours ename pname ploc allowance
+[s p] h e n l a
+s p -> h // s p is a superkey, all good
+s -> e // s is not a superkey
+p -> n, l // p is not a super key, branch p
+l, h -> a
+											[s p] h e n l a
+											// S is not a superkey, branch S E
+							[S] E										  [S P] H N L A
+											// P is not a superkey, branch P N L
+							                 [P] N L     					  S P H A
+							                                [P H] A          [S P] H
+```
+
+- 3NF
+  - 
 
 
 

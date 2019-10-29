@@ -89,7 +89,7 @@
 - FACT: poles of $G(s) \subseteq $ eigenvalues of A
 - FACT: stability of state model $\implies$ BIBO stability
 
-#### Bringing Together Asymptotic and BIBO Stability
+#### 3.7 Bringing Together Asymptotic and BIBO Stability
 
 - recall: asymptotically stable if all poles of $G(s)$ have real parts < 0
 - note that poles of $G(s) \subseteq$ eigenvalues of A
@@ -143,11 +143,13 @@
 
   - **Case 4: Complex Conjugate Zeroes**
 
-    - $G(s) = \frac{s^2}{w_n} + 2\frac{\zeta}{w_n}s + 1$
+    - $G(s) = \frac{s^2}{w_n^2} + 2\frac{\zeta}{w_n}s + 1$
+- For asymptotic bode plots it suffices to assume that $\zeta = 1$ and so $G(s) = (\frac{s}{w_n} + 1)^2$
+  
 
-    <img src="./se380-images/18.png" alt="alt text" style="zoom:50%;" />
+<img src="./se380-images/18.png" alt="alt text" style="zoom:50%;" />
 
-    <img src="./se380-images/17.png" alt="alt text" style="zoom:50%;" />
+<img src="./se380-images/25.png" alt="alt text" style="zoom:100%;" />
 
 ## Chapter 4: First and Second Order Systems
 
@@ -184,7 +186,7 @@
 - DEFN steady state value $y_{ss}$ is value $y(t)$ converges to
 - DEFN settling time $T_s$ is time it takes $y(t)$ to get and stay within 2% of $y_{ss}$
   - in order to meet a $T_s$ specification we require that a 2nd order system have all poles to the left of $-4/T_s$
-    - $pole \in \C : Re(pole) \leq \frac{-4}{T_s^{max}}$
+    - $pole \in \C^{-1} : Re(pole) \leq \frac{-4}{T_s^{max}}$
 - DEFN Peak y val is $y_{max}$
 - DEFN Overshoot OS $= \frac{y_{max} - y_{ss}}{y_{ss}}$
 - Observation: more dampening --> z increases --> less overshoot
@@ -193,7 +195,7 @@
   - ==In order to meet a $T_s$ specification we require that all poles of $G$ has $Re(pole) \leq \frac{-4}{T_s}$==
 - ==EQN time to peak: $T_p = \frac{\pi}{w \sqrt{1 - z^2}}$==
   - Only depends on the imaginary part of the poles
-  - all poles must be such that $Im(pole) \geq \pi/T_p$
+  - ==all poles must be such that $Im(pole) \geq \pi/T_p$==
 
 
 
@@ -214,6 +216,15 @@
 - **internal stability**
 
   - set all inputs to 0 (reference input, disturbance input)
+  - find closed-loop transfer functions? ex: (r,d) to (e,u) ?
+    - Get equations for E(s), U(s), Y(s) in terms of R(s) and D(s)
+    - then, isolate for R(s) and D(s)
+    - Then, calculate
+      - $\begin{bmatrix}a \ b \\ c \ d\end{bmatrix} \begin{bmatrix}E \\ U\end{bmatrix} = \begin{bmatrix}R \\ D\end{bmatrix}$
+      - then calculate the inverse of the abcd matrix to get
+      - $\begin{bmatrix}E \\ U\end{bmatrix} = \frac{1}{det(?? matrix)}\begin{bmatrix}e \ f \\ g \ h\end{bmatrix} \begin{bmatrix}R \\ D\end{bmatrix}$
+      - then we can get transfer functions
+      - from R to E: $\frac{e}{determinant}$
   - get equations for $\dot{x_p}$ and $\dot{x_c}$ and then let $\dot{x_{cl}} = \begin{bmatrix}\dot{x_p} \\ \dot{x_c}\end{bmatrix}$
 
   <img src="./se380-images/19.png" alt="alt text" style="zoom:50%;" />
@@ -261,6 +272,10 @@
 
 - $cos(t) = \frac{e^{jt} + e^{-jt}}{2}$
 
+- $sin(t) = \frac{e^{jt} - e^{-jt}}{2j} = Im(e^{jt})$
+
+- $e^{jt} = cos(t) + jsin(t)$
+
 - impulse response: if we let the input be the impulse function $\delta(t)$ (dirac delta function, infinite at t = 0, 0 everywhere else). we know that $L\{ \delta(t)\} = 1$ so $Y(s) = G(s)U(s) = G(s)1$ so $y(t) = g(t)$ so $g(t)$ is the impulse response.
 
 
@@ -270,4 +285,6 @@
 - if $G(s)$ is over damped, then the response is not oscillatory ($\zeta > 1$)
 - eigenvalues of a diagonal matrix (a matrix with non-zero numbers only from top-left to bottom-right) are the diagonal elements
 - Want to prove that an improper system is unstable? (G(s), for example, = s) (degree numerator > degree denominator). Then use the input $u(t) = sin(t^2)$
-- 
+- steady state gain of a BIBO system with a rational transfer function $G(s)$ is $G(0)$
+  - if input $u(t) = b 1(t)$ and $G(s)$ is BIBO stable then $y_{ss} = bG(0)$
+- if $G(s)$ is stable, and we have system r (input), controller, plant, output, with feedback; and $G$ is BIBO stable, then we know steady state gain is $G(0)$. If $r(t)$ is constant, then we know that $y_{ss} = r_0 \times G(0)$
