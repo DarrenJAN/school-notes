@@ -1322,16 +1322,60 @@ uCondLock x, y, *z; z = new uCondLock;
   - uSemaphore
   - How to make it a binary one?
 
-
-
-#### 6.4 Lock Programming
+### 6.4 Lock Programming
 
 - buffering
-  - 
+- TODO
+
+#### 6.4.3 Lock Techniques
+
+- Take a single semaphore and divide it up into different benches
+- Treat them collectively as though they are one single semaphore
+- Baton passing
 
 
 
+#### 6.4.4 Readers and Writers Problem
 
+- Entry list; waiting readers; waiting writers
+- Cooperation: when you leave, you need to pickup the baton and help waiting people on the benches enter
+- Implementation 1
+  - 3 binary semaphores: entry, rwait, wwait; sum of their values is at most 1; the 3 of them act like 1 binary semaphore
+  - Waiting readers counter, waiting writers counter, current readers in room counter, current writers in room (0 or 1)
+  - Reader impl
+    - Ex: `rdel ==> reader delay count (readers waiting)`
+    - Daisy chain signalling: once a reader is woken up to go in and read, it checks if any other readers are waiting, and so wakes up just ONE; cooperation is broken up into smaller pieces, more fair
+    - No reason to check the readers bench: it should be empty when the last reader leaves
+  - DOES NOT WORK: we have prioritized the readers over the writers, which means that if readers keep arriving, and writers will always wait because they will always see readers, so starvation
+
+- Rule 6: temporal barging
+  - Solution: put readers and writers in the same queue (sorted by time)
+  - Let in groups of readers in a row at a time
+  - Then let in the writer; so that next readers do read the correct information
+- Problem:
+  - What happens if you are interrupted between putting the baton down and Sutton on the bench
+  - So you put it down, someone else picks it up, and you haven't put it down yet
+  - We now have an issue between readers and readers, OR between writers and writers
+  - Don't want readers to cut ahead of other readers in between that baton passing, same for writers (keep temporal ordering)
+  - Need atomic block and release
+    - Recall yield no schedule
+    - Want to go asleep on the read bench, AND put the baton down
+    - Use Xwait.P(entry)
+    - Another solution
+      - Each person sits on their own bench (break up the bench into other benches)
+      - Go to wake you up, if someone else comes along, then they will sit NOT in front of you, but on their own bench
+      - Uses a semaphore for each bench I think ???
+- Random note: barrier already gives you barging prevention lock;
+
+
+
+## Chapter 7: later 
+
+
+
+## Chapter 8: Indirect Communication
+
+- We want something that makes our life better; don't want to keep programming using locks
 
 
 
