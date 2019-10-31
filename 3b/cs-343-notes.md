@@ -1025,6 +1025,7 @@ uActorStop(); // wait for all actors to terminate
 - Retract intent
 
   - In the long run, will break itself due to context switches causing some lines to be ahead of other
+  - We both go to the bathroom to go in. I see you wanna go in, so I take my name down. You see I want to go in, so you take your name down. Then this process repeats itself.
 
 - Prioritized retract intent (man and woman approach a door, woman goes first)
 

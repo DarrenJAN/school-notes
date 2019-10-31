@@ -968,6 +968,7 @@ having count(author) = 1
   - Each entity set maps to a new table
   - Each attribute maps to a new table column
   - Each relationship set maps to either new table columns OR a new table
+  
 - Weak Entity Sets
   - Need to contain the primary key of their dominant entities
   - Ex
@@ -975,6 +976,7 @@ having count(author) = 1
     - Account has an accountnum
     - So transaction ALSO needs to have an account num (as well as a transaction num) as its 2 primary keys
     - `[[Transaction]] -- << Log >> -- Account`
+  
 - Representing Relationship Sets
   - Columns contain
     - Attributes of the relationship set
@@ -992,7 +994,9 @@ having count(author) = 1
     - Need to have a table for the relationship
     - Team --- MATCH --- Location
     - Match table contains: LHS keys, RHS keys, match attributes
+  
 - Representing Aggrigation
+
 - Representing Specialization
   - Why do we need the professor table?
   - Because what if a professor doesn't supervise any graduate students?
@@ -1000,15 +1004,37 @@ having count(author) = 1
   - Also, you want a separate professor table because you want to be able to add more properties to it later
   - Also, if you add the telephone number to the graduate table instead (for the professor via professor name), then you will have lots of duplication if that professor supervises multiple students
 
-- TODO 
+- SQL Code to create all these things
+
+  ```
+  CREATE TABLE <name>
+  	(
+  		attr1		integer NOT NULL,
+  		name		char(20),
+  		PRIMARY KEY (<subset of attributes>)
+  	)
+  	
+  create table EMP
+  ( SSN			integer not NULL,
+  	NAME 		char(20),
+  	PRIMARY KEY (SSN),
+  	FOREIGN KEY (Dept) references DEPT(ID)
+  		on delete cascade
+  		on update restrict
+  ```
+
+  
+
 - Foreign key
   - EMP can only be made if the appropriate DEPT exists
   - `on delete cascade` => if you delete the DEPT, then delete all employees in that DEPT too
-  - `on update restrict`: can only update the DEPT ID of en existing DEPT if it has no EMP
+  - `on update restrict`: can only update the DEPT ID of an existing DEPT if it has no EMP
   - Actions can be: RESTRICT (produce an error), CASCADE (propagate the delete), SET NULL
+  
 - What if you want more than just primary and foreign keys?
   - CHECK constraints
   - `check (salary > 0)`
+  
 - Views and View Management
   - View: relation whose instance is determined by the instances of other relations
   - Has schema, has attributes, has access controls, other views can be defined in terms of it
@@ -1017,10 +1043,12 @@ having count(author) = 1
   - Or, sometimes, can be MATERIALIZED: the query that makes up the view is executed, the view constructed and stored in db
     - Sits on a disk;
     - Sometimes if you change the actual data (small changes) you can just construct a query to construct what are the necessary changes to the view, don't re-construct the whole view
+  
 - Updating Views
   - Ex: PersonalPastimes (view)
   - Can't just insert (Darryl, Hockey) because we don't know Darry's country
   - Can't just delete (Dave, Curling) because we can't delete Dave, and we can't delete Curling
+  
 - Data control language
 
 
@@ -1094,6 +1122,13 @@ having count(author) = 1
   				Y -> Z =====> X'Y -> ZY
   			from transitivity we get X -> ZY
   ```
+
+  ```
+  another example:
+  
+  ```
+
+  
 
 - Theorems
 
