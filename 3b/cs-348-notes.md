@@ -629,7 +629,6 @@ having count(author) = 1
   - Using DISTINCT
   - A finite valuation (tuple) can appear k times (k > 0) as a query answer
   - **DB**, theta, k entails phi reads "finite evaluation theta appears k times in phi's answer"
-  - Slide 9 ???
 
   ```
   T(x,y)
@@ -647,8 +646,24 @@ having count(author) = 1
   returns 1, 4 times
   ```
 
-  - ==IMPORTANT m - n entails phi - v; m entails phi, n entails v AND m > n==
-  - ==What is going on?==
+  ```
+  Range restricted formulas:
+  
+  assuming p1, p2 are range restricted:
+  
+  1. p1 and p2
+  2. p1 and (xi == xj) // one x is in FV(p1)
+  	Good example: all x . cat(x) and x == "bob"
+  	Bad example: all x . cat(x) and y == "bob" // unlimited values for y
+  3. exists x . p1 // x must be in FV(p1)
+  	Good example: exists x . (forall y in cat x.name = y.name)
+  	Bad example: exists x . (forall y in cat z.name = y.name) // x can be anything
+  4. p1 or p2 // FV(p1) must equal FV(p2)
+  	Good example: x . cat(x) or dog(x)
+  	Bad example: x . cat(x) or dog(y) // y can be anything
+  ```
+
+  
 
 - Ex: One problem with duplicates
 
@@ -752,7 +767,7 @@ having count(author) = 1
   	FROM author WHERE aid not in (select author from wrote)
   ```
 
-- OUTER JOIN
+- Joins
   - allow null-padded answers that fail to satisfy a conjuct in a conjunction
   - `FROM R <j-type> JOIN S ON C`
   - j-type is FULL, LEFT, RIGHT, or INNER

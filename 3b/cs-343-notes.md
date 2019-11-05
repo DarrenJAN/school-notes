@@ -1373,9 +1373,31 @@ uCondLock x, y, *z; z = new uCondLock;
 
 
 
-## Chapter 8: Indirect Communication
+## Chapter 8: Indirect Communication (Nov 5)
 
-- We want something that makes our life better; don't want to keep programming using locks
+- We want something that makes our life better; don't want to keep programming using locks, they are too low level and complicated
+- Region: acquire the provided shared variable, and then release it when you end
+  - Compiler can restrict your usage of the shared variable
+  - Can't read while someone is writing (bits get scrambled)
+  - AWAIT lets you do synchronization
+
+- Monitor
+  - Includes the shared data
+  - Members that see and modify the data
+  - Only the public members need mutual exclusion
+  - Private routines don't need mutual exclusion (you already have it; since you came in to the object via the public member)
+  - All public members are "automatically" mutually exclusive?
+- _Mutex (a monitor that does not begin execution if another active member is running)
+- To see all of the inserted code added by the compiler for the monitor add -U++ to the compile statement
+- Don't always want to enforce FIFO access/execution to a Monitor
+  - Producer consumers; buffer is full; producers are waiting; consumer comes and gets to remove (gets access AHEAD of the waiting producers that were there first)
+- _Accept(a,b,c) is accept a or b or c
+- _Accept(a); _Accept(b) is accept a AND accept b
+- Recall: if a function is const then the function is read only
+- Our laptop CPUs ensure that there is no bit scrambling
+- empty.signal() --> barging prevention so the task that you signal WILL run next
+
+
 
 
 

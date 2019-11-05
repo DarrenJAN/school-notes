@@ -1,6 +1,63 @@
 # CS 348 Textbook Notes
 
+## SQL Stuff
 
+- Joins
+  - Suppose we have tables STUDENT(id, name) and TAKES(student_id, course_id, semester, grade)
+  - If we want to query all of the courses taken for each student, we might think that `SELECT * FROM STUDENT as s, TAKES as t WHERE s.id = t.student_id`
+  - But what if a student has taken 0 courses? Then they wouldn't show up in the output
+  - Types of joins
+    - LEFT OUTER JOIN preserves tuples only in the relation named before (to left of) the left outer join operation
+    - RIGHT OUTER JOIN same but for right
+    - FULL OUTER JOIN preserves tuples in both relations
+  - So `SELECT * FROM STUDENT LEFT OUTER JOIN TAKES ON student.ID = takes.studentID` will just have all empty take values as NULL in the output
+- View
+  - A virtual relation, defined by a query, that conceptually contains the result of the query (useful for showing a subset of a table, due to restrictions or access permissions)
+    - Ex: a secretary might need to be able to lookup the room for any professor, but shouldn't see their salary. And, we don't want to create a new table for this subset of data, because then it might get out of date over time
+  - `create view view_name as <query expression>`
+  - Can store them in a materialized view (which allows for much faster querying); requires updating the content
+
+## Embedded SQL Stuff
+
+- CURSOR
+
+  ```
+  // declare 
+  EXEC SQL DECLARE name CURSOR FOR <query>;
+  
+  // use it and iterate over it
+  EXEC SQL OPEN name;
+  for (;;) {
+  	// setup host params
+  	EXEC SQL FETCH name INTO <host variables>
+  }
+  ```
+
+  
+
+- Stored procedure: executes application logic directly inside the DBMS process
+
+  - Minimize data transfer cost; have logical independence
+
+## Dynamic SQL
+
+- Pass parameters into SQL statements by leaving `?`s in the statement, and passing in params to them like
+
+  - `EXEC SQL EXECUTE my_stmt USING :var1, ..., :vark`
+
+- Get results into variables?
+
+  ```
+  EXEC SQL DECLARE cname CURSOR for stmt
+  EXEC SQL OPEN cname USING :var1, ..., :vark
+  EXEC SQL FETCH cname INTO :out1, ..., outn
+  ```
+
+- Unknown result types or amount? Use a DESCRIPTOR
+
+## ODBC
+
+- Open database connectivity; an interface built on library calls that 
 
 ## DB Design using ER Model (chapter 6)
 
@@ -55,8 +112,6 @@
 
 - Aggregation: make an entity out of a relationship; draw a box around the relationship and its related entities
 - Specialization: use an inheritance triangle in the relationship arrow line
-
-
 
 ## ER to Relational Schema
 

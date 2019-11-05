@@ -1451,10 +1451,126 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - A BN over a set of variables $\{ X_1, \dots, X_n\}$ has
     - a DAG whose nodes are the variables
     - a set of Conditional Probability Distributions (CPTs) of $P(X_i | Parents(X_i))$ for each $X_i$ where $Parents(X_i)$ returns all possible truth evaluations for each of its parents (3 parents ABC, then ex: A true, B true, C true; .... A true, B true, C false; ...)
-  - important semantic: every $X_i$ is conditionally independent of all of its nondescendents given its parents
+  - ==important semantic: every $X_i$ is conditionally independent of all of its non-descendents given its parents==
+  
+- Constructing a BN
+
+  - Determine the set of variables in the domain X_1, ..., X_n. Any order is fine, but the BN will be more compact if CAUSES precede EFFECTS
+  - Then from index = 1 to n
+    - Choose from X_1 to X_index-1 a minimal set of parents for X_index that satisfy conditional probability of X_index
+    - For each parent insert a link from parent to X_index
+    - Add the probability to the table, the Conditional Probability Table (CPT): P(X_index | Parents(X_index))
+
+- TERM CPT Conditional Probability Table (one for each node in a BN)
+
+- Testing independence: D-Separation
+  - A set of variables E d-separates X and Y if it blocks every undirected path between X and Y
+  - X and Y are conditionally independent given E if E d-separates X and Y
+- DEFN blocking: suppose we have some evidence set E, two variables X and Y, and P which is any undirected path from X to Y. Let Z be some node in P
+  - E blocks P if --> Z --> in P, and Z in E
+  - E blocks P if <-- Z --> in P, and Z in E
+  - E blocks P if --> Z <-- in P, and Z and all of its descendants are NOT in E
+- Markov Blankets
+  - Can work the other way, and start from topological semantics (encoded in graph structure) and then derive numerical semantics
+  - Topological semantics specifics that each variable is conditionally independence of its non-descendants, given its parents
+  - DEFN Markov Blanket: a node is conditionally independent of all other nodes in a network given its parents, children, and children's parents
 
 
 
 ## Chapter 12: More Bayes Nets
 
-- 24: A --> C, B --> C, C --> D
+- Variable elimination 
+
+  - DEFN a function f(X_1, ..., X_k) is a factor; a table of numbers one for each instantiation of the variables; exponential in k
+  - Each CPT in a BN is a factor; so P(A|B,C) is factor f(A,B,C)
+  - DEFN product of two factors with common variable Y
+    - If f(X,Y) and g(Y,Z) then h = fg is just their product
+
+  ![Screen Shot 2019-11-03 at 8.35.27 PM](/Users/scottsandre/git/school-notes/3b/images/Screen Shot 2019-11-03 at 8.35.27 PM.png)
+  - TERM Summing out a Factor
+    - Let f(X, **Y**) be a factor, with X a variable and **Y** a set
+    - Then we can sum out X from F to get
+      - $h = \sum_Xf = h(Y) = \sum_{x in X}f(x, Y)$
+  - TERM restricting a factor
+    - We can restrict factor f to X=x by setting X to the value x and deleting 
+    - So we have f(X,Y) and now we get $h = f_{X = x}f(x,Y)$
+      - Only take those specific X = x values
+  - 
+
+#### Notes from Ch 14.4 Exact Inference in Bayesian Nets
+
+- Recall the goal of a probabilistic inference system: compute the probability distribution to a set of query variables given some observed event
+- X is the query variable; E is the set of evidence variables E_1 to E_m, e is an observed event, Y is the set of non-evidence variables (hidden variables) Y_1 to Y_l
+- A typical query is P(X | e)
+
+
+
+## Chapter 14: Statistical Learning
+
+- Candy example
+  - Have different hypothesis
+  - Prior: a probability distribution over our hypothesis
+    - Uniform? All equally likely? Or we use some prior knowledge?
+    - What the probability is given 0 evidence samples
+  - Want to find probability given evidence P(H1 | E)
+  - Also want to make guesses (slide 9)
+    - Just a weighted average of the hypothesis
+  - Posterior distribution?
+  - This is intractable; need to relax it; use Maximum a posteriori (MAP)
+
+- MAP Example
+
+  - $P(h_i | lime) = P(lime | h_i) * P(h_i)$
+  - After 3 limes prediction
+    - MAP predicts lime next with prob 1
+    - Bayesian predicts lime next with 0.8
+
+  - Still intractable
+
+- MAP optimization
+
+  - $h_{MAP} = $ Arg max (for h) of $[log P(h) + \sum_i log P(di | h)]$
+  - Log changes the max value, but doesn't change which hypothesis we choose!
+
+- Maximum Likelihood (ML) optimization
+
+  - Assume all prior (hypothesis probability given 0 evidence) are all equally likely
+  - So $h_{ML} = max_h (P(d|h))$
+
+  ```
+  see 1 lime
+  for ML optimizaiton, P(hi) all the same
+  
+  P(h1 | l) = P(l | h1) * P(h1)
+  					= 0 * 0.2 = 0
+  P(h2 | l) = 0.25 * 0.2 = 0.05
+  ...
+  
+  ML predicts h_ml = h5 after 1 lime
+  ```
+
+- Note
+  - ML, MAP, Bayesian predictions converge as data increases
+
+> Why is taking the log of the sum faster or better than using the product? (In my eyes, it's just a for-loop) Helps us take the derivative better...
+
+- ML Candy Example
+  - $\theta$ Is the parameter which represents the maximum likelihood
+  - $h_\theta$
+  - $c$ Cherry candies, $l = N - c$ lime candies
+  - $P(d | h_\theta) - \theta^c \times (1 - \theta)^l$
+  - We can take the log, and then find the derivative, and get that $\theta = c / N$
+  - ML hypothesis asserts that actual proportion of cherries is equal to the observed proportion
+
+
+
+## Lecture 15: Expectation Maximization (EM)
+
+- Often have incomplete data; cannot just "sum out" the hidden values or missing values
+- Instead we perform guesses
+- EM
+  - Guess the h_ML (just fill in the missing values to compute)
+  - And then re-calculate what those missing values likely are
+  - repeat
+- 
+
