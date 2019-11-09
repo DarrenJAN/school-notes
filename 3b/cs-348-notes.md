@@ -1343,6 +1343,29 @@ l, h -> a
 
 
 
+## Database Turning and Physical Design: Basics of Query Execution
+
+- Transaction manager (manage requests from different request processors into one stream), such that they satisfy ACID properties
+- Recovery manager: responsibly for durability and atomicity
+- Basics of Query Execution
+  - How is data physically represented? Csv? Json? Xml? Nodes?
+  - How to compute answers to complex queries
+  - How to store intermediate results (they can be quite large)
+    - We want to avoid storing most of them
+    - Much like a CURSOR
+    - Operators on top implement a cursor protocol; application asks for next (calls fetch)
+    - Operator might have subqueries; it then asks them for the next one too
+    - Product: pick from left, go and grab every one from the right; now go and get the 2nd from the left, and repeat to go and get every one from the right etc
+- We define relational algebra
+- How to make it faster?
+  - Use disk-based data structures for efficient search using INDEXING
+  - Use sorting or hashing
+  - Re-write the relational algebra query to make it use more efficient algorithms
+- Query plan: pick an implementation for each operator
+  - Can't just run them though to figure out which is fastest; so most operating systems / disks provide a simple cost model based on uniformity and independence
+  - Cost model: in general, how many times do we have to go to disk and read a page?
+    - Blocking factor: how many records fit into one page? (Because we already read data page by page)
+
 
 
 

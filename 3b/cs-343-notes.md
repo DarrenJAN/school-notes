@@ -1376,6 +1376,7 @@ uCondLock x, y, *z; z = new uCondLock;
 ## Chapter 8: Indirect Communication (Nov 5)
 
 - We want something that makes our life better; don't want to keep programming using locks, they are too low level and complicated
+
 - Region: acquire the provided shared variable, and then release it when you end
   - Compiler can restrict your usage of the shared variable
   - Can't read while someone is writing (bits get scrambled)
@@ -1387,15 +1388,48 @@ uCondLock x, y, *z; z = new uCondLock;
   - Only the public members need mutual exclusion
   - Private routines don't need mutual exclusion (you already have it; since you came in to the object via the public member)
   - All public members are "automatically" mutually exclusive?
-- _Mutex (a monitor that does not begin execution if another active member is running)
-- To see all of the inserted code added by the compiler for the monitor add -U++ to the compile statement
-- Don't always want to enforce FIFO access/execution to a Monitor
-  - Producer consumers; buffer is full; producers are waiting; consumer comes and gets to remove (gets access AHEAD of the waiting producers that were there first)
-- _Accept(a,b,c) is accept a or b or c
-- _Accept(a); _Accept(b) is accept a AND accept b
-- Recall: if a function is const then the function is read only
-- Our laptop CPUs ensure that there is no bit scrambling
-- empty.signal() --> barging prevention so the task that you signal WILL run next
+  - _Mutex (a monitor that does not begin execution if another active member is running)
+  - To see all of the inserted code added by the compiler for the monitor add -U++ to the compile statement
+  - Don't always want to enforce FIFO access/execution to a Monitor
+    - Producer consumers; buffer is full; producers are waiting; consumer comes and gets to remove (gets access AHEAD of the waiting producers that were there first)
+  - _Accept (x) let a completed call to x be able to wake me up
+  - _Accept(a,b,c) is accept a or b or c
+  - _Accept(a); _Accept(b) is accept a AND accept b
+  - Recall: if a function is const then the function is read only
+  - Our laptop CPUs ensure that there is no bit scrambling
+  - empty.signal() --> barging prevention so the task that you signal WILL run next
+  - Recall: as soon as you have passed the baton, you can't touch anything (they could wake up right away and start touching stuff too)
+  - In monitors, the baton will not be passed until you get to the end of a mutex function or you call wait
+    - The signal is delayed
+  - Monitors is typically most scheduling outside of the monitor
+  - BoundedBuffer example uses mainly internal scheduling for barging avoidance (most of the tasks are waiting inside of the monitor)
+  - General Model of a Monitor:
+    - ==Always take from the acceptor/signalled stack before you take from the entry queue==
+    - Mutex queues; each node in the entry queue is also on ONE of the X queues and Y queues; so remove from the X queue (and then you have a pointer to it, so you can remove it from the entry queue in O(1))
+    - Ex: were looking for a consumer because the producer came in and realized that the buffer was full - so it needs a consumer to come.
+      - Might have had to do an O(n) solution, but we used the consumer and producers queues above
+  
+  - Internal scheduling vs external scheduling:
+    - Always choose external because its easier to specify and explain
+    - When to use internal scheduling:
+      - When I need to bring you in and then wait ??
+      - If you need to sit down to wait for others to enter to satisfy some request, then you need something to sit down on, so you need a condition variable; this is a use case for internal scheduling
+  - Girl boys
+    - Girl comes in. Looks at boy bench, if no matching boy, then sit and wait on girl bench
+    - If a girl sees a matching boy, she signals the boy. But there is a delay; since we don't pass the baton instantly; but he doesn't wake up instantly
+      - So the girl sits down on the chair; when she sits down; he can wake up from the internal chair (recall: always choose from the chair over the entry queue)
+  - Readers writers with temporal barging solution
+    - Recall: shadow queue
+    - uC++ also gives you space to put user data (an int or a pointer) into each node in the shadow queue
+    - So we get this shadow queue for free
+    - So how do you use a shadow queue? When you do a wait, you are allowed to pass in a value
+    - Now you can ask a question: RWers.front() == READER()
+  - Recall: always use external scheduling when you can; so try and solve readers/writers using that
+    - Moving most of the cooperating from exit to entry point
+  - Nested Monitor Problem:
+    - M1 -> M2 -> M3 -> M4 (blocks in M4; goes to sleep, frees lock in M4)
+    - But lock is still acquired for m1-3
+    - 
 
 
 

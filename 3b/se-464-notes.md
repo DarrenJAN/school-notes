@@ -1321,9 +1321,27 @@ main {
 - Security: CIA
   - ? ? ?
 
+## Lec 17
 
+```
+class A only has an add(T t) function
+A<Object> a
+A<String> b
 
+a = b; // not valid, you have to pointers to the same object using two different types. so they both can access and get and add to it. but b things its just using strings, whereas that is not the case
 
+class B only has a T get() function
+
+// PRODUCER
+foo(B <? <Number> b) // can pass in Number or anything that is a sub-typew of Number
+// can pass in Integer
+// cannot pass in Ojbect
+
+// CONSUMER
+bar(A <? super Number> a) // can pass in another that is Number of higher than number
+// cannot pass in Integer
+// can pass in Object
+```
 
 
 

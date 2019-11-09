@@ -1550,6 +1550,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   ```
 
 - Note
+  
   - ML, MAP, Bayesian predictions converge as data increases
 
 > Why is taking the log of the sum faster or better than using the product? (In my eyes, it's just a for-loop) Helps us take the derivative better...
@@ -1560,7 +1561,7 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - $c$ Cherry candies, $l = N - c$ lime candies
   - $P(d | h_\theta) - \theta^c \times (1 - \theta)^l$
   - We can take the log, and then find the derivative, and get that $\theta = c / N$
-  - ML hypothesis asserts that actual proportion of cherries is equal to the observed proportion
+  - ==ML hypothesis asserts that actual proportion of cherries is equal to the observed proportion==
 
 
 
@@ -1572,5 +1573,54 @@ Look at A --> D --> 1 // min can force me to get at most a 1
   - Guess the h_ML (just fill in the missing values to compute)
   - And then re-calculate what those missing values likely are
   - repeat
-- 
+- Coin Example
+  - We don't know coin A from coin B (can't tell them apart)
+  - So perform expectation maximization
+  - (COIN) ----> Heads (H)
+  - Where H is P(H|A) = $\theta_A$ and P(H|B) = $\theta_B$
+  - Assume P(A) = 0.5, so P(B) = 0.5
+  - Need to come up with initial hypothesis $\theta_A = 0.6, \theta_B = 0.5$
+  - Now, given the initial hypothesis, compute the expected counts of heads and tails
+  - Given trial 1, what is the probability that the coin used in the trial was A? Or B?
+    - See equations on slide 14
+  - $P(A|trial_1) = \frac{0.6^5 0.4^5 0.5}{0.5(0.6^5 0.4^5 + 0.5^{10})}$
+
+- K Means Algorithm
+  - Sum of square for predicted class value minus curr value
+  - For each classification calculate <x average ,y average>
+  - `+` examples: <4.6, 3.7>
+  - `x` examples: <5.2, 6.25>
+  - Then re-assign examples and re-calculate
+
+
+
+## Lec 16-17: Markov Decision Processes
+
+- Have a world that is changing over time; get rewards
+- If we are at state t then the state t + 1 is only determined by the state t and an action at that state (like, rolling the dice)
+- State space; transition probability matrix
+- Rewards: immediate and future 
+  - Future award is worth less than a current reward due to
+    - Chance of inflation
+    - Chance of loosing the game (getting obliterated)
+- $\bar{U} = R + \gamma P\bar{U}$
+- So $\bar{U} = (I - \gamma P)^{-1} R$
+- How to solve all of these complex systems? Value iteration.. calculate U1, U2, ..
+- K is number of time stamps
+- Si is the state number i
+- Sun Wind Hail example
+
+```
+s sun
+w wind
+h hail
+k			U^k (sun)					U^k(wind)					U^k(hail)
+1			4									0									-8
+2			4+0.5(0.5*U1(w)   -1									-10
+			+ 0.5*U1(s))
+			= 5
+3			5									-1.25							-10.75
+4
+5			4.875
+```
 
