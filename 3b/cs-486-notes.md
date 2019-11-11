@@ -1624,3 +1624,62 @@ k			U^k (sun)					U^k(wind)					U^k(hail)
 5			4.875
 ```
 
+- $U(S_i) =R + \gamma \sum_{j = 1}^n P(s_j | s_i)U(S_j)$
+  - Very computationally heavy; instead do an iterative process
+  - Instead do $U_i = R + \gamma P U_{i - 1}$
+    - Eventually will converge. Why? Eventually you will have multiplied $\gamma$ so many times that it approaches 0 (as $\gamma < 1$)
+
+
+
+```mermaid
+graph LR;
+		A --1--> B
+		B --1--> A
+```
+
+```
+A has probability of starting of Ra
+B has probability of starting of Rb
+U1(A) = Ra
+U1(B) = Rb
+U2(A) = Ra + y*U1(B) = Ra + yRb
+U2(B) = Rb + y*U1(A) = Rb + yRa
+U3(A) = Ra + y*U2(B) = Ra + y(Rb + yRa) = Ra + yRb + y^2Ra
+U4(A) = Ra + yRb + y^2 Ra + y^3 Rb
+so we see that |U4(A) - U3(A)| = y^3 Rb
+so as k gets larger, we are only adding smaller and smaller percentages
+```
+
+- markov decision processes
+
+  - maximize its expected utility (goal is to maximize long term reward)
+
+  - Choose a policy: a mapping from states -> actions
+
+  - Fact: for every MDP, there exists an optimal policy; might be multiple
+
+  - Policy such that for every possible start state, there is no better option than to follow that policy; for every state, its value will actually be maximum (no other policy will have a value for that state using some set of actions greater)
+
+  - Finding the optimal policy:
+
+  - ```
+    V // V indicates that we are in MDP 
+    π // our policy
+    Ex for policy 1: π(PU) = S, ..., ...
+    ```
+
+    - $V^π(PU)=0 + \gamma V^π(PU) \implies V^π(PU) = 0$
+    - $V^π(PF) = 0 + \gamma V^π(PF) \implies V^π(PF) = 0$
+    - $V^π(RU) = 10 + \gamma(0.5V^π(PU) + 0.5V^π(RU))$
+      - $\implies V^π(RU) = \frac{10}{1 - 0.5\gamma}$
+
+    - $V^π(RF) = 10 + \gamma V^π(PF) = 10$
+
+  - Example: slide 25; after t = 5; your values will be changing but your actions will not be changing; value difference will begin to decrease; so we have the optimal policy
+
+- Policy iteration algorithm
+  - Given PI; our evaluation $V^\pi (S_i)$(function of the policy) = $R_c + \gamma Z P_{c,i}^\pi V^\pi - Hellman's Eq$
+  - Here is my current evaluation. Is there some other action k which is going to lead to a better return? If so, then update what my action should be for this state
+    - Do this for all n states; and then start again
+    - Different from value iteration but we are still using bellman equation (define our entire system)
+    - Guaranteed to converge to the optimal policy
