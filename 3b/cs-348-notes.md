@@ -1356,16 +1356,203 @@ l, h -> a
     - Operators on top implement a cursor protocol; application asks for next (calls fetch)
     - Operator might have subqueries; it then asks them for the next one too
     - Product: pick from left, go and grab every one from the right; now go and get the 2nd from the left, and repeat to go and get every one from the right etc
-- We define relational algebra
+- We define relational algebra: a calculator over finite relation instances
 - How to make it faster?
   - Use disk-based data structures for efficient search using INDEXING
+    - Doing to database is expensive. Doing anything else in memory is essentially free
   - Use sorting or hashing
   - Re-write the relational algebra query to make it use more efficient algorithms
+    - Re-write it to an equivalent one that performs better
 - Query plan: pick an implementation for each operator
   - Can't just run them though to figure out which is fastest; so most operating systems / disks provide a simple cost model based on uniformity and independence
   - Cost model: in general, how many times do we have to go to disk and read a page?
     - Blocking factor: how many records fit into one page? (Because we already read data page by page)
+- Strategies
+- Parallelism in Query Execution:
+  - Bottleneck is not CPU; it is getting the data from the database
+  - Parallelize the mass storage of data
+- Summary
+  - Correctness just depends on the conceptual layer
 
 
 
+## Database Tuning and Physical Design: Execution of Transactions
 
+- Concurrent assumptions
+
+  - Fix a set of reads / writes that can be performed on db
+  - Define a transaction as a set of reads and writes, followed by a commit/abort
+  - We want to schedule the individual transactions in the transaction set
+
+- DEFN: an execution of S is serializable if it is equivalent to a serial execution of the same transactions
+
+- DEFN Conflict Equivalence
+
+  - Conflict if there are from different transactions, access same data x, and at least one of them is a write
+
+  - Require conflict-equivalent histories: always have the same ordering
+
+- Other properties of schedules
+
+  - Recoverable schedules (RC):
+    - Tj reads a value Ti has written. Tj succeeds to commit, and Ti tries to abort (in this order)
+    - If T2 has read something from T1, then T2 has to wait for T1 to commit before it can commit
+    - Can result in cascading aborts (T1 writes, T2 reads that, and then writes, and then T3 reads that .. and so on ... and then T1 aborts, so all others need to abort now too)
+
+- Serializable schedules
+
+  - Ex: ignore it
+    - T1 and T2 come (in that order) to write into X. Somehow T2 goes first. We can now just ignore T1.
+    - Conservative schedulers (like db2)
+    - Aggressive schedulers (more like distributed systems)
+
+- Two Phase Locking (2PL)
+
+  - Read: requires a shared lock
+  - Write: requires an exclusive lock
+  - A transaction needs to acquire all of the locks that it needs before it releases any of them
+  - Recall: serializable iff no cycles in dependency graph
+
+- Deadlocks and What to do:
+
+  - Use deadlock prevention: grant locks in correct order
+  - Use deadlock detection:
+    - Use a "wait for" graph. Indicates which transactions are waiting for other transactions
+    - Arrows indicate ordering. Use a topological sort
+
+- Variations on Locking:
+
+  - Multi-granularity locking:
+    - Tuple | Table | Page level locks
+
+  - Tree locking
+    - If you need the lock for some root in a b-tree then you will need to get a lock on the top level page. Completely destroys concurrency control
+  - Predicate locking ?
+    - Lock on actual values; some query is creating v=1; and another query has a predicate lock on v=1
+
+- Inserts and Deletes:
+
+  - We have assumed a fixed set of data so far
+  - One transaction counts while another transactions adds/deletes
+  - Phantom problem
+    - Solution: operations that ask for all records have to lock against insertion/deletion of a qualifying record
+
+- Isolation Levels
+
+  - 0:
+  - 1: Cursor Stability
+    - Tuple-level exclusive locks and ignore share locks
+    - Reading the database ==> don't need a lock
+    - Go to the same cursor twice, can see different values
+  - 2: same as above, but if you go to the same cursor twice you will see the SAME values
+
+- Recovery:
+
+  - Goal 1: allow transactions to be committed and aborts
+  - Goal 2: Allow database to be recovered to a consistent state in case of some power failure. Any previously committed transaction will be there. Any transactions that were aborted or still running will not be there
+
+- Approaches to recovery
+
+  - Shadowing: 
+
+    - abandoned completely; after a while the disk will be fragmented
+    - Copy on write
+- Logging:
+  
+  - Read disk (optimized for reading)
+    - Write disk (optimized for writing)
+    - Need to keep them reasonably synced
+  - How does it work? Recall there is a buffer (RAM) (basically a cache) that is checked first
+  - Optimize for successful transactions
+    - Authoritative copy
+    - Minimal amount of information to commit and abort a transaction
+      - Ex: redo information; undo information;
+      - Contains OLD image of the data; NEW image of the data
+    - To commit:
+      - Everything up to the commit needs to be added to log
+    - To abort:
+      - Part is on disk; part is in memory;
+      - Go backwards and undo all actions; no forced writes
+      - Undo everything since your transaction started
+  - Write-ahead logging
+    - Up to previous commit is on the LOG
+    - Go backwards; undo all abort transactions; then go forwards and redo all commit transactions
+  - Issue: eventually this log grows and grows; and gets too large;
+    - Checkpoint: special records in the log that say everything older than this has already been correctly propagated into the DB
+  
+- Summary
+
+  - Abstracted application logic; only cared about reads and writes and on which items we are operating
+  - Developed sequences of operations; ends with commit | abort
+  - Scheduling them together
+    - Conditions to determine if sequences of scheduled transactions are OK
+    - OK ==> equivalence histories; all conflict the same way
+    - Conflict serializable: conflicts; but they are all ordered the same; lets us still perform all of the operations
+  - How to implement scheduling?
+    - Two Phase Locking (2PL) (shared and exclusive locks)
+    - 2PL protocol
+  - Recovery
+  - Physical DB Overview
+
+  ```mermaid
+  graph TD;
+  	user1 --> transaction_manager;
+  	transaction_manager --> rm_bc
+    rm_bc --> disks
+  	rm_bc --> LOG
+  ```
+  - Rm = recovery manager; bc = buffer cache
+
+## Data Base Tuning and Physical Design (continued)
+
+- ```mermaid
+  graph TD;
+  	conceptual-->physical
+  ```
+
+- Conceptual is tables; physical is data structures
+
+- Workload modeling
+
+  - A description (succinct) of your typical workload; most important and popular queries / updates
+
+- What to optimize? Response time or throughput
+
+- Physical design:
+
+  - Storage strategy (holds the actual data): hash file, sorted file
+  - Indexing strategy (helps you go and find that file): B+ trees
+
+- Creating Indexes
+
+  - `create index lastnameindex on employee(lastname)`
+  - Only one cluster index per relation
+    - Cluster index: Records with same or similar IDs go together
+    - Fixes the data pages to be optimized for indexing via some attribute; therefore won't be nicely indexed on other attributes
+    - (Cluster index by IDs; nicely organized by IDs; but searching for name is harder)
+  - ==Significantly speeds up your queries; but slows down insertions==
+  - Possible to index on multiple attributes (like; last name, first name)
+
+- Using Multi-Attribute INdices
+
+  - NameIndex is on last name; first name
+  - If searching for all first names for employees with last name smith; then you don't even need to go to disk because the last name, and then first name, will be contained in the index data (data contained in the non-leaf nodes of the tree); root -> last name nodes -> first name joins -> disk pages
+
+- You can run `db2explain` to see what the physical plan is to implement that query
+
+- More complex designs
+
+  - You can keep physically optimizing; but the more you do the harder it is for the db to know how to use those optimizations to its advantage during querires
+
+- Index Design / Selection
+
+  - Consider all possible physical designs; pick the best one for the given user workload (expected queries and updates)
+
+- Schema Turning / Normal Forms
+
+  - What if we have added data structures to improve performance, but this still isn't enough?
+  - Change the conceptual design to use fewer physical disk operations
+  - Denormalize relations so you can retrieve related data in fewer operations
+  - Techniques:
+    - Column stores? https://en.wikipedia.org/wiki/Column-oriented_DBMS
+    - 

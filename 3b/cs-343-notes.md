@@ -1369,7 +1369,10 @@ uCondLock x, y, *z; z = new uCondLock;
 
 
 
-## Chapter 7: later 
+## Chapter 7: Concurrent Errors; Nov 14
+
+- Race condition: missing synchronization or missing mutual exclusion
+- Starvation: texting; look to your right; see a car; it goes first; you text again; look up; see a car on right; they go first; etc;
 
 
 
@@ -1429,7 +1432,71 @@ uCondLock x, y, *z; z = new uCondLock;
   - Nested Monitor Problem:
     - M1 -> M2 -> M3 -> M4 (blocks in M4; goes to sleep, frees lock in M4)
     - But lock is still acquired for m1-3
-    - 
+
+
+
+### 8.7 Monitor Types
+
+- When a monitor becomes empty, then IT decides who will run next
+- Waits, exits, signals; monitor is empty and needs to make a decision of from which queue it should select next
+- Signalled, signallers, calling (W, S, C) are ready to go and ready to enter
+- Condition waiters have not been signalled: they are not ready to be brought into the monitor
+- So there are different types of monitors: based on which order they accept W, S, C from
+  - If you give C (caller) higher priority than any others; then it has barging; caller can barge in front of any other (S,W) that are waiting
+  - So when a signaller can signal, and then keep on going, this corresponds to S > W
+  - uC++ ==> S > W > C
+  - uC++ uses a stack instead of a queue; because we use _Accept's
+  - Got an issue with multiple signalling (because they are put on a stack; so they come off in reverse order) then just use daisy chain signalling instead
+- waitUntil statement
+  - When you leave; wake everyone up for everyone to check their predicate
+  - Is quite expensive
+- Note: almost every single example; do a signal and then return; but not always (ex: dating service); but true for 90%
+  - So optimize signal in highest position; get in; signal; get out fastest
+- Slide 156: all RHS columns have barging; we need to insert barging avoidance
+- Note:
+  - Signal might have to be in a loop?
+  - I signal you; then I get blocked; and if I don't have priority; so I wake up later; and then I check if the cooperation you did for me (I signalled you) was completed; maybe it was, but a barger came and un-did it; so I wait more
+- Bam: Co-monitor
+  - _Mutex _Coroutine_
+
+### 8.8 Java Monitor
+
+- Only have 1 condition variable per Monitor; doesn't even have a name; you just use wait() and notifyAll() etc
+- Java: wait statements need the try catch because they can throw
+- Has barging: 
+  - block() example
+  - Nth person comes; signals everyone; then swings around barbers (everyone else is on the ready queue); and then just keeps barging (it could do this 17 times); meanwhile everyone else has not even woke up yet
+  - "Generations" you want each group of N to go through (this is a generation); but this code allows for someone to be on generation 17, but everyone else hasn't even finished generation 1
+    - Setting count = 0 mitigates this problem
+- DANGER: spurious wakeup
+  - In java, if you wait on a condition variable; you might spontaneously wake up even though you weren't signalled
+  - Just put it in a while loop? Go back to sleep
+  - Creating your own condition (uses classes and synchronized keyword) doesn't work in Java; this is a nested monitor
+
+## Chapter 9: Direct Communication
+
+- Now we are going put public members in our tasks; so tasks can communicate with one another
+- Recall: Task
+  - Has its own stack; store member routines and information
+  - Has a distinguished member main
+  - Task is also a monitor
+  - All public members are mutex
+
+### 9.1 Task
+
+- 3 properties (has its own stack; also has its own thread; AND mutex)
+- Problem with thread; stack; but no MUTEX; then it could have public members; then other people can call in and now you have multiple threads in there; then you will have to provide own locking to protect shared information
+- _When clause; or clause; both doors are open; how do you deal with fairness?
+  - In uC++ we check the doors in the order you write them
+  - Recall: busy waiting; starve forever; if you starve for a bound; then it's not busy waiting
+  - Want fairness? Accept insert then remove; then next line underneath you accept remove then accept insert
+  - Assign 5: hire a full time person to help with the voters; use a task instead of a monitor
+- We use _When instead of if because it lets you accept all (that are or'd); if you used if statements you would need exponentially more if statements
+- Picture slide 164:
+  - Monitors start with all doors open; because its empty and wants someone to come in
+  - Task starts with all doors shut (because it has the active task inside; the person helping to coordinate)
+    - Full time person has to learn how to sit down so that someone else can come in; due to mutual exclusion
+- Assign 5: signalBlock()
 
 
 

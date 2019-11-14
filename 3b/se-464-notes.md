@@ -1345,7 +1345,16 @@ bar(A <? super Number> a) // can pass in another that is Number of higher than n
 
 
 
+## Lecture 18: Optional Type Systems & Checker Framework
 
+- Never directly use user input to perform some type of important action or system call -> always check it and sanitize it first to make sure it's good
+  - Ex: SQL injection attack
+- `@Untaintesd`
+- False Positive: an error message that points to something that isn't actually an error
+- Checker itself might contain an error
+  - Theoretical: this is how the type system works
+  - Implementation problem
+- `@Regex(1) foo = "..."` typechecks that foo has at least ? Or only ? 1 group
 
 
 
