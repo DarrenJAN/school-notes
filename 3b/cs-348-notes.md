@@ -1555,4 +1555,64 @@ l, h -> a
   - Denormalize relations so you can retrieve related data in fewer operations
   - Techniques:
     - Column stores? https://en.wikipedia.org/wiki/Column-oriented_DBMS
+
+
+
+## Nov 19 New Developments Lecture
+
+- Scaling
+
+  - Parallel databases
+    - Query processing and algorithms
+    - Distribute data to different devices under the same system
+  - Distributed databases
+    - How to make transactions atomic when they are running on several systems? (A master system and 2 slave systems)
+    - 2PC: 2 phase commit protocol
+      - Coordinate commits between different systems
+      - Master first sends (and waits for response) the first commit message to all slaves
+      - Then waits for responses; and confirms all are YES; and seconds 2nd actual commit message to all slaves
+      - Uncertainty between slave responses
+
+- New circumstances
+
+  - Memory is available and cheap
+  - Workloads are different (constant streams of user data; twitter; Facebook; instagram)
+  - What if you put the entire database into RAM?
+    - Well, 1 disk read approx = 10,000 instructions
+    - So they are NOT optimized to be efficient (in terms of running instructions) because they assume that running thousands of instructions costs nothing compared to reading from disk
+
+  - New systems want to get rid of this overhead
+
+- Time improvements
+
+  - Single threading vs multicore (multicore has expensive process switches to other CPUs)
+  - Replication vs logging (you can have both)
+  - Variations on isolation: how separate can the users be ???
+  - Cache-conscious data structures: want to reduce reading from the disk
+
+- New DB Systems
+
+  - NoSQL
+    - Flexible schema (don't need to have it pre-defined)
+    - Easy horizontal scale (adding new machines)
+    - Representation
+      - Key Value Store: distributed b-tree; tightly coupled to system
+      - Document store: json/xml
+      - Wide Column Store: key -> multiple values (just an array? A set?)
+      - Graph DBMS: vertices and edges; query language is targeted toward the graph structure
+      - Similarities: key idea allows for horizontal scaling
+
+- Schemaless Design
+
+  - Data warehouse: curated data; you know what's in it; after the data-cleaning phase
+  - Data lake: mass collection of data; good for data collection (just observe it; dump it into the lake; format it later)
+
+- Scale Out and CAP Theorem
+
+  - SQL queries scale up with more cheap hardware; transaction requirements do not
+
+- ACID vs BASE
+
+  - Session consistency: just point and use and refer to a slave (a replication) so from your perspective everything is in sync
+    - Only issue is when you write
     - 

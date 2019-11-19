@@ -1372,7 +1372,60 @@ uCondLock x, y, *z; z = new uCondLock;
 ## Chapter 7: Concurrent Errors; Nov 14
 
 - Race condition: missing synchronization or missing mutual exclusion
+
 - Starvation: texting; look to your right; see a car; it goes first; you text again; look up; see a car on right; they go first; etc;
+
+  - One person is NOT using the critical section
+
+- Live-lock: you go first (person to right); continues forever
+
+  - Cardboard test: if putting up a piece of cardboard to your right solves the problem; then this is a way to break the tie; so we are one live-lock
+  - No one is using the critical section
+
+- Deadlock:
+
+  - One or more process is waiting for an event that will not occur
+
+- Synchronization deadlock: stuck waiting
+
+- Mutual exclusion deadlock: (NOT the same thing)
+
+  - 5 conditions
+    - Concrete source; exists even if no tasks in system
+  - Examples
+    - 2 tasks acquire resources in reverse order from one another
+      - T1: get A, get B
+      - T2: get B, get A
+
+- Deadlock prevention: want to be able to prove statically that program is deadlock free
+
+  - Synchronization: difficult to prevent
+
+  - Mutual exclusion: eliminate 1 of the 5 rules
+
+    - No wait and hold: grab all of them before you start; issues when you need hundred+ for a long time
+
+    - Allow preemption => can't solve statically
+    - Best option: no circular wait
+      - Ordered resource policy: give resources a priority; all tasks must acquire them in that order
+
+- Resource graph
+
+  - Just because you have found a cycle does NOT mean you have found a resource-hold-cycle
+  - Take our bi-partite graph and build an isomorphic graph
+    - Cleave it; break it into pieces; any resource that has multiple resources inside of it
+      - Figuring out HOW to cleave is very complex (exponential)
+  - OR do graph reduction
+    - Find cycles; then look for any tasks that have only in arrows (not waiting on anything else); it can just run
+
+- Note: but you never write code that asks the oracle if it can grab the resource. You just grab the resource 
+
+- Detection and recovery
+
+  - Just let deadlock occur and be able to recover from it
+  - Preemption is dangerous: pick someone; stop them; then re-start them later (not safe; they might already have done work)
+
+- 
 
 
 
@@ -1497,6 +1550,12 @@ uCondLock x, y, *z; z = new uCondLock;
   - Task starts with all doors shut (because it has the active task inside; the person helping to coordinate)
     - Full time person has to learn how to sit down so that someone else can come in; due to mutual exclusion
 - Assign 5: signalBlock()
+
+
+
+### 9.3 Increasing Concurrency
+
+- 
 
 
 

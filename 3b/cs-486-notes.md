@@ -1683,3 +1683,19 @@ so as k gets larger, we are only adding smaller and smaller percentages
     - Do this for all n states; and then start again
     - Different from value iteration but we are still using bellman equation (define our entire system)
     - Guaranteed to converge to the optimal policy
+
+
+
+## Lec 18: RL Bandits (ch 21 in R & N)
+
+- Learning what to do to maximize numerical reward
+- ==learner is not told what actions to take==
+  - Tries out different actions; sees what the rewards are
+- Want to maximize future rewards by choosing actions that maximize $r_0 + \gamma r_1 + \gamma^2 r_2 + \dots$
+- RL Model
+  - States S, actions A, rewards (which might be delayed)
+- From textbook
+  - Exploitation: maximize the current reward
+  - Exploration: maximize its long term well-being
+  - Greedy in the limit of infinite exploration (GLIE)
+  - 
