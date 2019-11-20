@@ -1698,4 +1698,78 @@ so as k gets larger, we are only adding smaller and smaller percentages
   - Exploitation: maximize the current reward
   - Exploration: maximize its long term well-being
   - Greedy in the limit of infinite exploration (GLIE)
-  - 
+
+
+
+## Lec 19: Reinforcement Learning 
+
+- $V(S_t)$ Value of state at time t
+- Prediction Problem:
+  - Given a policy; learn the values of being in any state by following that polify
+  - Find the Q value: state-action pair values
+- Control Problem:
+  - Agent needs to figure out what it should be doing
+
+- Driving Home Example
+
+  ```
+  lambda = y = 1 (usually its like 0.9 or something)
+  alpha = a = 1 (step size)
+  
+  we are updating V(s)
+  
+  V(office) = 30 (start estimate)
+  V(car) = 35 (start estimate)
+  V(highway) = 15 (start estimate)
+  V(office') = 30 + a*[5 + 1*35 - 30]
+  					 = 40
+  V(car') = 35 + a[15 + y*15 - 35]
+  				= 35-5
+  				= 30
+  ```
+
+- Control problem with state values
+
+  - Not was well defined; you will be driven by what these state values are; you can find the optimal policy using the optimal state values ... which needs the optimal policy to compute. A little weird
+
+- Action Values
+
+  - Q values are defined over a (state, action) pair
+  - (State, action, reward) -> (state, action, reward) -> ...
+  - Updating state action pairs using temporal difference -> newer values replace older values
+
+- Now on to the control problem
+
+  - Agent in the environment; it has to figure out by itself what to do
+  - It has to decide what actions to take
+  - So we don't give it a policy
+  - Its own actions need to be guided by current estimates of Q values
+  - Behavioural policy: policy used to **choose actions** (gets data and feedback from environment)
+  - Learning policy: target policy to **learn**
+
+- Types of Control Learning
+
+  - On-Policy Learning: evaluate or improve some policy that is being used to drive decision inside learning algorithm
+    - SARSA
+    - $(S_t, A_t, R_{t + 1}, S_{t + 1}, A_{t + 1})$
+    - Code uses `R` because you get R at time t + 1 after you take some action A at time t
+    - $\epsilon$-greedy policy converges to optimal policy with prob 1 if all state, action pairs visited infinitely often AND policy using to select actions converges to greedy policy
+  - Off-policy: evaluate or improve some policy that is **different** from what is generating data / action choices
+    - Updates not dependent on that policy
+    - Update rule is different from SARSA
+    - Instead of discounting action for NEXT state using action to be taken in next state according to policy
+      - Instead we will try all actions and find max value
+
+- Grid Example
+
+  ```
+  off policy
+  Q(s=(0,0),a) = 73 + 0.5(0 + 0.9*max[100,66,81] - 73) = 81.5
+  Q(s'=(1,0), a') = 66 + 0.5[0 + 0.9*max[81.5] - 100] = 69.7
+  
+  on policy
+  // we assume that there is a pre-chosen policy to take the 66 action in top middle cell
+  Q(s=(0,0),a) = 73 + 0.5(0 + 0.9*66 - 73)
+  ```
+
+  
