@@ -1555,6 +1555,60 @@ uCondLock x, y, *z; z = new uCondLock;
 
 ### 9.3 Increasing Concurrency
 
+- Write SERVERS as ADMINISTRATORS
+
+- Admin gives worker work and gets result in single call?
+  - Worker drops off result and then picks up next work in a single
+  - What if there isn't any work? Then they sit down on a bench
+- How do 2 administrators talk? They use a courier
+  - Courier goes back and forth asking Admins if they have anything they want deliver
+  - Want to send multiple messages in a row? CREATE a courier
+- Use signalBlock while in administrator
+- Need a couple places to have busy waiting
+  - Parent gives money to student
+  - Without money simulation will do nothing
+  - Parent is in a busy loop
+    - Every once and a while it will randomly give money to students
+- Client Side
+  - Async call from client to the server
+  - Async call: system will put in a bounded buffer between client and server
+    - From the server's perspective it looks just like a normal call
+    - But only picking from a buffer; the client dropped the work off a while ago
+  - QUESTION: callee is the client or **server**?
+    - `server.start` is different from START (for threads) as the server is already there; we don't create a new thread
+
+- Recall: why are protocols bad? Just another way for programmers to screw up your code
+- Server: 25 works; 35 results? Which results go with which client?
+  - Use tickets. What about making a fake ticket?
+  - But we are writing the client AND the server; so don't worry about attacks
+  - Pass in a ROUTINE to run when your task is finished by the server
+    - Text you; server should not do everything (don't drive to your house)
+    - Lets them get rid of clothes faster
+- ADMINS can call out to NEW routines (to make new objects)
+  - Has to make some fundamental calls
+
+#### 9.3.2.4 Futures
+
+- Instantaneous cleaning of clothes
+  - They give you a bag right away; sneak in later and put clothes into bag
+  - Takes our multi-step protocol and turns it into a single-step protocol: the client instantly gets a result
+  - We get the `future` variable instantly; eventually the actually stuff will be put into `future`; if we go to use `future` before it is ready, then we will BLOCK
+
+- `Future_ISM<T>`, `Future_ESM<T>`
+  - After you have done `my_future()` then after that you can just do `my_future` to get the value; no brackets needed because we have already waited and grabbed the value
+  - CANNOT write to a future; sometimes futures are returned to multiple clients
+  - Can reset a future
+  - Can cancel a future
+  - Server will check if you have cancelled it before it starts work 
+
+- Want to be able to write and change the value of the future? You a pointer. You can't change the pointer, but you can change the value it points to.
+  - ==Needed for assignment 6==
+- Scenario
+  - What if you go and ask N servers and get N futures
+    - We might need 2 or 3 or 4 (different combinations) of futures to do certain work
+    - Wait until all of our needs are met
+  - `_Select` statement
+
 - 
 
 

@@ -1683,6 +1683,18 @@ so as k gets larger, we are only adding smaller and smaller percentages
     - Do this for all n states; and then start again
     - Different from value iteration but we are still using bellman equation (define our entire system)
     - Guaranteed to converge to the optimal policy
+  
+- Ex: Poor Unknown, Rich Unknown etc etc
+
+  ```
+  v(t+1)(s_i) = action k with max (r_i + y*SUM neighbours s'(P(s'|s,a)*U(s')))
+  sum of the probability of going to neighbour * V(neighbour) for all neighbours that I might visit should I choose action a
+  				Vt(PU)			Vt(PF)			Vt(RU)
+  t = 0		0						0						10
+  t = 1		
+  ```
+
+  
 
 
 
@@ -1708,8 +1720,9 @@ so as k gets larger, we are only adding smaller and smaller percentages
   - Given a policy; learn the values of being in any state by following that polify
   - Find the Q value: state-action pair values
 - Control Problem:
-  - Agent needs to figure out what it should be doing
-
+  
+- Agent needs to figure out what it should be doing
+  
 - Driving Home Example
 
   ```
@@ -1772,4 +1785,8 @@ so as k gets larger, we are only adding smaller and smaller percentages
   Q(s=(0,0),a) = 73 + 0.5(0 + 0.9*66 - 73)
   ```
 
-  
+- Cliff Example:
+
+  - Q learning finds optimal policy; but there's a chance it goes off the cliff due to randomness (epsilon)
+  - SARSA takes more caution and goes the longer way; way around the cliff
+  - 

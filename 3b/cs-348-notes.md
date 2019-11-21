@@ -1615,4 +1615,28 @@ l, h -> a
 
   - Session consistency: just point and use and refer to a slave (a replication) so from your perspective everything is in sync
     - Only issue is when you write
-    - 
+
+
+
+## Big Data Problems
+
+- Hdfs: Hadoop distributed file system?
+- Map Reduce
+  - MapReduce doesn't perform well in iterative computations
+    - Is just a sequence of steps; want to add loops? That's harder
+    - Need to persist results from each iteration (run through); write to disks; next iteration, read from disks
+- Spark
+  - Complete cluster management
+  - Key Concepts
+    - RDD: Reliable Distributed Datasets
+      - Not written to disk. How do you make it reliable?
+    - Caching of working set
+    - Maintaining lineage for fault-tolerance
+      - You don't persist the data itself: you persist how to re-calculate it
+  - Types of operations:
+    - Transformation functions (filter, map, reduce)
+    - Action functions: force operations to occur; like "count"
+      - So all transformations are lazy-performed: only performed when they are needed at that time for an operation
+  - Transitive colusres
+    - deltar is closures grouped by start?
+    - deltal is closured grouped by end?
