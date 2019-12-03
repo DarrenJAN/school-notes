@@ -258,9 +258,144 @@
   }
   ```
 
+
+
+
+## Chapter 7:  Concurrent Errors
+
+- Race condition: missing synchronization or mutual exclusion
+- Live-lock: indefinite postponement (you go first)
+- Starvation: selection algorithm ignores one or more tasks (other person goes first, I send a text message and miss that I was able to go, repeats forever)
+- Deadlock
+  - Synchronization: wait on a semaphore that is closed, will always be closed
+  - Mutex: multiple ppl enter critical section
+  - 5 conditions (CHNCS)
+    - Concrete shared resource (intersection)
+    - Holding (hold and wait)
+    - No Pre-emption (don't give back the resource)
+    - Circular Wait
+    - Simultaneous
+- Prevention: ordered resource policy
+- Avoidance:
+  - Banker's algorithm
+  - Allocation graph
+    - (Task) --> [resource] means task is waiting on a resource
+    - [resource] --> (Task) means task is currently holding that resource
+
+
+
+## Chapter 8: Indirect Communication
+
+- `_Monitor`
+
+  - All public members are mutex; does not begin execution if there is another active mutex member
+  - EXT
+    - `_Accept(foo)` blocks; waits for foo to be called and finished, or foo to be called and blocked
+    - Can't be used when
+      - Depends on member param values OR cannot guarantee that accepting(x) will fulfil their desired cooperation (bank balance of student, calling withdraw / deposit)
+  - INT
+    - `uCondition ::wait(), ::signal(), ::signalBlock(), ::empty()`
+    - The signaller (person that calls `signal()`) does NOT block. Signalled task continues waiting
+    - Signaller will block if they use `::signalBlock()`
+    - When you call `myUCondition.wait()` inside of a member function, it releases the monitor lock and lets someone else in
+
+  - Rendezvous failure
+
+- Monitor Types
+  - Explicit, implicit, calling (C; outside the function; waiting to get in), signalled (W; waited inside the function, blocked on some queue), signaller (S; signalled a waiter that they can go) queues
+  - uC++ does C < W < S (signallers have top priority. Sit on bench, then stand back up right away)
+
+- `_Cormonitor`: monitor coroutine
+
+  - Monitor but with a main; suspend(); resume()
+
+- Java
+
+  - Uses a single condition variable; doesn't even have a name, just `wait(), notify(), notifyAll()`
+  - When you wait inside a `synchronized` function, you get put back onto the entry queue ==(C = W < S)==
+  - Need to use a `while` loop around waits due to spurious wakeup
+  - ==Need a ticket, keep track of your current generation==
+  - Waits need to be surrounded by
+
+  ```
+  try {
+  	wait();
+  } catch (InterruptedException e) {}
+  ```
+
+
+
+## Chapter 10: Direct Communication
+
+```
+_Task {
+private:
+	void main() {
+		_When (..) _Accept(a,b,c)
+		or _When (..) _Accept(d)
+		_Else {
+			...
+		}
+	}
+}
+```
+
+- External Scheduling
+  - Try and do as much work inside of `_Task::main` inside of `_Accept(foo) { .. do work .. }` calls, such that public API methods do less work (callers do less work)
+- Internal Scheduling
+  - Need to have duplicate order of Accept(insert) and Accept(remove) so there is no starvations
+  - Need to signalBlock() while in Task::main() else you will still be inside of mutex and no one else will be allowed in
+- Accepting a destructor: when you do so, the caller blocks and waits for the task to finish (can't delete its storage while it is being used)
+  - So main calls ~foo
+  - foo accepted destructor in Foo::main()
+  - Accept statement gets executed EVEN THOUGH the destructor was never actually called (started destructor execution)
+
+- Increased concurrency
+
+  - Server, client
+  - Administrator (manager), worker relationship
+  - Admin does almost no work, it's job is to manage and create jobs for workers to do
+
+- Asynchronous work
+
+  - tickets: Error prone; fake a ticket; use a ticket twice; bad idea
+
+  - Call back routine
+
+  - future
+
+    - `available()` is the async call finished?
+
+    - `cancelled()`
+
+    - `operator()` gets a read-only copy of the future RESULT
+
+    - `reset` mark as unavailable
+
+    - `cancel` : waiting clients are woken up, exception `uCancellation` is raised
+
+    - Wait for different futures to be ready? `_Select` statement
+
+      ```
+      _When (...) _Select (f1, f2)
+      or 
+      	_When (...) _Select (f3)
+      	and _When (...) _Select (f4)
+      _Else { ... }
+      ```
+
+    - ==when a guard if false (When (false) _Select( f ) ) execution does NOT wait for that future to be come available==
+
   
+
+
 
 - terms
   - Cooperation
   - single acquisition
-  - multiple acquisition 
+  - multiple acquisition
+  - Race condition
+  - live-lock
+  - starvation
+  - deadlock (synchronization vs mutex)
+  - 

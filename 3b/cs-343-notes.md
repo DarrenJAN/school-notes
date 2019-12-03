@@ -1425,7 +1425,6 @@ uCondLock x, y, *z; z = new uCondLock;
   - Just let deadlock occur and be able to recover from it
   - Preemption is dangerous: pick someone; stop them; then re-start them later (not safe; they might already have done work)
 
-- 
 
 
 
@@ -1609,7 +1608,21 @@ uCondLock x, y, *z; z = new uCondLock;
     - Wait until all of our needs are met
   - `_Select` statement
 
-- 
+
+
+
+## Chapter 10: Optimization
+
+- Re-ordering: how to get it out of memory into registers as quickly as you can
+- Just like with caching, you want the most commonly-used variables in the registers
+- Problem: doesn't do well with context switching, unloading all registers into memory from program 1, load variables from memory into registers for program 2
+  - So how to optimize across context switching?
+
+
+
+## Chapter 11: Other Approaches
+
+
 
 
 

@@ -1789,4 +1789,47 @@ so as k gets larger, we are only adding smaller and smaller percentages
 
   - Q learning finds optimal policy; but there's a chance it goes off the cliff due to randomness (epsilon)
   - SARSA takes more caution and goes the longer way; way around the cliff
-  - 
+
+
+
+## 21: GT
+
+- Multi-agent setting (==will be on the exam==)
+- Each agent has their own perspective of the world; their own utility functions
+- Requirements for Game Theory to apply: interactions, group, must be rational (act towards their own best self interests), strategic
+- Assumption: both agents make a decision as to what to play at the same time (so they don't know the other person's move first)
+- Choose the best response: an action that maximizes your utility considering you have some beliefs about what your opponents will do
+- $p(a_{-i})$ Uses $a_{-I}$ which is a vector that has an action for every agent besides agent $i$
+- $a_i'$ Strictly dominates any other action $a_i$ if the expected utility using $a_i'$ knowing vector of other player's actions $a_{-i}$ is greater than any other utility of $a_i$ using vector of other player's actions $a_{-i}$
+- Example: Prisoner Confessions
+  - Row player: always better to confess (-5 > -10, 0 > -1)
+  - Confess dominates dont confess action
+  - But, lots of scenarios where we don't have dominant strategies
+
+- Some scenarios don't have stable Nash equilibrium 
+
+- P and Q graph example:
+
+  - q is the probability that person Q takes action 1
+  - $p$ Is the probability that person P takes action 1
+
+- Example:
+
+  - ```
+    Agent 1 is player P, on the left side of the matrix
+    Agent 2 is player Q, on the top side of the matrix
+    U1(p,q) = 2(p)(q) - 3(p)(1-q) - 3(1-p)(q) + 4(1-p)(1-q)
+    
+    partial U1(p,q) / partial p = ...
+    
+    (because we can only control probability p)
+    
+    set to 0, solve for q to find maximum
+    solve that q = 7/12
+    ```
+
+- Result: every game has at least 1 mixed strategy equilibria; always will be an odd number total
+- Repeated games:
+  
+  - Have a history of games and moves and actions and strategies
+- 
