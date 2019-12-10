@@ -1,0 +1,76 @@
+- State space model: xdot = f(x,u); y = h(x,u); f = Ax + Bu; y = Cx + Du
+- Linearization:
+  - Equilibrium config 
+  - jacobians
+- Systematic method for block diagram manipulation reduction
+- Cramer's rule
+- 1st order eqn; Ts == 4T; bw = 1/tau
+- 2nd order eqn:
+  - Zeta and theta
+  - Overshoot; zMin
+  - Settling time; Re decreases implies Ts decreases
+  - Time to peak; as Im increases then Tp decreases
+  - Bw = 1/wn; -3dB lower than low frequency gain
+  - $yss / b = G(0)$ For step input of $b * 1(t)$
+- Matrix exponential (midterm sheet)
+- State-space to transfer function (midterm sheet)
+- Chapter 3:
+  - every pole of G(s) has negative real part and G(s) proper <==> BIBO stable
+  - Poles of G(s) contained in eigenvalues of A
+  - Asymptotic is just xdot = Ax; eigenvalues of A must all have negative roots
+    - Convergence
+  - Asymptotic stability => BIBO stability
+  - FVT
+  - Bode Plots
+    - Cases 1,2,3,4
+- Chapter 4:
+- Chapter 5:
+  - Xcl, Acl
+  - Internal stability defn
+  - Internal stability is the same as IO stability for the purpose of this course
+    - Asymptotic: eigenvalues of A ==> BIBA
+    - IO: make sure all 6 TFs are stable (same as internal) ==> BIBO
+    - Internal: eigenvalues of Acl (same as IO) ==> BIBO
+    - BIBO: all poles < 0 of transfer functions; or impulse response in time domain is absolutely integrable
+  - IO stability: all transfer functions (r,d) to (e,u,y) (page 121)
+  - 5.2.3 io stability criteria
+  - 5.2.5 Char poly; if char poly is H then this implies IO stability
+    - All 6 TFs have the char poly on the bottom
+  - Unstable plant controller pole-zero cancellation ==> unstable
+  - Hurwitz defn and implication / meaning; 
+    - all coefficients must be same sign
+  - Routh's algorithm and what it means
+    - Rule 10 has to do with imaginary crossings
+  - 5.4 and on
+    - IMP
+      - For disturbance reference tracking you can **only** include the bad part of the disturbance in the controller
+      - For tracking it can be in either
+    - Input vs output disturbance
+    - Pick C, then pick C1. Make it to be the simplest
+- Chapter 6
+  - Departure arrival angle formulas
+  - Centroid formula; asymptote formula
+  - N and m
+  - Improper case
+  - Special case of multiple poles on same spot; arrival departure angles
+  - Negative gain case: no yes no from LEFT to RIGHT
+    - Departure angles equal 0 instead of Pi
+  - PD formula, PI formula, PID formula
+  - PID pole placement
+  - Made approximation
+- Chapter 8
+- Chapter 9
+  - wgc = wbw
+  - Check stability using routhe hurwitz
+  - PHIpm = 100zeta
+  - Steps for lead and lag
+    - Formulas for alpha, PHImax, T
+  - Lead lag steps
+  - PHIpm too high; split in 2
+- All the midterm cheat sheet stuff I missed (equations, Laplace transforms)
+
+
+
+- Random formulas
+  - Eigenvalues of a matrix
+  - Determinant of a matrix

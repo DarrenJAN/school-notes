@@ -69,7 +69,7 @@
 
 <img src="./se380-images/8.png" alt="alt text" style="zoom:40%;" />
 
-- EQN: single input single output system with impulse response input $y(t) = C^{eAt}B1(t) + Dδ(t)$
+- EQN: single input single output system with impulse response input $y(t) = Ce^{At}B1(t) + Dδ(t)$
 
 #### 3.4 Stability of state-space models
 
@@ -280,6 +280,31 @@
 
 
 
+## Chapter 9
+
+#### Lag Compensator
+
+- goal:meet the phase margin by adjusting the magnitude plot, not by adjusting the phase
+- If we dropped magnitude then the gain crossover freq would move to the left, increasing phase margin. But we have already set our low-freq-gain to meet error requirements
+- Sample Lag C(s) Bode Plot:
+
+- ![Screen Shot 2019-12-09 at 10.35.08 AM](/Users/scottsandre/git/school-notes/3b/se380-images/Screen Shot 2019-12-09 at 10.35.08 AM.png)
+- Bode plot of a lag Controller, we see 0dB at low freq. so it doesn't change the gain at low freq. which is what we want
+- Recall: we want to reduce gain of the system without changing the phase too much. On the right side of the bode plot we see that the phase change is minimal and the magnitude has been decreased significantly. This is what we want
+- So we want to put THIS section of the lag compensator over the region of the plant that we want to adjust
+- $w_{gc}$ Will be increased for a lead and decreased for a lag compensator
+- $w_{gc}$ Is related to the speed of a control system. So with a LAG we have SLOWED down the system
+
+#### Lead Compensator
+
+- Bandwidth: when the gain drops to -3dB
+- Goal: for K*P(s) bode plot we want to shift the phase margin up without disturbing the gain that much
+- If you compare compensated system vs KP(s) you will see that gain is virtually the same for low frequency and only differs at high frequency slightly, despite large changes made to phase
+- Lead Controller Bode plot:
+- ![Screen Shot 2019-12-09 at 11.18.29 AM](/Users/scottsandre/git/school-notes/3b/se380-images/Screen Shot 2019-12-09 at 11.18.29 AM.png)
+
+
+
 #### Notes from doing problem sets
 
 - if $G(s)$ is over damped, then the response is not oscillatory ($\zeta > 1$)
@@ -288,3 +313,4 @@
 - steady state gain of a BIBO system with a rational transfer function $G(s)$ is $G(0)$
   - if input $u(t) = b 1(t)$ and $G(s)$ is BIBO stable then $y_{ss} = bG(0)$
 - if $G(s)$ is stable, and we have system r (input), controller, plant, output, with feedback; and $G$ is BIBO stable, then we know steady state gain is $G(0)$. If $r(t)$ is constant, then we know that $y_{ss} = r_0 \times G(0)$
+

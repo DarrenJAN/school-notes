@@ -50,6 +50,33 @@
   // Foo then returns and continues here
   ```
 
+- Non-Local transfer
+
+  ```
+  jump_buf name;
+  setjmp(jump_buf)
+  lonjmp(jump_buf, xxx)
+  
+  jmp_buf env; //delcare
+  int main() {
+  	int val = setjmp(env); // L = L1
+  
+    if (val == 0) {
+      // first time through
+      foo()
+    } else {
+      // second time through; val was re-assigned after longjmp
+    }
+  }
+  
+  func foo() {
+  	longjmp(env, 1); 
+  }
+  
+  ```
+  
+  
+
 - coroutine
 
   ```
@@ -80,11 +107,23 @@
   }
   ```
 
+  - This vs uThisCoroutine
+    - This is the current object we are inside of; uThisCoroutine is the current stack we are running on 
+    - So C1 is running. uThisCoroutine is C1. This is C1
+    - C1 calls C2.publicMethod()
+    - Inside of C2.publicMethod(), while it is running, uThisCoroutine is C1, and this is C2.
+    - Once c2.publicMethod() calls resume, it suspends uThisCoroutine (c1), and resumes this (c2)
+
 - uC++ Exception Handling
 
+  - Can only throw exception types that are of type `_Event`
   - throwing: `_Throw [except]` or `_Resume [except] [_At anotherCoroutineVar]`
     - able to throw by the child class
   - handling: `_CatchResume`; if catchResume'd, then it continues from the next line of the CALLER
+  - In order to receive an Event that was "thrown" at you, you need to `_Enable <type1><type2> <...>`
+  - When a Coroutine throws E(), but does not catch it, then `uBaseCoroutine::UnhandledException` is raised at its last RESUMER, not at its starter
+
+## Chapter 5: Concurrency
 
 - low-level thread creation
 
@@ -97,7 +136,12 @@
   int ret = WAIT(tf); // waits for tf thread to finish
   ```
 
+- Mutual exclusion game (SPALS)
+  
+  - Security (only 1 in critical section at a time)
+  
 - software locks
+  
   - Yale (simple, bad spin lock; board says open or closed; breaks rule 1 (2ppl can be in same time)
   
   - Alternation (board says who was last in; can't go twice in a row; breaks rule 3; you control who else can go in while you are away at school)
@@ -164,7 +208,11 @@
 - hardware implementations
   
   - Test and set; swap; fetch and increment
-  
+
+
+
+## Chapter 6: Locks
+
 - locks
   - general
     - synchronization: be able to let S1 in T1 come before S2 in T2
@@ -325,7 +373,7 @@
 
 
 
-## Chapter 10: Direct Communication
+## Chapter 9: Direct Communication
 
 ```
 _Task {
@@ -341,6 +389,7 @@ private:
 ```
 
 - External Scheduling
+  
   - Try and do as much work inside of `_Task::main` inside of `_Accept(foo) { .. do work .. }` calls, such that public API methods do less work (callers do less work)
 - Internal Scheduling
   - Need to have duplicate order of Accept(insert) and Accept(remove) so there is no starvations
@@ -370,9 +419,9 @@ private:
 
     - `operator()` gets a read-only copy of the future RESULT
 
-    - `reset` mark as unavailable
+    - `reset()` mark as unavailable
 
-    - `cancel` : waiting clients are woken up, exception `uCancellation` is raised
+    - `cancel()` : waiting clients are woken up, exception `uCancellation` is raised
 
     - Wait for different futures to be ready? `_Select` statement
 
@@ -398,4 +447,7 @@ private:
   - live-lock
   - starvation
   - deadlock (synchronization vs mutex)
-  - 
+  - thread
+  - process
+  - Task
+- 

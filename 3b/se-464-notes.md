@@ -15,11 +15,11 @@
 - conceptual fabric that defines a system
 - role of designers: take radical problems and turn them into normal solutions
 - all architecture is design, but not all design is architecture
-- parts of a system that would be difficult to change once the system is built
+- ==parts of a system that would be difficult to change once the system is built==
 - 3 dimensions:
-  - structure (MVC?)
-  - communication (how do components talk to one another)
-  - nonfunctional requirements (performance, scalability; extensible, influence design choices)
+  - ==structure== (MVC?)
+  - ==communication== (how do components talk to one another)
+  - ==nonfunctional requirements== (performance, scalability; extensible, influence design choices)
 - is
   - all about communication
   - what parts are there? 
@@ -45,8 +45,8 @@
   - interaction
   - non-functional properties
 - functional vs non-functional requirements
-  - Function requirements: define specific behaviour; what a system is supposed to **do**
-  - Non-functional requirements: specify criteria that can be used to judge the operation of a system; how a system is supposed to **be**
+  - ==Function requirements==: define specific behaviour; what a system is supposed to **do**
+  - ==Non-functional requirements==: specify criteria that can be used to judge the operation of a system; how a system is supposed to **be**
 
 - stakeholders in a system's architecture
   - engineers, architects, developers, etc
@@ -56,33 +56,33 @@
 
 ### Key Definitions
 
-- what is principal?
+- what is ==principal==?
   - principal implies a degree of importance that grants a design decision architectural status
   - definition depends on system goals
 - prescriptive vs descriptive architecture
-  - Prescriptive: captures the design decisions made prior to the system's construction; **as-intended**
-  - Descriptive: describes how the sytem has been built; **as-implemented**
+  - ==Prescriptive==: captures the design decisions made prior to the system's construction; **as-intended**
+  - ==Descriptive==: describes how the system has been built; **as-implemented**
 - architectural evolution
   - as a system evolves, ideally its prescriptive architecture is modified first
   - in practice, the descriptive architecture is modified directly
   - due to developer sloppiness, deadlines, lack of planning, need for optimizations
 - architecture degradation
-  - architecture drift: introduction of principal design decisions into a system's descriptive architecture that are not included in the prescriptive architecture but do not violate any prescriptive design decisions
-  - architecture erosion: into of design decisions that violate prescriptive plan
-- architecture recovery
+  - ==architecture drif==t: introduction of principal design decisions into a system's descriptive architecture that are not included in the prescriptive architecture but do not violate any prescriptive design decisions
+  - ==architecture erosion==: into of design decisions that violate prescriptive plan
+- architecture ==recovery==
   - hard to recover what the nonfunctional requirements were from source code
 - architecture elements
   - processing
   - data (information; state)
   - interaction
-- components
+- ==components==
   - elements that encapsulate processing and data
   - defn: a software components is an architectural entity that
     - encapsulates a subset of the systems functionality / data
     - restricts access using a defined interface
     - has explicitly-defined dependencies
     - usually are application-specific
-- connectors
+- ==connectors==
   - interaction might become more important and challenging than functionality of individual components
   - defn: a building block tasked with effecting and regulating interactions among components
   - important because you have performance considerations and tradeoffs
@@ -90,13 +90,13 @@
     - procedure call
     - shared memory (pointer)
     - message passing
-- configurations
+- ==configurations==
   - defn: also called a topology, is a set of associations between components and connectors
 - deployment
   - a software system cannot fulfill its purpose until it is deployed
   - executable modules are physicalled placed on hardware devices on which they are to be run
 - possible assessment dimensions: available memory, power consumption, required network bandwidth
-- essential difficulties (hard to overcome)
+- ==essential difficulties== (hard to overcome)
   - complexity
   - conformity: system is dependent on its environment
   - Intangibility: hard to manage or understand; not constrainted by physical laws
@@ -319,7 +319,6 @@ public class ShapeFactory {
 
 - an interface (super factory) is responsible for creating a factory of related objects without explicitly specifying their classes
 - isolates client code from concrete implementation factory classes
-- 
 
 ```java
 interface Shape {
@@ -337,10 +336,10 @@ class Rectangle implements Shape {
 class Square implements Shape {
 	void draw() { print("SQUARE") }
 }
-abstract class AbstractFactory {
+abstract class Factory {
 	abstract Shape getShape(String type)
 }
-class NormalShapeFactory extends AbstractFactory {
+class NormalShapeFactory extends Factory {
 	Shape getShape(String type) {
 		if type is SQAURE
 			return new Square()
@@ -348,7 +347,7 @@ class NormalShapeFactory extends AbstractFactory {
 			return new Rectangle()
 	}
 }
-class RoundedShapeFactory extends AbstractFactory {
+class RoundedShapeFactory extends Factory {
 	Shape getShape(String type) {
 		if type is SQAURE
 			return new RoundedSquare()
@@ -357,10 +356,18 @@ class RoundedShapeFactory extends AbstractFactory {
 	}
 }
 class FactoryProducer { // this is what you use to get your factory
-	static AbstractFactory getFactory(boolean isRounded) {
+	static Factory getFactory(boolean isRounded) {
 		if is rounded return RountedShapeFactory()
 		else return NormalShapeFactory()
 	}
+}
+
+void main() {
+  	Factory f = FactoryProducer.getFactory(isRounded=false);
+    Shape normalSquare = f.getShape("square");
+  
+  	Factory f2 = FactoryProducer.getFactory(isRounded=true);
+  	Shape roundedRect = f2.getShape("rectangle")
 }
 ```
 
@@ -508,7 +515,7 @@ main {
 
 #### Bridge Pattern
 
-- separate the abstraction from the implementation
+- ==separate the abstraction from the implementation==
 - client codes to the abstraction (interface) without being concerned about the implementation
 - abstraction has a reference to the implementor
 - Note: adapter helps things work AFTER they've been created; Bridge designs classes such that they work up front and let abs/impl vary independently
@@ -573,7 +580,7 @@ abstract class Vehicle {
 class Car extends Vehicle {
   @Override String description() { return "I am a car" }
 }
-class Decorator extends Vehicle {
+abstract class Decorator extends Vehicle {
   protected Vehicle component;
   public Decorator(Vehicle v) { this.component = v}
   // does NOT override description()
@@ -606,6 +613,8 @@ main {
 
 
 #### Facade Pattern
+
+- Be like an API or system / library interface to make using lots of their components easier
 
 ```java
 class Oven {
@@ -734,6 +743,115 @@ main {
     Player p = PlayerFactory.getPlayer(randomType())
     p.assignWeapon(randomWeapon())
     p.mission() // send them on their mission
+}
+```
+
+
+
+### Behavioural Patterns
+
+- Identify common communication patterns between objects; increase flexibility in carrying out this communication
+- Interpreter, Template, chain of responsibility, command, iterator, mediator, memento, observer, state, strategy, visitor
+
+#### Visitor
+
+- Separate an algorithm from an object structure on which it operates
+- Can add new operations to an existing object without modifying those structures
+
+```java
+abstract class Weapon {
+  void strike(Soldier s); // visit
+  void strike(Troll t);
+}
+
+class Sword extends Weapon {
+  void strike(Solider s) {
+    s.health -= 1;
+  }
+  
+  void strike(Troll t) {
+    t.health -= 2;
+  }
+}
+
+abstract class Enemy {
+  void beStruckBy(Weapon w); // accept
+}
+
+class Soldier extends Enemy {
+  void beeStruckBy(Weapon w) {
+    w.strike(this);
+  }
+}
+
+class Troll extends Enemy {
+  void beeStruckBy(Weapon w) {
+    w.strike(this);
+  }
+}
+```
+
+- ==Double dispatch==: dispatches a function call to different concrete functions based off of the runtime type of the two objects involved
+- ==Single dispatch==: for most calls in an OOP language, the concrete function that is called depends only on the runtime type of one object
+
+
+
+#### Subject / Observer Pattern
+
+```java
+abstract class Observer {
+  void getNotified()
+}
+
+abstract class Subject {
+  List<Observer> observers;
+  void attach(Observer o); // add to observers
+  void detach(Observer o); // remove
+  void notifyAll(); // call o.getNotified() for all observers
+  State getState();
+}
+
+class Election extends Subject {
+  void electionIsOver() {
+    notifyAll()
+  }
+}
+
+class NewsStation extends Observer {
+  void getNotified() {
+    ...
+  }
+}
+```
+
+
+
+#### Template method pattern
+
+- Uses a skeleton 
+
+```java
+abstract class PhoneBill {
+  abstract double getPlanBill();
+  double getTotalBill()  {
+    int bill = 0;
+    bill += 10; // base rate
+    bill += getPlanBill(); // abstract away to a conrete type
+    bill *= 1.13; // tax
+    return bill
+  }
+}
+
+class CheapPhoneBill extends PhoneBill {
+  double getPlanBill() {
+    return 10;
+  }
+}
+
+class ExpensivePhoneBill extends PhoneBill {
+  double getPlanBill() {
+    return 20;
+  }
 }
 ```
 
@@ -914,9 +1032,9 @@ main {
   - REST API / Microservices
     - Components in any programming language, exchange information over standard HTTP protocols to affect state
 
-- Design Recovery
-
-- Syntactic Clustering
+- ==Design Recovery==: examine existing code base, determine overall topology; uses 2 types of clustering
+  - ==Syntactic Clustering==: static relationships; coupling and cohesion
+  - ==Semantic clustering==: behavioural information; difficult to automate; executing system on different inputs
 
 - Greenfield Design
 
@@ -930,9 +1048,9 @@ main {
 
 ## Let 08: Architecture Modelling
 
-- What is an architecture model?
+- What is an ==architecture model==?
   - Recall: all architecture is design, but not all design is architecture
-  - Artifact that captures some or all of the design decisions that comprise a system's architecture
+  - ==Artifact that captures some or all of the design decisions that comprise a system's architecture==
 - How do we choose what to model?
   - Which decisions and concepts
   - Which level of detail
@@ -979,11 +1097,11 @@ main {
 
 ## Lec 08: Security
 
-- NFP: Security
+- NFP: ==Security==
   - The protection afforded to an automated information system in order to attain the applicable objectives of preserving the integrity, availability, and confidentiality of information system resources (hardware, software, firmware, data)
-  - Confidentiality: prevent unauthorized parties from accessing information
-  - Integrity: only authorized parties can manipulate data
-  - Availability: accessible by authorized parties on all appropriate occasions
+  - ==Confidentiality==: prevent unauthorized parties from accessing information
+  - ==Integrity==: only authorized parties can manipulate data
+  - ==Availability==: accessible by authorized parties on all appropriate occasions
 - Design Principles for Security (9)
   - Least Privilege: 
     - Only the minimum necessary rights should be assigned to a subject that requests access to a resource and should be in effect for the shortest duration necessary (remember to relinquish privileges)
@@ -1006,12 +1124,12 @@ main {
 
 ## Lec 10: Design
 
-- Analysis
+- ==Analysis==
   - Domain-level modelling of real world objects
-- Design
+- ==Design==
   - Modelling of implementation objects
 - Design process: measure --> learn --> build --> repeat
-  - Are you just trying to understand the problem domain?
+  - alAre you just trying to understand the problem domain?
   - Or are you now trying to focus on the implementation?
 - Motivation
   - We want specific notations that let us represent these design ideas in code
@@ -1028,7 +1146,7 @@ main {
     - Increased abstraction == decreased control
     - Composition instead of inheritance 
 - Design Principles
-  - STUPID Principles
+  - ==STUPID Principles==
     - Singleton (shared global state is bad)
     - Tight Coupling
     - Untestable (large functions, can't mock)
@@ -1037,20 +1155,23 @@ main {
       - Do use nouns for class names
       - Do use verbs for function names
     - Duplication
-  - SOLID Principles: https://itnext.io/solid-principles-explanation-and-examples-715b975dcad4
-    - Single Responsibility Principle
-    - Open/Closed Principle
+  - ==SOLID Principles==: https://itnext.io/solid-principles-explanation-and-examples-715b975dcad4
+    - ==Single Responsibility Principle==
+      - Classes should only have one major task
+    - ==Open/Closed Principle==
       - Open for extensions closed for modifications
       - Template method in super class, calls other methods, maybe some are implemented or some are abstract
       - Then you have subclasses that can adapt the behaviour
-    - Liskov Substitution Principle
+      - Allow for its behaviour to be extended WITHOUT modifying its source code
+      - Essentially; just use interfaces (or abstract base classes)
+    - ==Liskov Substitution Principle==
       - You want subtypes to behave consistently with super types
       - If you have a method in the super class that accepts all integers, then you DONT want to have a child class that implements the same function but throws if you pass in a negative integer
-    - Interface Segregation Principle
+    - ==Interface Segregation Principle==
       - Don't add extra methods to an interface if it doesn't relate to that interface
       - Just make a new interface instead
       - Pick the smallest implementation that provides what you need
-    - Dependency Inversion Principle
+    - ==Dependency Inversion Principle==
       - Have dependencies between high level abstractions (have dependencies between Observer and Subject, not on concrete implementations)
   - Lower-Level Principles
     - Program to abstractions (interfaces), not to implementations (classes)
@@ -1125,8 +1246,8 @@ main {
 
   - **Subclass**:
 
-    - **Less strict pre-conditions**
-    - **More-strict post-conditions**\
+    - **Less strict pre-conditions** (accept more general)
+    - **More-strict post-conditions** (return more specific)
 
 - Visitor
 
@@ -1180,7 +1301,6 @@ main {
     - Tight coupling between the data structures between these components
     - Bad re-use
     - Tight coupling between view and controller
-
   - Model View Presenter MVP
     - Presenter only takes primate common data structures
       - Glues model and view together; breaks down domain objects into primitives
@@ -1188,8 +1308,12 @@ main {
       - Only interacts with primitives
       - Does not interact with domain logic
       - Better separation
-  - Model View View Model
+  - Model View ViewModel
     - Have another view model...
+    - Good for event-driven programming
+  - MVC vs MVP
+    - MVP: easier to test; each view has its own presenter; interaction with view is through an interface; view is in charge
+    - MVC: harder to test; one controller; controller determines which view to show; all views use the same controller; view is more tightly coupled to the model; controller is in charge
 
 - Midterm Review
   - Stakeholder Questions:
@@ -1321,7 +1445,95 @@ main {
 - Security: CIA
   - ? ? ?
 
-## Lec 17
+## Lec 14: Dependency Injection
+
+- SOLID. D stands for dependency inversion
+
+  - High level modules should depend on abstractions, not low-level concrete implementations
+  - Minimizes direct coupling between concrete classes
+  - Program to interfaces not to implementations
+  - Details should depend on abstractions
+  - Often manifests itself in object creation
+  
+- IoC: inversion of control
+
+  - Custom-written (concrete, specific) parts of a program receive the flow of control from a generic framework
+
+- Dependency inversion (more)
+
+  - Want to eliminate coupling between concrete classes
+  - Want to be able to substitute different implementations without recompiling
+  - Solution: separate objects from their assemblers
+
+- Eliminate initialization statements
+
+  - `Foo f = new ConcreteFoo()`
+  - Takes a set of components (classes, interfaces)
+  - Adds a set of configuration metadata
+  - Provides the metadata to a dependency injection framework
+  - Bootstraps object creation with a configured injector
+
+- Googl Guice
+
+  ```
+  public class BillingModule extends AbstractModule {
+  	@Override
+  	protected void configure() {
+  		bind(Foo.class).to(SimpleFoo.class);
+  		bind(Bar.class).to(ExpensiveBar.class);
+  		bind(BillingService.class).to(RealBillingService.class);
+  	}
+  }
+  
+  public class RealBillingService implements BillingService {
+  	// Guice automatically instantiates the correct objects
+  	// determines which concrete implementations get injected into constructor arguments
+  	@Inject
+  	public RealBillingService(Foo foo, Bar bar) {
+  		this.foo = foo;
+  		this.bar = bar;
+  	}
+  }
+  
+  public static void main(String[] args) {
+  	Injector inj = Guice.createInjector(new BillingModule());
+  	BillingService b = injector.getInstance(BillingService.class);
+  }
+  ```
+
+  
+
+## Lec 15: Cloud Web Services
+
+- Cloud/REST architectures
+
+  - Pre-cursors
+    - Grid computing: super-computers; lots of computers put together; work on parallel tasks
+
+  - Model for enable convenient, on-demand network access to a shared pool of configurable computing resources (networks, servers, storage, applications, services) that can be rapidly provisioned and released with minimal management effort or service provider interaction
+
+  - Promotes availability
+
+  - 5 essential characteristics (OBRRM)
+
+    - On-demand self service (clients can provision computing capabilities without human interaction)
+    - Broad network access (capabilities available over network)
+    - Resource pooling (computing resources are pooled to serve multiple consumers); location independence
+
+    - Rapid elasticity (resourced can be added/removed easily)
+    - Measured service (metering; storage; bandwidth)
+    - Benefits?
+      - Agility; scalability; cost; reliability; security
+
+  - 3 service models (___ as a service)
+    - Infrastructure (IaaS) vendor provides resources
+    - Platform (PaaS) vendor controls the environment
+    - Software (Saas) vendor controls the application
+  - 4 deployment models
+
+
+
+## Lec 17: Code Quality
 
 ```
 class A only has an add(T t) function
@@ -1343,18 +1555,156 @@ bar(A <? super Number> a) // can pass in another that is Number of higher than n
 // can pass in Object
 ```
 
-
+- Liksov Substitution Principle
+  - Subtypes should behave as their parent types
+  - If B inherits from A, and A has a method foo, then be must have foo but can change things a bit
+  - B can RETURN more specific, and B's params can ACCEPT more general
 
 ## Lecture 18: Optional Type Systems & Checker Framework
 
+- Lots of errors that we miss
+  - Not sanitizing user input
+  - Insert object into hash map; then change that object; then say map.get(my object). Object has changed so its hash value has changed, too. So this is an error
 - Never directly use user input to perform some type of important action or system call -> always check it and sanitize it first to make sure it's good
   - Ex: SQL injection attack
-- `@Untaintesd`
-- False Positive: an error message that points to something that isn't actually an error
-- Checker itself might contain an error
-  - Theoretical: this is how the type system works
-  - Implementation problem
+- But given code that uses tainted input, we can't directly tell where the defect/error is; it depends on our specification
+- So we use annotations like `@Untainted | @Tainted` to help with the specification
+- `@Immutable`
+- Benefits:
+  - Improves documentation; helps you find bugs
+  - Aids compilers
+- Negatives:
+  - False Positive: an error message that points to something that isn't actually an error
+  - Checker itself might contain an error
+    - Theoretical: this is how the type system works
+    - Implementation problem
 - `@Regex(1) foo = "..."` typechecks that foo has at least ? Or only ? 1 group
+
+## Lecture 19: Building a Type System
+
+- Java 8: `Optional<T>` type
+  - `bool isPresent()`
+  - `T get()`
+
+- Defining a type system
+
+  1. Type hierarchy (sub-typing)
+
+     - Type = type_qualifier + java basetype
+     - `@NonNull String foo;`
+     - `@Nullable <-- @NonNull`
+     - @Nullable is the DEFAULT
+
+  2. Type rules (what operations are illegal)
+
+     ```
+     // @MaybePresent <--- @Present
+     // for optionals
+     @Present Optional<String> foo;
+     <------> 									type qualifier
+     				<---------------> java basetype
+     <---------------------> 	type
+     class Optional<T> {
+     	T get(@Present Optional<T> this)
+     }
+     ```
+
+  3. Type introduction (what types for literals)
+
+  4. Dataflow (run time tests)
+
+  ```
+  if (x != null) {
+  	// x is @NonNull here
+  	...
+  }
+  // x is @Nullable again here
+  
+  @Nullable Foo f;
+  f = new Foo()
+  // f is @NonNull here
+  f = unknownVal
+  // f is @Nullable here
+  ```
+
+
+## Lecture 21:
+
+- @NonNull: will never be null
+
+- @Nullable: might be null
+
+- @SideEffectFree: does not modify externally visible state // not checked, this is trusted
+
+- @Deterministic: if called with args, then it returns the same args (according to == comparator)
+
+- @Pure: both side-effect-free and deterministic
+
+- @MonotonicNonNull: might be null or might be non-null. May only be (re-)assigned a non-null value. So you can avoid re-checking. Once non-null, always non-null
+
+- @RequiresNonNull: lets you state non-null-requirements for values inside an object
+
+  ```
+  class MyClass {
+  	String other
+  }
+  @RequiresNonNull({ "other.foo" })
+  void method(@NonNull MyClass other) {
+  	...
+  	other.foo.toString()
+  	...
+  }
+  ```
+
+- @EnsuresNonNull
+
+- @EnsuresNonNullIf
+
+- @PolyNull: creates two output instances for every 1 usage instance. One with it replaced by @Null and another with it replaced by @NonNUll
+
+  ```
+  @PolyNull String foo(@PolyNull String a) ...
+  	if a is null return a
+  	else return a.foo
+  creates
+  
+  @Null String foo(@Null String a)
+  and
+  @NonNull String foo(@NonNull String a)
+  ```
+
+  
+
+## Chapter 23: Symbolic Execution
+
+- Fuzzing
+  - Feed random inputs in and check for abnormal behaviour 
+  - American Fuzzy Lop (AFL)
+  - libFuzzer
+- Symbolic Execution:
+  - Automatically explore program paths
+  - Execute program on symbolic input values
+  - Fork execution at each branch
+  - Generates test cases
+  - Used to reason about all inputs that take the same path through a program; uses a symbolic value for the input variable; then collects symbolic path conditions to help you determine what are good input values that will test all parts of the code
+  - Symbolic State is a pair S = (Env, PC) where
+    - Env: L->E is a mapping / environment, from program variables to symbolic expressions
+    - PC is a first-order-logic formula called a path condition
+  - difficulties
+    - Loops, complex flow, procedures
+    - Environment: pointers, data structures, files, databases, threads, etc
+- EXE ALgorithm
+  - Same as symbolic execution but now for a given path condition you give the symbolic state of each input variable S(x) and the concrete state of all local and input variables C(x); that way by the end you know exactly what concrete states work (need to be tested)
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1362,13 +1712,25 @@ bar(A <? super Number> a) // can pass in another that is Number of higher than n
 
 ## Readings
 
-###[What should a Software Engineering Course look like?](http://tomasp.net/blog/2019/software-engineering/)
+#### 4 + 1 View Model Architecture
 
-- SE has become a course trying to cover whatever methods and tools the industry needs; not practical (keep changing)
-- what about SE will still be relevant in 100 years?
-- what are the mortifications that led to ideas like waterfall and agile? (agile = need for more rapid response)
-- what was the context in which UML appeared? Metaphor or an architect who designs a master rplan for a system
-- believes that universities should teach historically situated software engineering as it provides a framework for critical thinking about software engineering, and past examples to guide this thinking
+- Logical view (classes)
+  - Functional requirements; UML diagrams; ER diagrams
+- Process view (concurrency and synchronization)
+  - Groups and networks of different processes
+  - Some NFPs (performance, availability)
+- Physical view (software -> hardware)
+  - NFPs: reliability; scalability; performance 
+  - Map needs onto software nodes (servers, processors); development vs production 
+  - 1
+- Development view 
+  - Decomposed into different libraries and modules; those are decomposed into different layers
+  - Team organization; cost planning; portability; imports / exports
+- Use cases / scenarios view
 
 
 
+#### Design patterns vs arch patterns
+
+- How the major parts of the system fit together; how messages and data flow through it;
+- Scaffolding; framework upon which everything rests

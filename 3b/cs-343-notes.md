@@ -1,4 +1,4 @@
-# CS 343: Concurrent and Parallel Programming
+#  CS 343: Concurrent and Parallel Programming
 
 ## Intro
 
@@ -1613,19 +1613,68 @@ uCondLock x, y, *z; z = new uCondLock;
 
 ## Chapter 10: Optimization
 
-- Re-ordering: how to get it out of memory into registers as quickly as you can
-- Just like with caching, you want the most commonly-used variables in the registers
-- Problem: doesn't do well with context switching, unloading all registers into memory from program 1, load variables from memory into registers for program 2
-  - So how to optimize across context switching?
+- Sequential optimization
+  - Reordering, eliding (removal of unnecessary code), replication
+- Using cache
+  - Re-ordering: how to get it out of memory into registers as quickly as you can
+  - Just like with caching, you want the most commonly-used variables in the registers
+  - Problem: doesn't do well with context switching, unloading all registers into memory from program 1, load variables from memory into registers for program 2
+    - So how to optimize across context switching?
+  - Cache line: loads in registers to hardware cache for each variable???
+- Cache coherence
+  - Unlike registers, all cache values are shared in a CPU. So we can replicate variables
+  - Strong memory ordering: reading always returns last value written
+- Concurrent optimization
+  - Weak memory ordering: can return old / future value
 
 
 
 ## Chapter 11: Other Approaches
 
+- Atomic (lock-free) data structure: have operations, which are critical sections, but are performed without ownership
+- CAA: compare and assign instruction
 
+```
+bool CAA(int & val, int comp, int newval) {
+	// begin atomic
+	if (val == comp) {
+		val = newval;
+		return true;
+	}
+	return false
+	// end atomic
+}
 
+Stack::push()
+	n.next = top
+	if CAA(top, n.next, n) break
 
+Stack::pop()
+	if CAA(top, t, t->next) break
+	// if curr is top, then set curr => curr.next
+```
 
+- ABA problem
+  - Pathological failure for series of pushes and pops
 
+### 11.4 Concurrency Languages
 
- 
+- Ada 95
+  - When clause is only used at start of entry routine not within
+  - When can contain only global variables
+  - Select only within task main
+  - No direct internal scheduling (no condition variables)
+  - Re-queue: make a blocking call to another mutex member
+  - Issue with "accumulated temporary results"
+- java
+  - Requires `t.start()` to start a thread (explicit)
+  - `join()`: termination synchronization
+- go
+  - No direct communication
+- pthreads
+  - pthread_create,
+  - pthread_join // wait for thread termination and result
+
+## Extra
+
+- the **ABA problem** occurs during synchronization, when a location is read twice, has the same value for both reads, and "value is the same" is used to indicate "nothing has changed". However, another thread can execute between the two reads and change the value, do other work, then change the value back, thus fooling the first thread into thinking "nothing has changed" even though the second thread did work that violates that assumption.
