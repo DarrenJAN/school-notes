@@ -1131,20 +1131,15 @@ having count(author) = 1
   set X' = X ====> X -> X'
   	while true
   		pick a Y -> Z from F such that
-  			Y contained in X' =====> X -> X'Y
+  			Y contained in X' =====> X -> X'-> X'Y
   			Z not contained in X'
-  			also, from the selection, 
+  			so, from the selection, 
   				Y -> Z =====> X'Y -> ZY
   			from transitivity we get X -> ZY
   ```
 
-  ```
-  another example:
   
-  ```
-
   
-
 - Theorems
 
   - X is a super key of R if and only if ComputeX+(X,F) = R
@@ -1343,7 +1338,7 @@ l, h -> a
 
 
 
-## Database Turning and Physical Design: Basics of Query Execution
+## Lect 15: Database Turning and Physical Design: Basics of Query Execution
 
 - Transaction manager (manage requests from different request processors into one stream), such that they satisfy ACID properties
 - Recovery manager: responsibly for durability and atomicity
@@ -1376,7 +1371,7 @@ l, h -> a
 
 
 
-## Database Tuning and Physical Design: Execution of Transactions
+## Lect 16: Database Tuning and Physical Design: Execution of Transactions
 
 - Concurrent assumptions
 

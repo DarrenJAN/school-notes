@@ -186,4 +186,73 @@
   sin, pnum, hours, ename, pname, ploc, allowance (4)
   ```
 
-  
+
+- BCNF decomposition
+
+  - Rules:
+    - A schema `R` and a list of function dependencies `F` is in BCNF iff whenever `X->Y` is in` F+` AND `XY` contained in `R` then
+      - `X->Y` is trivial (so `Y` contained in `X`), OR
+      - `X` is a super key of `R`
+  - algorithm
+
+  ```
+  function ComputeBCNF (R, F):
+  	result = {R}
+  	while not done:
+  		if there is a schema Ri in result that is not in BCNF:
+  			let A -> B be a nontrivial FD that holds on Ri
+  			such that A+ does not contain Ri and A INTERSDECT B = {}
+  			result = (result - Ri) UNION (Ri - B) UNION (A,B)
+  	return result
+  ```
+
+  - example
+
+```
+relation:
+class(course_id, title, dept_name, credits, sec_id, semester, year, building, room_number, capacity, time_slot_id)
+
+FDs:
+1. course_id -> title, dept_name, credits
+2. building, room_number -> capacity
+3. course_id, sec_id, semester, year -> building, room_number, time_slot_id
+
+candidate key: course_id, sec_id, semester, year
+- it entails all of class
+
+******************************************************
+iteration 1:
+- class is not in BCNF
+- course_id -> title, dept_name, credits
+	- is NOT a super key and
+	- is NOT trivial
+- so we create
+// REMOVE title, dept_nam, credits FROM CLASS
+class1(course_id, sec_id, semester, year, building, room_number, capacity, time_slot_id)
+and
+course(course_id, title, dept_name, credits)
+
+******************************************************
+iteration 2:
+- class 1 is not in BCNF
+- building, room_number -> capacity
+	- not NOT a super key and
+	- is NOT trivial
+- so we create
+// REMOVE capacity from CLASS1
+class2(course_id, sec_id, semester, year, building, room_number, time_slot_id)
+and
+classroom(building, room_number, capacity)
+
+******************************************************
+iteration 3:
+- class 2 is in BCNF, so is classroom and course
+
+we are done
+
+we are left with
+class(course_id, sec_id, semester, year, building, room_number, time_slot_id)
+classroom(building, room_number, capacity)
+course(course_id, title, dept_name, credits)
+```
+
