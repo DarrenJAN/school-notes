@@ -201,6 +201,7 @@
   	while not done:
   		if there is a schema Ri in result that is not in BCNF:
   			let A -> B be a nontrivial FD that holds on Ri
+  			// this means that AB must be contained in Ri
   			such that A+ does not contain Ri and A INTERSDECT B = {}
   			result = (result - Ri) UNION (Ri - B) UNION (A,B)
   	return result
@@ -256,3 +257,23 @@ classroom(building, room_number, capacity)
 course(course_id, title, dept_name, credits)
 ```
 
+- Serialization / precedence graph
+  - Given a list of histories of reads, writes performed by a set of transactions, we will construct a serialization graph
+  - We will add $T_i \rightarrow T_j$ if and only if one of the following holds
+    - $T_i$ Writes Q before $T_j$ reads Q
+    - $T_i$ Reads Q before $T_j$ writes Q
+    - $T_i$ Writes Q before $T_j$ writes Q
+  - If the precedence graph has a cycle then schedule S is not conflict serializable
+  - Else it is
+- Transaction Isolation Levels
+  - Serialization allows programmers to ignore concurrency issues when they code transactions
+  - But the protocols needed to allow serialization might not allow enough concurrency (parallel execution) to take place, thus hindering performance
+  - Different levels of isolation help longer transactions that do not need to be precise
+  - Levels
+    - Serializable. Highest level
+      - Use when you need exclusive access; touching all rows; doing a count all; figuring out min or max over a range
+    - Repeatable read. Only committed data can be read. Data item can't be updated between reads.
+    - Read committed: only committed data can be read.
+      - Writing to one row
+    - Read uncommitted: lowest isolation level allowed by SQL
+      - When you do not need a lock (reading 1 row)
